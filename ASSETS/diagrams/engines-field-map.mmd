@@ -1,0 +1,90 @@
+graph TB
+    subgraph "🔮 Divination Engine Field"
+        Core[🧿 Engine Core<br/>Pattern Recognition]
+        
+        subgraph "🌌 Archetypal Engines"
+            HD[Human Design<br/>Scanner]
+            GK[Gene Keys<br/>Compass]
+            EN[Enneagram<br/>Resonator]
+            TR[Tarot Sequence<br/>Decoder]
+        end
+        
+        subgraph "🌟 Temporal Engines"
+            VD[Vimshottari Dasha<br/>Timeline Mapper]
+            NU[Numerology<br/>Field Extractor]
+            BR[Biorhythm<br/>Synchronizer]
+            IC[I-Ching Mutation<br/>Oracle]
+        end
+        
+        subgraph "🔺 Symbolic Engines"
+            SG[Sacred Geometry<br/>Mapper]
+            SF[Sigil Forge<br/>Synthesizer]
+        end
+    end
+    
+    subgraph "🌬️ Input Layer"
+        Query[User Query]
+        Birth[Birth Data]
+        Intent[Intention]
+        Field[Current Field State]
+    end
+    
+    subgraph "⚡ Processing Layer"
+        Analysis[Archetypal Analysis]
+        Pattern[Pattern Recognition]
+        Synthesis[Symbolic Synthesis]
+    end
+    
+    subgraph "🌱 Output Layer"
+        Guidance[Guidance Insight]
+        Patch[Reality Patch]
+        Sigil[Generated Sigil]
+        Timeline[Timeline Forecast]
+    end
+    
+    %% Input Connections
+    Query --> Core
+    Birth --> HD
+    Birth --> GK
+    Birth --> VD
+    Birth --> NU
+    Birth --> BR
+    Intent --> SF
+    Field --> EN
+    Field --> TR
+    Field --> IC
+    
+    %% Engine to Processing
+    HD --> Analysis
+    GK --> Analysis
+    EN --> Pattern
+    TR --> Pattern
+    VD --> Synthesis
+    NU --> Synthesis
+    BR --> Synthesis
+    IC --> Synthesis
+    SG --> Synthesis
+    SF --> Synthesis
+    
+    %% Processing to Output
+    Analysis --> Guidance
+    Pattern --> Patch
+    Synthesis --> Sigil
+    Synthesis --> Timeline
+    
+    %% Styling
+    classDef engineCore fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    classDef archetypal fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef temporal fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef symbolic fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef input fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef processing fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+    classDef output fill:#ffebee,stroke:#b71c1c,stroke-width:2px
+    
+    class Core engineCore
+    class HD,GK,EN,TR archetypal
+    class VD,NU,BR,IC temporal
+    class SG,SF symbolic
+    class Query,Birth,Intent,Field input
+    class Analysis,Pattern,Synthesis processing
+    class Guidance,Patch,Sigil,Timeline output

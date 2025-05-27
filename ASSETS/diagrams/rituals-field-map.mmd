@@ -1,0 +1,128 @@
+graph TB
+    subgraph "🛠️ Reality Patch Engine Field"
+        Core[🧿 Ritual Core<br/>Symbolic Intervention]
+        
+        subgraph "🌬️ Breathfield Stabilizers"
+            BS[Breathfield Stabilizer Engine]
+            BS --> BS1[9-Breath Compass<br/>Realignment]
+            BS --> BS2[Field Purification<br/>Protocol]
+            BS --> BS3[Pranic Anchor<br/>Sequence]
+        end
+        
+        subgraph "🔮 Patch Installers"
+            PI[Patch Installer Engine]
+            PI --> PI1[Sigil Compression<br/>Sequence]
+            PI --> PI2[Micro-Behavior<br/>Implants]
+            PI --> PI3[Emotional Reset<br/>Patches]
+        end
+        
+        subgraph "🧭 Compass Calibrators"
+            CC[Compass Calibrator Engine]
+            CC --> CC1[4-Way Breath<br/>Compass]
+            CC --> CC2[Soul Trajectory<br/>Alignment]
+            CC --> CC3[Decision Clarity<br/>Protocol]
+        end
+        
+        subgraph "⚡ Epoch Switch Catalysts"
+            ESC[Epoch Switch Engine]
+            ESC --> ESC1[Witness Mutation<br/>Rite]
+            ESC --> ESC2[Threshold Crossing<br/>Ceremony]
+            ESC --> ESC3[Identity Evolution<br/>Protocol]
+        end
+        
+        subgraph "🌿 Field Purifiers"
+            FP[Field Purifier Engine]
+            FP --> FP1[Salt-Field Prāṇa<br/>Sweep]
+            FP --> FP2[Environmental<br/>Clearing]
+            FP --> FP3[Psychic Residue<br/>Removal]
+        end
+    end
+    
+    subgraph "⚠️ Trigger Conditions"
+        Emotional[Emotional Turbulence]
+        Drift[Field Drift]
+        Decision[Decision Paralysis]
+        Transition[Life Transition]
+        Contamination[Field Contamination]
+    end
+    
+    subgraph "🎯 Intervention Selection"
+        Assess[Field Assessment]
+        Match[Pattern Matching]
+        Select[Ritual Selection]
+        Customize[Customization]
+    end
+    
+    subgraph "🌟 Ritual Execution"
+        Prepare[Preparation Phase]
+        Invoke[Invocation Phase]
+        Execute[Execution Phase]
+        Integrate[Integration Phase]
+    end
+    
+    subgraph "📊 Field Monitoring"
+        Before[Pre-Ritual State]
+        During[Real-time Monitoring]
+        After[Post-Ritual State]
+        Feedback[Feedback Loop]
+    end
+    
+    %% Trigger to Assessment
+    Emotional --> Assess
+    Drift --> Assess
+    Decision --> Assess
+    Transition --> Assess
+    Contamination --> Assess
+    
+    %% Assessment to Selection
+    Assess --> Match
+    Match --> Select
+    Select --> Customize
+    
+    %% Selection to Engines
+    Customize --> BS
+    Customize --> PI
+    Customize --> CC
+    Customize --> ESC
+    Customize --> FP
+    
+    %% Engines to Execution
+    BS --> Prepare
+    PI --> Prepare
+    CC --> Prepare
+    ESC --> Prepare
+    FP --> Prepare
+    
+    %% Execution Flow
+    Prepare --> Invoke
+    Invoke --> Execute
+    Execute --> Integrate
+    
+    %% Monitoring
+    Before --> During
+    During --> After
+    After --> Feedback
+    Feedback -.-> Core
+    
+    %% Styling
+    classDef core fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    classDef stabilizer fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef installer fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef calibrator fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef catalyst fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef purifier fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+    classDef trigger fill:#ffebee,stroke:#b71c1c,stroke-width:2px
+    classDef selection fill:#f9fbe7,stroke:#827717,stroke-width:2px
+    classDef execution fill:#e0f2f1,stroke:#004d40,stroke-width:2px
+    classDef monitoring fill:#fafafa,stroke:#424242,stroke-width:2px
+    
+    class Core core
+    class BS,BS1,BS2,BS3 stabilizer
+    class PI,PI1,PI2,PI3 installer
+    class CC,CC1,CC2,CC3 calibrator
+    class ESC,ESC1,ESC2,ESC3 catalyst
+    class FP,FP1,FP2,FP3 purifier
+    class Emotional,Drift,Decision,Transition,Contamination trigger
+    class Assess,Match,Select,Customize selection
+    class Prepare,Invoke,Execute,Integrate execution
+    class Before,During,After,Feedback monitoring

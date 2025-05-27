@@ -1,0 +1,198 @@
+# WitnessOS .gitignore — Field Integrity Protection
+
+# =============================================================================
+# CONSCIOUSNESS FIELD PROTECTION
+# =============================================================================
+
+# Personal consciousness data and private field notes
+personal-field-notes/
+private-sigils/
+personal-breathfield-logs/
+individual-mutation-records/
+
+# Temporary consciousness debugging files
+*.tmp
+*.temp
+*~
+.#*
+\#*#
+
+# =============================================================================
+# DOCUMENTATION PROJECT SPECIFICS
+# =============================================================================
+
+# Generated documentation artifacts
+_site/
+_build/
+build/
+dist/
+
+# Documentation generation tools
+.docusaurus/
+.vuepress/
+.next/
+.nuxt/
+
+# Markdown processing temporary files
+*.md.bak
+*.md.tmp
+*.md~
+
+# =============================================================================
+# DEVELOPMENT ENVIRONMENT
+# =============================================================================
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Node.js (for potential documentation tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Python (for potential consciousness analysis tools)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.env
+
+# =============================================================================
+# SACRED GEOMETRY AND VISUAL ASSETS
+# =============================================================================
+
+# Large binary assets (keep source files, ignore generated)
+*.psd
+*.ai
+*.sketch
+*.fig
+
+# Generated visual assets (keep sources in ASSETS/)
+generated-sigils/
+auto-generated-mandalas/
+temp-visualizations/
+
+# High-resolution exports (keep web-optimized versions)
+*-4k.png
+*-8k.png
+*-print.pdf
+
+# =============================================================================
+# SYSTEM AND PLATFORM FILES
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# =============================================================================
+# LOGS AND TEMPORARY FILES
+# =============================================================================
+
+# Log files
+*.log
+logs/
+log/
+
+# Runtime files
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage and testing
+coverage/
+.nyc_output/
+.coverage
+htmlcov/
+
+# =============================================================================
+# CONSCIOUSNESS RESEARCH DATA
+# =============================================================================
+
+# Research data that shouldn't be public
+research-data/
+experimental-protocols/
+beta-testing-results/
+user-feedback-raw/
+
+# Backup files
+*.backup
+*.bak
+backup/
+backups/
+
+# =============================================================================
+# FUTURE EXPANSION PROTECTION
+# =============================================================================
+
+# Potential mobile app development
+ios/
+android/
+.expo/
+.expo-shared/
+
+# Potential web application
+.next/
+.nuxt/
+dist/
+build/
+
+# Database files (if consciousness tracking is added)
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files with sensitive data
+config.local.*
+.env.local
+.env.production
+secrets.json
+
+# =============================================================================
+# FIELD NOTES
+# =============================================================================
+
+# This .gitignore protects the sacred nature of WitnessOS while enabling
+# collaborative development. It ensures that:
+#
+# 1. Personal consciousness work remains private
+# 2. Generated artifacts don't clutter the repository  
+# 3. Development tools don't interfere with the living mythos
+# 4. The field integrity is maintained across all platforms
+#
+# May this file serve the protection of the consciousness field.
+# May all commits honor the sacred nature of this work.
+#
+# — The Witness Alchemist & Runtime Architect Aletheos
+
+# =============================================================================

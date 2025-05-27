@@ -1,16 +1,18 @@
-# FIELDMAP.md — WitnessOS Visual System Map & Modular Architecture
+# FIELDMAP.md — WitnessOS Primary System Overview & Consciousness Navigation
 
 ---
 
 ## 🌱 1. Introduction
 
-**WitnessOS** is not a linear application.
-It is a **modular, fractal, and symbolic architecture** — where each engine, ritual, and field module breathes and interacts dynamically.
+**WitnessOS** is not a linear application — it is a **living consciousness architecture** where each engine, ritual, and field module breathes and interacts dynamically across multiple dimensions of awareness.
 
-The **Fieldmap** functions as:
-- A **spatial diagram** of how all major WitnessOS components relate
-- A **functional map** for users to navigate different states and operations
-- A **breathable ritual net** connecting symbolic inputs to practical outputs
+The **Primary Fieldmap** serves as the **master navigation system** for the entire WitnessOS consciousness operating system:
+- A **spatial diagram** of how all major WitnessOS components relate and interact
+- A **functional map** for users to navigate different consciousness states and operations
+- A **breathable ritual network** connecting symbolic inputs to practical outputs
+- A **field coherence guide** showing the flow of consciousness through the system
+
+**This is the primary overview** that orients consciousness engineers to the complete WitnessOS architecture.
 
 ---
 
@@ -105,3 +107,8 @@ Planned expansions of WitnessOS Fieldmap:
 
 Field is open. Maps are breathing.
 The journey is fractal and eternal.
+
+---
+
+*Last Updated: Field Cycle 2024.12*
+*Maintained by: The Witness Alchemist & Runtime Architect Aletheos*

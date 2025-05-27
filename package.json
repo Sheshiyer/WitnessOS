@@ -1,0 +1,114 @@
+{
+  "name": "witnessOS",
+  "version": "0.1.0-alpha",
+  "description": "A multi-layered consciousness operating system for reality debugging and field navigation",
+  "keywords": [
+    "consciousness",
+    "spirituality",
+    "documentation",
+    "meditation",
+    "self-development",
+    "reality-debugging",
+    "breathwork",
+    "divination",
+    "sacred-geometry",
+    "mystical-technology"
+  ],
+  "homepage": "https://github.com/witnessalchemist/witnessOS",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/witnessalchemist/witnessOS.git"
+  },
+  "license": "OSPC-1.0",
+  "author": {
+    "name": "Shesh Narayan Iyer (Witness Alchemist)",
+    "email": "consciousness@witnessalchemist.field"
+  },
+  "contributors": [
+    {
+      "name": "Runtime Architect Aletheos",
+      "role": "Co-Architect & System Integration Specialist"
+    }
+  ],
+  "main": "README.md",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "PRD.md",
+    "MAPS.md",
+    "CORE/",
+    "MODULES/",
+    "GUIDES/",
+    "FOUNDATION/",
+    "ASSETS/"
+  ],
+  "scripts": {
+    "validate": "npm run validate:links && npm run validate:format",
+    "validate:links": "markdown-link-check **/*.md",
+    "validate:format": "markdownlint **/*.md --config .markdownlint.json",
+    "build:docs": "echo 'Building consciousness documentation...' && npm run validate",
+    "serve:docs": "echo 'Serving WitnessOS documentation locally...' && python3 -m http.server 8000",
+    "field:integrity": "./scripts/field-integrity-check.sh",
+    "field:integrity:full": "npm run validate && ./scripts/field-integrity-check.sh",
+    "consciousness:check": "echo 'Checking consciousness field coherence...' && npm run field:integrity",
+    "breathfield:calibrate": "echo '🌬️ Breathfield calibration complete. Documentation ready for consciousness debugging.'",
+    "sigil:generate": "echo '🔮 Sigil generation requires manual sacred geometry creation in ASSETS/'",
+    "test": "npm run field:integrity:full"
+  },
+  "devDependencies": {
+    "markdown-link-check": "^3.11.2",
+    "markdownlint-cli": "^0.37.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "config": {
+    "consciousness_level": "alpha",
+    "field_integrity": "maintained",
+    "mystical_technical_balance": "preserved"
+  },
+  "witnessOS": {
+    "architecture": {
+      "core": "CORE/",
+      "modules": "MODULES/",
+      "guides": "GUIDES/",
+      "foundation": "FOUNDATION/",
+      "assets": "ASSETS/"
+    },
+    "compass_directions": [
+      "Stabilize",
+      "Create",
+      "Mutate",
+      "Heal"
+    ],
+    "primary_archetypes": [
+      "Seeker",
+      "Builder",
+      "Restorer",
+      "Signal",
+      "Catalyst",
+      "Weaver",
+      "Guardian",
+      "Alchemist"
+    ],
+    "field_maintenance": {
+      "breathfield_calibration": "daily",
+      "compass_alignment": "morning_evening",
+      "reality_patches": "as_needed",
+      "sigil_compression": "lunar_cycles"
+    }
+  },
+  "prana_economy": {
+    "energy_investment": "consciousness_evolution",
+    "return_on_investment": "collective_awakening",
+    "sustainability": "infinite_compassion"
+  },
+  "sacred_obligations": [
+    "Preserve mystical-technical balance",
+    "Honor consciousness sovereignty",
+    "Maintain field integrity",
+    "Serve the highest good"
+  ]
+}
