@@ -1,0 +1,6 @@
+Collecting pyswisseph
+  Downloading pyswisseph-2.10.3.2-cp311-cp311-macosx_10_9_universal2.whl.metadata (1.9 kB)
+Downloading pyswisseph-2.10.3.2-cp311-cp311-macosx_10_9_universal2.whl (793 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 794.0/794.0 kB 8.5 MB/s eta 0:00:00
+Installing collected packages: pyswisseph
+Successfully installed pyswisseph-2.10.3.2
