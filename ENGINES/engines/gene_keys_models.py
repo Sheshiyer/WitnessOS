@@ -4,8 +4,8 @@ Data models for Gene Keys Compass Engine
 Defines input/output structures and Gene Keys specific data types.
 """
 
-from datetime import date
-from typing import Optional, Dict, List, Any, Literal
+from datetime import date, time
+from typing import Optional, Dict, List, Any, Literal, Tuple
 from pydantic import BaseModel, Field, field_validator
 from base.data_models import BaseEngineOutput, BirthDataInput
 
@@ -61,17 +61,22 @@ class GeneKeysProfile(BaseModel):
 
 class GeneKeysInput(BirthDataInput):
     """Input model for Gene Keys Compass."""
-    
+
+    # Birth data is required for Gene Keys (same as Human Design)
+    birth_time: time = Field(..., description="Exact birth time is required for Gene Keys calculations")
+    birth_location: Tuple[float, float] = Field(..., description="Birth coordinates (latitude, longitude)")
+    timezone: str = Field(..., description="Birth timezone (e.g., 'America/New_York')")
+
     focus_sequence: Optional[Literal["activation", "venus", "pearl", "all"]] = Field(
         default="activation",
         description="Which sequence to focus on"
     )
-    
+
     include_programming_partner: bool = Field(
         default=True,
         description="Whether to include programming partner analysis"
     )
-    
+
     pathworking_focus: Optional[str] = Field(
         None,
         description="Specific area for pathworking guidance"

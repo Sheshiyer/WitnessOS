@@ -5,13 +5,14 @@ Provides Gene Keys archetypal analysis based on birth data.
 Calculates Activation, Venus, and Pearl sequences with pathworking guidance.
 """
 
-from datetime import datetime, date
+from datetime import datetime, date, time
 from typing import Dict, List, Any, Type, Optional
 
 from base.engine_interface import BaseEngine
 from base.data_models import BaseEngineInput, BaseEngineOutput
 from base.utils import load_json_data
 from calculations.divination import DivinationCalculator
+from calculations.astrology import AstrologyCalculator
 from .gene_keys_models import (
     GeneKeysInput, GeneKeysOutput, GeneKey, SequenceGate, GeneKeysSequence,
     GeneKeysProfile, GeneKeysData
@@ -30,6 +31,7 @@ class GeneKeysCompass(BaseEngine):
         super().__init__()
         self.gene_keys_data: Optional[GeneKeysData] = None
         self.divination_calc = DivinationCalculator()
+        self.astro_calc = AstrologyCalculator()
         self._load_gene_keys_data()
     
     @property
@@ -72,35 +74,60 @@ class GeneKeysCompass(BaseEngine):
         key_data = self.gene_keys_data.gene_keys[str(number)]
         return GeneKey(**key_data)
     
-    def _calculate_gene_key_from_date(self, birth_date: date, offset_days: int = 0) -> int:
+    def _calculate_gene_keys_from_astronomy(self, birth_date: date, birth_time: time,
+                                          birth_location: tuple, timezone: str) -> Dict[str, int]:
         """
-        Calculate Gene Key number from birth date.
-        
-        This is a simplified calculation. In a full implementation,
-        this would use actual astronomical calculations.
+        Calculate Gene Key numbers using proper astronomical calculations.
+
+        Gene Keys use the same I-Ching gates as Human Design, based on planetary positions.
         """
-        # Add offset for design calculations (88 days before birth)
-        calculation_date = birth_date
-        if offset_days != 0:
-            from datetime import timedelta
-            calculation_date = birth_date - timedelta(days=offset_days)
-        
-        # Simple calculation based on day of year
-        day_of_year = calculation_date.timetuple().tm_yday
-        
-        # Map to Gene Key number (1-64)
-        gene_key_number = ((day_of_year - 1) % 64) + 1
-        
-        return gene_key_number
+        # Combine birth date and time
+        birth_datetime = datetime.combine(birth_date, birth_time)
+        lat, lon = birth_location
+
+        # Calculate Human Design astronomical data (which Gene Keys are based on)
+        hd_data = self.astro_calc.calculate_human_design_data(
+            birth_datetime, lat, lon, timezone
+        )
+
+        # Extract the four primary gates for Activation Sequence
+        activation_gates = {
+            'lifes_work': hd_data['personality_gates']['sun'],    # Personality Sun
+            'evolution': hd_data['personality_gates']['earth'],   # Personality Earth
+            'radiance': hd_data['design_gates']['sun'],          # Design Sun
+            'purpose': hd_data['design_gates']['earth']          # Design Earth
+        }
+
+        # For Venus Sequence, we need Venus positions
+        venus_gates = {
+            'attraction': hd_data['personality_gates'].get('venus', 1),
+            'magnetism': hd_data['design_gates'].get('venus', 1)
+        }
+
+        # For Pearl Sequence, we need outer planet positions
+        pearl_gates = {
+            'vocation': hd_data['personality_gates'].get('jupiter', 1),
+            'culture': hd_data['personality_gates'].get('saturn', 1),
+            'brand': hd_data['personality_gates'].get('uranus', 1)
+        }
+
+        return {
+            **activation_gates,
+            **venus_gates,
+            **pearl_gates
+        }
     
-    def _create_activation_sequence(self, birth_date: date) -> GeneKeysSequence:
-        """Create the Activation Sequence."""
-        
-        # Calculate the four gates
-        lifes_work_num = self._calculate_gene_key_from_date(birth_date)
-        evolution_num = self._calculate_gene_key_from_date(birth_date, 1)  # Slight offset
-        radiance_num = self._calculate_gene_key_from_date(birth_date, 88)  # Design Sun
-        purpose_num = self._calculate_gene_key_from_date(birth_date, 89)   # Design Earth
+    def _create_activation_sequence(self, birth_date: date, birth_time: time,
+                                  birth_location: tuple, timezone: str) -> GeneKeysSequence:
+        """Create the Activation Sequence using astronomical calculations."""
+
+        # Calculate the four gates using proper astronomy
+        gene_keys = self._calculate_gene_keys_from_astronomy(birth_date, birth_time, birth_location, timezone)
+
+        lifes_work_num = gene_keys['lifes_work']
+        evolution_num = gene_keys['evolution']
+        radiance_num = gene_keys['radiance']
+        purpose_num = gene_keys['purpose']
         
         gates = [
             SequenceGate(
@@ -135,12 +162,15 @@ class GeneKeysCompass(BaseEngine):
             gates=gates
         )
     
-    def _create_venus_sequence(self, birth_date: date) -> GeneKeysSequence:
-        """Create the Venus Sequence."""
-        
-        # Calculate Venus gates (simplified)
-        attraction_num = self._calculate_gene_key_from_date(birth_date, 30)  # Venus cycle approximation
-        magnetism_num = self._calculate_gene_key_from_date(birth_date, 118) # Venus design
+    def _create_venus_sequence(self, birth_date: date, birth_time: time,
+                             birth_location: tuple, timezone: str) -> GeneKeysSequence:
+        """Create the Venus Sequence using astronomical calculations."""
+
+        # Calculate Venus gates using proper astronomy
+        gene_keys = self._calculate_gene_keys_from_astronomy(birth_date, birth_time, birth_location, timezone)
+
+        attraction_num = gene_keys['attraction']
+        magnetism_num = gene_keys['magnetism']
         
         gates = [
             SequenceGate(
@@ -163,13 +193,16 @@ class GeneKeysCompass(BaseEngine):
             gates=gates
         )
     
-    def _create_pearl_sequence(self, birth_date: date) -> GeneKeysSequence:
-        """Create the Pearl Sequence."""
-        
-        # Calculate Pearl gates (simplified)
-        vocation_num = self._calculate_gene_key_from_date(birth_date, 365)  # Jupiter cycle approximation
-        culture_num = self._calculate_gene_key_from_date(birth_date, 10950) # Saturn cycle approximation
-        brand_num = self._calculate_gene_key_from_date(birth_date, 30660)   # Uranus cycle approximation
+    def _create_pearl_sequence(self, birth_date: date, birth_time: time,
+                             birth_location: tuple, timezone: str) -> GeneKeysSequence:
+        """Create the Pearl Sequence using astronomical calculations."""
+
+        # Calculate Pearl gates using proper astronomy
+        gene_keys = self._calculate_gene_keys_from_astronomy(birth_date, birth_time, birth_location, timezone)
+
+        vocation_num = gene_keys['vocation']
+        culture_num = gene_keys['culture']
+        brand_num = gene_keys['brand']
         
         gates = [
             SequenceGate(
@@ -227,13 +260,16 @@ class GeneKeysCompass(BaseEngine):
     
     def _calculate(self, validated_input: GeneKeysInput) -> Dict[str, Any]:
         """Process the Gene Keys calculation."""
-        
+
         birth_date = validated_input.birth_date
-        
-        # Create sequences
-        activation_sequence = self._create_activation_sequence(birth_date)
-        venus_sequence = self._create_venus_sequence(birth_date)
-        pearl_sequence = self._create_pearl_sequence(birth_date)
+        birth_time = validated_input.birth_time
+        birth_location = validated_input.birth_location
+        timezone = validated_input.timezone
+
+        # Create sequences using astronomical calculations
+        activation_sequence = self._create_activation_sequence(birth_date, birth_time, birth_location, timezone)
+        venus_sequence = self._create_venus_sequence(birth_date, birth_time, birth_location, timezone)
+        pearl_sequence = self._create_pearl_sequence(birth_date, birth_time, birth_location, timezone)
         
         # Get primary Gene Key and programming partner
         primary_gene_key = activation_sequence.gates[0].gene_key  # Life's Work

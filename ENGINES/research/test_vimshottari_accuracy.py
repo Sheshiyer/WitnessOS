@@ -279,19 +279,19 @@ def test_nakshatra_calculation_consistency():
 if __name__ == "__main__":
     print("🧪 VIMSHOTTARI DASHA ACCURACY TESTING")
     print("=" * 80)
-    
+
     success1 = test_vimshottari_accuracy()
     success2 = test_nakshatra_calculation_consistency()
-    
+
     overall_success = success1 and success2
-    
+
     print("\n" + "=" * 80)
     print("📈 OVERALL RESULTS")
     print("=" * 80)
-    
+
     if overall_success:
         print("🎉 ALL TESTS PASSED! Vimshottari calculation is accurate!")
     else:
         print("🔴 ISSUES FOUND! Review calculation methods.")
-    
+
     sys.exit(0 if overall_success else 1)
