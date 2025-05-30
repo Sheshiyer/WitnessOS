@@ -25,6 +25,10 @@ pillow>=10.0.0
 # SVG generation (Phase 6)
 svglib>=1.5.0
 
+# API dependencies (Phase 7)
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
 # Development dependencies
 # black>=23.0.0
 # flake8>=6.0.0

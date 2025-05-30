@@ -296,14 +296,122 @@ async def health_check():
 # Helper functions
 def _convert_birth_data_to_engine_input(birth_data: BirthData, engine_name: str):
     """Convert birth data to appropriate engine input format"""
-    # This would be implemented based on each engine's input model
-    # For now, return a simplified conversion
-    return {
-        "name": birth_data.name,
-        "birth_date": birth_data.date,
-        "birth_time": birth_data.time,
-        "birth_location": birth_data.location
+    from datetime import datetime
+    import re
+
+    # Parse birth date (DD.MM.YYYY format)
+    try:
+        day, month, year = birth_data.date.split('.')
+        birth_date = datetime(int(year), int(month), int(day)).date()
+    except ValueError:
+        raise ValueError(f"Invalid birth date format. Expected DD.MM.YYYY, got: {birth_data.date}")
+
+    # Parse birth time (HH:MM format)
+    birth_time = None
+    if birth_data.time:
+        try:
+            hour, minute = birth_data.time.split(':')
+            birth_time = datetime.strptime(f"{hour}:{minute}", "%H:%M").time()
+        except ValueError:
+            raise ValueError(f"Invalid birth time format. Expected HH:MM, got: {birth_data.time}")
+
+    # Parse birth location (for now, use a simple geocoding approach)
+    # In production, you'd want to use a proper geocoding service
+    birth_location = None
+    timezone_str = birth_data.timezone or "UTC"
+
+    # Simple location mapping for common cities (expand as needed)
+    location_coords = {
+        "bengaluru": (12.9716, 77.5946),
+        "bangalore": (12.9716, 77.5946),
+        "mumbai": (19.0760, 72.8777),
+        "delhi": (28.7041, 77.1025),
+        "new york": (40.7128, -74.0060),
+        "london": (51.5074, -0.1278),
+        "paris": (48.8566, 2.3522),
+        "tokyo": (35.6762, 139.6503),
+        "sydney": (-33.8688, 151.2093)
     }
+
+    location_lower = birth_data.location.lower()
+    for city, coords in location_coords.items():
+        if city in location_lower:
+            birth_location = coords
+            break
+
+    if not birth_location:
+        # Default to Bengaluru if location not found (for testing)
+        birth_location = (12.9716, 77.5946)
+        logger.warning(f"Location '{birth_data.location}' not found, using default coordinates")
+
+    # Convert based on engine type
+    if engine_name == "numerology":
+        return {
+            "full_name": birth_data.name,
+            "birth_date": birth_date,
+            "system": "pythagorean"
+        }
+
+    elif engine_name == "biorhythm":
+        return {
+            "birth_date": birth_date,
+            "include_extended_cycles": True,
+            "forecast_days": 14
+        }
+
+    elif engine_name in ["human_design", "gene_keys"]:
+        if not birth_time:
+            raise ValueError(f"{engine_name} requires exact birth time")
+        return {
+            "birth_date": birth_date,
+            "birth_time": birth_time,
+            "birth_location": birth_location,
+            "timezone": timezone_str
+        }
+
+    elif engine_name == "vimshottari":
+        if not birth_time:
+            raise ValueError("Vimshottari requires exact birth time")
+        return {
+            "birth_date": birth_date,
+            "birth_time": birth_time,
+            "birth_location": birth_location,
+            "timezone": timezone_str
+        }
+
+    elif engine_name in ["tarot", "iching"]:
+        return {
+            "question": f"Guidance for {birth_data.name}",
+            "context": f"Born {birth_data.date} in {birth_data.location}"
+        }
+
+    elif engine_name == "enneagram":
+        return {
+            "identification_method": "intuitive",
+            "behavioral_description": f"Person born {birth_data.date} seeking personality insights"
+        }
+
+    elif engine_name == "sacred_geometry":
+        return {
+            "intention": f"Sacred geometry for {birth_data.name}",
+            "birth_date": birth_date,
+            "pattern_type": "personal"
+        }
+
+    elif engine_name == "sigil_forge":
+        return {
+            "intention": f"Manifestation sigil for {birth_data.name}",
+            "generation_method": "traditional"
+        }
+
+    else:
+        # Generic fallback
+        return {
+            "birth_date": birth_date,
+            "birth_time": birth_time,
+            "birth_location": birth_location,
+            "name": birth_data.name
+        }
 
 # Error handlers
 @app.exception_handler(ValueError)
