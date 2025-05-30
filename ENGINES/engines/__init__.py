@@ -46,6 +46,16 @@ try:
 except ImportError:
     pass
 
+try:
+    from .sacred_geometry import SacredGeometryMapper
+except ImportError:
+    pass
+
+try:
+    from .sigil_forge import SigilForgeSynthesizer
+except ImportError:
+    pass
+
 # Future engines to be implemented:
 # from .sacred_geometry import SacredGeometryEngine
 # from .sigil_forge import SigilForgeEngine
@@ -59,5 +69,7 @@ __all__ = [
     "IChingMutationOracle",
     "GeneKeysCompass",
     "EnneagramResonator",
+    "SacredGeometryMapper",
+    "SigilForgeSynthesizer",
     # Will be populated as more engines are implemented
 ]

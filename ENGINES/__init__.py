@@ -88,11 +88,17 @@ except ImportError:
 # except ImportError:
 #     pass
 
-# try:
-#     from .engines.sacred_geometry import SacredGeometryEngine
-#     register_engine("sacred_geometry", SacredGeometryEngine)
-# except ImportError:
-#     pass
+try:
+    from .engines.sacred_geometry import SacredGeometryMapper
+    register_engine("sacred_geometry_mapper", SacredGeometryMapper)
+except ImportError:
+    pass
+
+try:
+    from .engines.sigil_forge import SigilForgeSynthesizer
+    register_engine("sigil_forge_synthesizer", SigilForgeSynthesizer)
+except ImportError:
+    pass
 
 # try:
 #     from .engines.sigil_forge import SigilForgeEngine
