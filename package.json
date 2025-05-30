@@ -34,27 +34,27 @@
   "files": [
     "README.md",
     "LICENSE",
-    "CONTRIBUTING.md",
-    "PRD.md",
-    "MAPS.md",
-    "CORE/",
-    "MODULES/",
-    "GUIDES/",
-    "FOUNDATION/",
+    "src/",
+    "docs/",
+    "tests/",
+    "scripts/",
+    "config/",
     "ASSETS/"
   ],
   "scripts": {
     "validate": "npm run validate:links && npm run validate:format",
-    "validate:links": "markdown-link-check **/*.md",
-    "validate:format": "markdownlint **/*.md --config .markdownlint.json",
+    "validate:links": "markdown-link-check docs/**/*.md",
+    "validate:format": "markdownlint docs/**/*.md --config .markdownlint.json",
     "build:docs": "echo 'Building consciousness documentation...' && npm run validate",
-    "serve:docs": "echo 'Serving WitnessOS documentation locally...' && python3 -m http.server 8000",
+    "serve:docs": "python scripts/docs_server.py",
+    "dev:setup": "python scripts/dev_setup.py",
+    "dev:start": "python src/api/main.py --dev",
+    "test:all": "python scripts/run_tests.py",
+    "test:api": "python scripts/run_tests.py --type api",
     "field:integrity": "./scripts/field-integrity-check.sh",
-    "field:integrity:full": "npm run validate && ./scripts/field-integrity-check.sh",
     "consciousness:check": "echo 'Checking consciousness field coherence...' && npm run field:integrity",
-    "breathfield:calibrate": "echo '🌬️ Breathfield calibration complete. Documentation ready for consciousness debugging.'",
-    "sigil:generate": "echo '🔮 Sigil generation requires manual sacred geometry creation in ASSETS/'",
-    "test": "npm run field:integrity:full"
+    "breathfield:calibrate": "echo '🌬️ Breathfield calibration complete. APIs ready for consciousness debugging.'",
+    "test": "npm run test:all"
   },
   "devDependencies": {
     "markdown-link-check": "^3.11.2",
@@ -71,10 +71,11 @@
   },
   "witnessOS": {
     "architecture": {
-      "core": "CORE/",
-      "modules": "MODULES/",
-      "guides": "GUIDES/",
-      "foundation": "FOUNDATION/",
+      "source": "src/",
+      "documentation": "docs/",
+      "tests": "tests/",
+      "scripts": "scripts/",
+      "config": "config/",
       "assets": "ASSETS/"
     },
     "compass_directions": [

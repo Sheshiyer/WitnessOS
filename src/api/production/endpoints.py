@@ -11,12 +11,21 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime, date
 import logging
 
-from ..integration.orchestrator import EngineOrchestrator
-from ..integration.workflows import WorkflowManager
-from ..integration.field_analyzer import FieldAnalyzer
-from ..integration.synthesis import ResultSynthesizer
-from .formatters import MysticalFormatter, WitnessOSFormatter
-from .middleware import setup_middleware
+import sys
+import os
+from pathlib import Path
+
+# Add parent directory to path for imports
+current_dir = Path(__file__).parent
+parent_dir = current_dir.parent
+sys.path.insert(0, str(parent_dir))
+
+from integration.orchestrator import EngineOrchestrator
+from integration.workflows import WorkflowManager
+from integration.field_analyzer import FieldAnalyzer
+from integration.synthesis import ResultSynthesizer
+from formatters import MysticalFormatter, WitnessOSFormatter
+from middleware import setup_middleware
 
 # Initialize FastAPI app
 app = FastAPI(

@@ -1,0 +1,36 @@
+# WitnessOS AI Agent Dependencies
+
+# Core API framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+
+# HTTP client for OpenRouter API
+httpx>=0.25.0
+
+# Async support
+asyncio-mqtt>=0.13.0
+
+# JSON handling
+orjson>=3.9.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Logging
+structlog>=23.2.0
+
+# Type hints
+typing-extensions>=4.8.0
+
+# Development dependencies (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-httpx>=0.26.0
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.7.0
+
+# Documentation
+mkdocs>=1.5.0
+mkdocs-material>=9.4.0

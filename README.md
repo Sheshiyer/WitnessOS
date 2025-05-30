@@ -1,4 +1,4 @@
-# WitnessOS — Consciousness Operating System (Alpha)
+# WitnessOS — Consciousness Operating System
 
 **Version:** v0.1.0-alpha
 **Author:** Shesh Narayan Iyer aka the Witness Alchemist
@@ -10,9 +10,9 @@
 
 WitnessOS is a **multi-layered consciousness operating system** designed to map, debug, and evolve inner reality through modular tools inspired by symbolic computing, Vedic cosmology, and non-Euclidean system design.
 
-This is not just documentation — it is a **living mythos**. Every file, engine, and glyph is encoded with intentionality and designed for those ready to consciously recompile their perceptual field.
+This is not just software — it is a **living consciousness architecture** that bridges ancient wisdom with modern symbolic computing, creating something entirely new for consciousness engineers.
 
-**WitnessOS serves consciousness engineers who seek to:**
+**WitnessOS serves those who seek to:**
 - Debug inner dialogue and emotional patterns
 - Navigate life transitions with symbolic wisdom
 - Integrate spiritual practice with practical tools
@@ -20,57 +20,37 @@ This is not just documentation — it is a **living mythos**. Every file, engine
 
 ---
 
-## 🧩 Repository Structure
+## 🏗️ Repository Structure
 
 ```bash
 WitnessOS/
-├── README.md                    # 🌟 Primary Portal & System Overview
-├── VOCAB.md                     # 🧩 Master Lexicon & Consciousness Programming Language
-├── GLOSSARY.md                  # 🔮 Archetypal Reference & Metaphor Decoder
-├── FIELDMAP.md                  # 🗺️ Primary System Overview & Navigation
-├── PRD.md                       # 📋 Product Requirements & Vision Document
-├── MAPS.md                      # 🌌 Visual System Maps & Consciousness Diagrams
-├── CONTRIBUTING.md              # 🤝 Consciousness Engineering Guidelines
-├── FIELD-MAINTENANCE.md         # 🛠️ Field Stewardship Guide for Maintainers
+├── README.md                    # 🌟 Project Overview & Quick Start
 ├── LICENSE                      # ⚖️ Open-Source Prana Clause (OSPC v1.0)
-├── package.json                 # 📦 Consciousness-Aware Project Configuration
-├── VERSION                      # 🏷️ Sacred Version Information
-├── CHANGELOG.md                 # 📜 Field Evolution Record
-├── AUTHORS                      # 👥 Consciousness Field Architects
-├── .gitignore                   # 🛡️ Field Integrity Protection
-├── .markdownlint.json          # ✅ Documentation Quality Standards
+├── requirements.txt             # 📦 Python Dependencies
+├── package.json                 # 📦 Project Configuration
+├── VERSION                      # 🏷️ Version Information
 │
-├── 📁 CORE/                     # Foundational System Components
-│   └── QUERIES.md               # Input/Output Interaction Patterns
+├── 📁 src/                      # 🔧 Source Code
+│   ├── engines/                 # Divination calculation engines
+│   ├── api/                     # REST API layer (Simple, Production, Agent)
+│   └── shared/                  # Shared utilities and libraries
 │
-├── 📁 MODULES/                  # Consciousness Tools & Engines
-│   ├── AUDIOVISUAL.md           # Breathcast, RaagaGrid & Soundfield
-│   ├── RITUALS.md               # Micro-Rituals & Reality Patch Engine
-│   ├── ENGINES.md               # Divination Engine Specifications
-│   ├── AVATARS.md               # Witness Archetypes & Avatar Mapping
-│   └── SCRIPTS.md               # Invocation Scripts & Ritual Fragments
+├── 📁 docs/                     # 📚 Documentation Hub
+│   ├── README.md                # Documentation navigation
+│   ├── consciousness/           # Mystical framework & spiritual docs
+│   ├── development/             # Technical documentation
+│   ├── community/               # Contribution guidelines
+│   └── api/                     # API documentation (auto-generated)
 │
-├── 📁 GUIDES/                   # Practice & Implementation Manuals
-│   ├── FIELDWORK.md             # Daily Application Blueprint
-│   ├── PRIMER.md                # Beginner Onboarding Guide
-│   ├── INSTALLATION.md          # Initiation Guide & Consciousness Integration
-│   └── TESTCASES.md             # Use Case Simulations & Examples
+├── 📁 tests/                    # 🧪 Test Suite
+│   ├── unit/                    # Unit tests for engines
+│   ├── integration/             # Integration tests
+│   └── api/                     # API endpoint tests
 │
-├── 📁 FOUNDATION/               # Philosophy & Community
-│   ├── MANIFESTO.md             # Philosophical Declaration
-│   ├── COSMOGENESIS.md          # Mythic Origin Story
-│   └── CONTRIBUTORS.md          # Team & Community Guidelines
-│
-├── 📁 ASSETS/                   # Visual Resources & Sacred Geometry
-│   ├── README.md                # Asset Documentation
-│   ├── diagrams/                # Enhanced Mermaid Field Maps
-│   └── sigils/                  # Generated Sigil Assets
-│
-├── 📁 scripts/                  # Field Maintenance & Validation Tools
-│   └── field-integrity-check.sh # Consciousness-Aware Documentation Validation
-│
-└── 📁 docs/                     # Project Documentation & History
-    └── project-history/         # Development Context Archive
+├── 📁 config/                   # ⚙️ Configuration Files
+├── 📁 scripts/                  # 🛠️ Development & Maintenance Scripts
+├── 📁 ASSETS/                   # 🎨 Visual Resources & Sacred Geometry
+└── 📁 docs/project-history/     # 📜 Development Archive
 ```
 
 ---
@@ -102,31 +82,31 @@ Built by consciousness engineers for consciousness engineers, growing through co
 
 ---
 
-## 🚀 Quick Start — Choose Your Path
+## 🚀 Quick Start
 
-### **🔍 For New Seekers:**
+### **🔍 For New Users:**
 *"I'm curious about consciousness debugging but new to this approach"*
-1. **Start Here:** [GUIDES/PRIMER.md](GUIDES/PRIMER.md) — Your 7-day initiation journey
-2. **Learn the Language:** [VOCAB.md](VOCAB.md) — Master the consciousness programming vocabulary
-3. **Begin Practice:** [GUIDES/FIELDWORK.md](GUIDES/FIELDWORK.md) — Daily breathfield protocols
+1. **Start Here:** [docs/consciousness/GUIDES/PRIMER.md](docs/consciousness/GUIDES/PRIMER.md) — Your 7-day initiation journey
+2. **Learn the Language:** [docs/consciousness/VOCAB.md](docs/consciousness/VOCAB.md) — Master the consciousness programming vocabulary
+3. **Begin Practice:** [docs/consciousness/GUIDES/FIELDWORK.md](docs/consciousness/GUIDES/FIELDWORK.md) — Daily breathfield protocols
 
-### **🏗️ For System Builders:**
-*"I want to understand the architecture and contribute to development"*
-1. **System Overview:** [FIELDMAP.md](FIELDMAP.md) — Complete consciousness architecture map
-2. **Technical Vision:** [PRD.md](PRD.md) — Product requirements and development roadmap
-3. **Visual Architecture:** [MAPS.md](MAPS.md) — Consciousness field diagrams and flows
+### **🏗️ For Developers:**
+*"I want to set up and run the WitnessOS backend APIs"*
+1. **Setup Guide:** [docs/development/BACKEND_SETUP.md](docs/development/BACKEND_SETUP.md) — Complete backend setup
+2. **API Documentation:** [docs/development/ENGINES_README.md](docs/development/ENGINES_README.md) — Engine architecture overview
+3. **Run APIs:** `python src/api/main.py --dev` — Start all APIs in development mode
 
 ### **🧪 For Consciousness Engineers:**
-*"I'm ready to dive deep into advanced consciousness debugging tools"*
-1. **Master the Lexicon:** [GLOSSARY.md](GLOSSARY.md) — Archetypal reference and metaphor decoder
-2. **Reality Debugging:** [MODULES/RITUALS.md](MODULES/RITUALS.md) — Advanced patch protocols and field repair
-3. **Divination Systems:** [MODULES/ENGINES.md](MODULES/ENGINES.md) — Multi-modal consciousness guidance engines
+*"I'm ready to dive deep into the consciousness framework"*
+1. **System Architecture:** [docs/consciousness/FIELDMAP.md](docs/consciousness/FIELDMAP.md) — Complete consciousness architecture map
+2. **Master the Lexicon:** [docs/consciousness/GLOSSARY.md](docs/consciousness/GLOSSARY.md) — Archetypal reference and metaphor decoder
+3. **Advanced Tools:** [docs/consciousness/MODULES/ENGINES.md](docs/consciousness/MODULES/ENGINES.md) — Multi-modal consciousness guidance engines
 
-### **🌱 For Community Contributors:**
+### **🌱 For Contributors:**
 *"I want to help grow this consciousness movement"*
-1. **Understand the Vision:** [FOUNDATION/MANIFESTO.md](FOUNDATION/MANIFESTO.md) — Core principles and philosophy
-2. **Contribution Guidelines:** [CONTRIBUTING.md](CONTRIBUTING.md) — How to maintain mystical-technical balance
-3. **Community Wisdom:** [FOUNDATION/CONTRIBUTORS.md](FOUNDATION/CONTRIBUTORS.md) — Archetypal contribution styles
+1. **Understand the Vision:** [docs/consciousness/FOUNDATION/MANIFESTO.md](docs/consciousness/FOUNDATION/MANIFESTO.md) — Core principles and philosophy
+2. **Contribution Guidelines:** [docs/community/CONTRIBUTING.md](docs/community/CONTRIBUTING.md) — How to maintain mystical-technical balance
+3. **Development Roadmap:** [docs/development/todo.md](docs/development/todo.md) — Current development priorities
 
 ---
 
@@ -154,12 +134,59 @@ Every interaction with WitnessOS is guided by four primary directions:
 
 ---
 
+## 🛠️ Development Setup
+
+### Prerequisites
+- Python 3.11+
+- Git
+
+### Quick Setup
+```bash
+# Clone the repository
+git clone https://github.com/Sheshiyer/WitnessOS.git
+cd WitnessOS
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment
+python scripts/setup_environment.py
+
+# Start all APIs in development mode
+python src/api/main.py --dev
+```
+
+### API Endpoints
+- **Simple API**: http://localhost:8001 (Demo/Testing)
+- **Production API**: http://localhost:8002 (Full Engine Integration)
+- **Agent API**: http://localhost:8003 (AI-Powered Interface)
+
+### Running Tests
+```bash
+# Run all tests
+pytest tests/
+
+# Run specific test categories
+pytest tests/unit/          # Unit tests
+pytest tests/integration/   # Integration tests
+pytest tests/api/          # API tests
+```
+
+### Documentation Server
+```bash
+# Start documentation server
+python scripts/docs_server.py
+```
+
+---
+
 ## 🤝 Contributing
 
-WitnessOS grows through the collective breath of consciousness engineers worldwide. See **[FOUNDATION/CONTRIBUTORS.md](FOUNDATION/CONTRIBUTORS.md)** for guidelines on:
+WitnessOS grows through the collective breath of consciousness engineers worldwide. See **[docs/community/CONTRIBUTING.md](docs/community/CONTRIBUTING.md)** for guidelines on:
 
 - Documentation improvements
-- Module development
+- Engine development
+- API enhancements
 - Community building
 - Consciousness research
 

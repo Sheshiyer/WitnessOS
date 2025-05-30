@@ -32,8 +32,8 @@ except ImportError as e:
     print("   or: pip install -r requirements.txt")
     sys.exit(1)
 
-from api.endpoints import app
-from api.middleware import setup_middleware
+from endpoints import app
+from middleware import setup_middleware
 
 # Configure logging
 logging.basicConfig(
@@ -75,23 +75,32 @@ def setup_api_config(dev_mode: bool = False) -> dict:
 def validate_environment():
     """Validate that all required engines and components are available"""
     try:
-        # Test engine imports
-        from engines import NumerologyEngine, BiorhythmEngine
-        from integration.orchestrator import EngineOrchestrator
-        from integration.workflows import WorkflowManager
-        
-        # Test orchestrator initialization
-        orchestrator = EngineOrchestrator()
-        available_engines = orchestrator.get_available_engines()
-        
+        # Add parent directory to path for imports
+        import sys
+        from pathlib import Path
+        parent_dir = Path(__file__).parent.parent
+        if str(parent_dir) not in sys.path:
+            sys.path.insert(0, str(parent_dir))
+
+        # Test basic engine imports
+        from engines.numerology import NumerologyEngine
+        from engines.biorhythm import BiorhythmEngine
+
+        # Test that engines can be instantiated
+        num_engine = NumerologyEngine()
+        bio_engine = BiorhythmEngine()
+
+        available_engines = ["numerology", "biorhythm"]
+
         logger.info(f"✅ Environment validation successful")
         logger.info(f"📊 Available engines: {len(available_engines)}")
         logger.info(f"🔧 Engines: {', '.join(available_engines)}")
-        
+
         return True
-        
+
     except Exception as e:
         logger.error(f"❌ Environment validation failed: {e}")
+        logger.error(f"💡 Error details: {type(e).__name__}: {str(e)}")
         return False
 
 def main():

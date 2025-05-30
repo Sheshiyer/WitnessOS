@@ -51,24 +51,55 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Node.js (for potential documentation tooling)
-node_modules/
+# Node.js (for documentation tooling and future frontend)
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
 
-# Python (for potential consciousness analysis tools)
+# Python (WitnessOS backend engines and APIs)
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
 env/
 venv/
 .venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables and secrets
 .env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# API keys and sensitive configuration
+openrouter_key.txt
+api_keys.json
+secrets.json
+config.local.*
 
 # =============================================================================
 # SACRED GEOMETRY AND VISUAL ASSETS
@@ -129,11 +160,50 @@ log/
 *.seed
 *.pid.lock
 
-# Coverage and testing
+# Testing and coverage
 coverage/
 .nyc_output/
 .coverage
 htmlcov/
+.pytest_cache/
+.tox/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Test artifacts
+test-results/
+test-reports/
+.pytest_cache/
+
+# =============================================================================
+# WITNESSOS DEVELOPMENT ARTIFACTS
+# =============================================================================
+
+# Generated engine outputs and calculations
+src/engines/demos/generated_*/
+src/engines/examples/output_*/
+calculation_outputs/
+engine_test_results/
+
+# API development artifacts
+api_logs/
+request_logs/
+response_cache/
+api_test_outputs/
+
+# Agent AI model cache and responses
+agent_cache/
+llm_responses/
+model_cache/
+
+# Development databases and data
+dev_data/
+test_data/
+sample_calculations/
+*.db-journal
 
 # =============================================================================
 # CONSCIOUSNESS RESEARCH DATA
@@ -144,6 +214,8 @@ research-data/
 experimental-protocols/
 beta-testing-results/
 user-feedback-raw/
+personal-readings/
+private-calculations/
 
 # Backup files
 *.backup
@@ -161,16 +233,41 @@ android/
 .expo/
 .expo-shared/
 
-# Potential web application
+# Frontend development (React/Vue/etc)
 .next/
 .nuxt/
 dist/
 build/
+out/
+.vercel/
+.netlify/
+
+# Frontend dependencies and cache
+node_modules/
+.pnp/
+.pnp.js
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Frontend build artifacts
+*.tsbuildinfo
+.cache/
+public/build/
+static/build/
 
 # Database files (if consciousness tracking is added)
 *.db
 *.sqlite
 *.sqlite3
+*.db-shm
+*.db-wal
+
+# Docker development
+.dockerignore
+docker-compose.override.yml
+.docker/
 
 # Configuration files with sensitive data
 config.local.*
