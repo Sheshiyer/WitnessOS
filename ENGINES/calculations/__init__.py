@@ -16,13 +16,18 @@ try:
 except ImportError:
     pass
 
+try:
+    from .divination import DivinationCalculator
+except ImportError:
+    pass
+
 # Examples of future modules:
 # from .astrology import SwissEphemerisCalculator
 # from .geometry import SacredGeometryCalculator
-# from .divination import DivinationRandomizer
 
 __all__ = [
     "NumerologyCalculator",
     "BiorhythmCalculator",
+    "DivinationCalculator",
     # Will be populated as more modules are implemented
 ]

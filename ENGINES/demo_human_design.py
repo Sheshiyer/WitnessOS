@@ -38,26 +38,30 @@ def test_human_design_engine():
         print(f"❌ Failed to create engine: {e}")
         return False
     
-    # Test sample data
+    # Test sample data - Using real Human Design data for validation
     test_cases = [
         {
-            "name": "Sample Person 1",
-            "birth_date": date(1990, 6, 15),
-            "birth_time": time(14, 30, 0),
-            "birth_location": (40.7128, -74.0060),  # New York City
-            "timezone": "America/New_York"
+            "name": "Cumbipuram Nateshan Sheshnarayan",  # Real test data for validation
+            "birth_date": date(1991, 8, 13),
+            "birth_time": time(13, 31, 0),  # 13:31 local time
+            "birth_location": (12.9716, 77.5946),  # Bengaluru, Karnataka, India
+            "timezone": "Asia/Kolkata",
+            "description": "Real Human Design chart for validation - 2/4 Hermit/Opportunist Generator"
         },
         {
-            "name": "Sample Person 2", 
+            "name": "Sample Person 2",
             "birth_date": date(1985, 12, 25),
             "birth_time": time(8, 45, 0),
             "birth_location": (51.5074, -0.1278),  # London
-            "timezone": "Europe/London"
+            "timezone": "Europe/London",
+            "description": "Secondary test case"
         }
     ]
     
     for i, test_case in enumerate(test_cases, 1):
         print(f"\n📊 TEST CASE {i}: {test_case['name']}")
+        if 'description' in test_case:
+            print(f"   {test_case['description']}")
         print("-" * 40)
         
         try:

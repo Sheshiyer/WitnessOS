@@ -240,9 +240,13 @@ class SeededRandom:
         """Return a random integer between a and b (inclusive)."""
         return self.random.randint(a, b)
     
-    def random(self) -> float:
+    def random_float(self) -> float:
         """Return a random float between 0 and 1."""
         return self.random.random()
+
+    def uniform(self, a: float, b: float) -> float:
+        """Return a random float between a and b."""
+        return self.random.uniform(a, b)
 
 
 # Validation utilities

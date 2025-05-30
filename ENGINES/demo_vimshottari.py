@@ -38,30 +38,34 @@ def test_vimshottari_engine():
         print(f"❌ Failed to create engine: {e}")
         return False
     
-    # Test sample data
+    # Test sample data - Using real Vedic astrology data for validation
     test_cases = [
         {
-            "name": "Sample Person 1",
-            "birth_date": date(1985, 3, 20),
-            "birth_time": time(10, 15, 0),
-            "birth_location": (28.6139, 77.2090),  # New Delhi
+            "name": "Cumbipuram Nateshan Sheshnarayan",  # Real test data for validation
+            "birth_date": date(1991, 8, 13),
+            "birth_time": time(13, 31, 0),  # 13:31 local time
+            "birth_location": (12.9716, 77.5946),  # Bengaluru, Karnataka, India
             "timezone": "Asia/Kolkata",
             "current_date": date(2025, 1, 15),
-            "years_forecast": 10
+            "years_forecast": 10,
+            "description": "Real Vimshottari Dasha chart for validation"
         },
         {
-            "name": "Sample Person 2", 
+            "name": "Sample Person 2",
             "birth_date": date(1992, 8, 5),
             "birth_time": time(16, 30, 0),
             "birth_location": (19.0760, 72.8777),  # Mumbai
             "timezone": "Asia/Kolkata",
             "current_date": date(2025, 1, 15),
-            "years_forecast": 5
+            "years_forecast": 5,
+            "description": "Secondary test case"
         }
     ]
     
     for i, test_case in enumerate(test_cases, 1):
         print(f"\n📊 TEST CASE {i}: {test_case['name']}")
+        if 'description' in test_case:
+            print(f"   {test_case['description']}")
         print("-" * 40)
         
         try:

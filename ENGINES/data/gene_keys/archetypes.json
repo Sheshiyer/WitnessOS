@@ -1,0 +1,209 @@
+{
+  "gene_keys_info": {
+    "name": "Gene Keys Archetypal System",
+    "description": "The 64 Gene Keys with Shadow, Gift, and Siddhi frequencies",
+    "total_keys": 64,
+    "source": "Gene Keys synthesis by Richard Rudd",
+    "sequences": ["Activation", "Venus", "Pearl"]
+  },
+  "gene_keys": {
+    "1": {
+      "number": 1,
+      "name": "The Prime",
+      "shadow": "Entropy",
+      "gift": "Freshness",
+      "siddhi": "Beauty",
+      "codon": "CCG",
+      "amino_acid": "Proline",
+      "programming_partner": 2,
+      "physiology": "Pineal Gland",
+      "shadow_description": "The frequency of entropy represents the tendency toward decay, staleness, and loss of vitality. When we operate from this frequency, we feel stuck in old patterns and unable to access our creative potential.",
+      "gift_description": "Freshness is the gift of seeing life with new eyes, bringing innovation and vitality to everything we touch. This frequency allows us to break free from stagnant patterns and embrace the new.",
+      "siddhi_description": "Beauty is the recognition that all existence is inherently beautiful, even in its apparent imperfections. This is the frequency of divine aesthetic appreciation.",
+      "keywords": ["creativity", "innovation", "vitality", "renewal"],
+      "life_theme": "Breaking free from entropy through creative expression"
+    },
+    "2": {
+      "number": 2,
+      "name": "The Orientation",
+      "shadow": "Dislocation",
+      "gift": "Orientation",
+      "siddhi": "Unity",
+      "codon": "GGC",
+      "amino_acid": "Glycine",
+      "programming_partner": 1,
+      "physiology": "Liver",
+      "shadow_description": "Dislocation is the feeling of being lost, disconnected from our true direction and purpose. This frequency creates confusion and a sense of not belonging anywhere.",
+      "gift_description": "Orientation is the natural ability to find our way, both literally and metaphorically. This gift allows us to navigate life with an inner compass that always points toward our highest potential.",
+      "siddhi_description": "Unity is the recognition that there is no separation, that all apparent dislocation is an illusion. In this frequency, we experience the fundamental interconnectedness of all life.",
+      "keywords": ["direction", "navigation", "purpose", "belonging"],
+      "life_theme": "Finding true direction through inner orientation"
+    },
+    "3": {
+      "number": 3,
+      "name": "The Innovation",
+      "shadow": "Chaos",
+      "gift": "Innovation",
+      "siddhi": "Innocence",
+      "codon": "AAG",
+      "amino_acid": "Lysine",
+      "programming_partner": 50,
+      "physiology": "Sacrum",
+      "shadow_description": "Chaos represents the overwhelming feeling when we cannot make sense of the complexity around us. This frequency creates anxiety and the urge to control what cannot be controlled.",
+      "gift_description": "Innovation is the ability to bring order out of chaos through creative solutions. This gift allows us to see patterns and possibilities that others miss, creating breakthrough moments.",
+      "siddhi_description": "Innocence is the state of pure being that exists before the mind creates complexity. In this frequency, we approach life with the wonder and simplicity of a child.",
+      "keywords": ["breakthrough", "creativity", "order", "simplicity"],
+      "life_theme": "Transforming chaos into innovative solutions"
+    },
+    "4": {
+      "number": 4,
+      "name": "The Formulaic",
+      "shadow": "Intolerance",
+      "gift": "Understanding",
+      "siddhi": "Forgiveness",
+      "codon": "TGC",
+      "amino_acid": "Cysteine",
+      "programming_partner": 49,
+      "physiology": "Lymphatic System",
+      "shadow_description": "Intolerance arises when we become rigid in our thinking and cannot accept different perspectives or ways of being. This frequency creates judgment and separation.",
+      "gift_description": "Understanding is the ability to see the logic and reason behind all perspectives, even those that initially seem foreign or wrong. This gift brings tolerance and wisdom.",
+      "siddhi_description": "Forgiveness is the ultimate understanding that there is nothing to forgive, as all actions arise from the appropriate level of consciousness. This is unconditional love in action.",
+      "keywords": ["logic", "understanding", "tolerance", "wisdom"],
+      "life_theme": "Developing understanding through embracing different perspectives"
+    },
+    "5": {
+      "number": 5,
+      "name": "The Timeless",
+      "shadow": "Impatience",
+      "gift": "Patience",
+      "siddhi": "Timelessness",
+      "codon": "TTG",
+      "amino_acid": "Leucine",
+      "programming_partner": 35,
+      "physiology": "Stomach",
+      "shadow_description": "Impatience is the frequency of wanting things to happen faster than their natural timing. This creates stress, anxiety, and often leads to premature action that disrupts natural flow.",
+      "gift_description": "Patience is the understanding of natural timing and the ability to wait for the right moment. This gift allows us to move in harmony with life's rhythms rather than against them.",
+      "siddhi_description": "Timelessness is the recognition that time is an illusion and that all moments exist simultaneously in the eternal now. This frequency transcends all concepts of past and future.",
+      "keywords": ["timing", "rhythm", "flow", "presence"],
+      "life_theme": "Learning to move in harmony with natural timing"
+    },
+    "6": {
+      "number": 6,
+      "name": "The Peacemaker",
+      "shadow": "Conflict",
+      "gift": "Diplomacy",
+      "siddhi": "Peace",
+      "codon": "TCG",
+      "amino_acid": "Serine",
+      "programming_partner": 36,
+      "physiology": "Solar Plexus",
+      "shadow_description": "Conflict arises when we are unable to find common ground with others, leading to friction, arguments, and emotional turbulence. This frequency creates division and stress.",
+      "gift_description": "Diplomacy is the art of finding win-win solutions and creating harmony between opposing forces. This gift allows us to be natural mediators and peacemakers.",
+      "siddhi_description": "Peace is the recognition that conflict is an illusion created by the mind's need to be right. In this frequency, we embody the peace that surpasses all understanding.",
+      "keywords": ["harmony", "mediation", "balance", "resolution"],
+      "life_theme": "Creating peace through diplomatic understanding"
+    }
+  },
+  "sequences": {
+    "activation": {
+      "name": "Activation Sequence",
+      "description": "The four primary gates that form your core genetic blueprint",
+      "gates": [
+        {
+          "name": "Life's Work",
+          "description": "Your core life purpose and creative expression",
+          "calculation": "Sun position at birth"
+        },
+        {
+          "name": "Evolution",
+          "description": "Your path of personal development and growth",
+          "calculation": "Earth position at birth"
+        },
+        {
+          "name": "Radiance",
+          "description": "Your gift to humanity and how you shine",
+          "calculation": "Sun position 88 days before birth"
+        },
+        {
+          "name": "Purpose",
+          "description": "Your deepest calling and spiritual mission",
+          "calculation": "Earth position 88 days before birth"
+        }
+      ]
+    },
+    "venus": {
+      "name": "Venus Sequence",
+      "description": "The pathway of love and relationships",
+      "gates": [
+        {
+          "name": "Attraction",
+          "description": "What draws you to others and others to you",
+          "calculation": "Venus position at birth"
+        },
+        {
+          "name": "Magnetism",
+          "description": "Your natural charisma and appeal",
+          "calculation": "Venus position 88 days before birth"
+        }
+      ]
+    },
+    "pearl": {
+      "name": "Pearl Sequence",
+      "description": "The pathway of prosperity and material manifestation",
+      "gates": [
+        {
+          "name": "Vocation",
+          "description": "Your natural career path and work style",
+          "calculation": "Jupiter position at birth"
+        },
+        {
+          "name": "Culture",
+          "description": "Your contribution to collective evolution",
+          "calculation": "Saturn position at birth"
+        },
+        {
+          "name": "Brand",
+          "description": "Your unique signature in the world",
+          "calculation": "Uranus position at birth"
+        }
+      ]
+    }
+  },
+  "frequencies": {
+    "shadow": {
+      "name": "Shadow Frequency",
+      "description": "The victim consciousness that creates suffering",
+      "characteristics": ["fear", "reactivity", "unconsciousness", "separation"],
+      "purpose": "To provide the pressure needed for transformation"
+    },
+    "gift": {
+      "name": "Gift Frequency", 
+      "description": "The genius consciousness that serves others",
+      "characteristics": ["love", "creativity", "consciousness", "service"],
+      "purpose": "To express our unique gifts in service to life"
+    },
+    "siddhi": {
+      "name": "Siddhi Frequency",
+      "description": "The divine consciousness that transcends duality",
+      "characteristics": ["unity", "transcendence", "pure being", "divine love"],
+      "purpose": "To embody the highest potential of human consciousness"
+    }
+  },
+  "pathworking": {
+    "contemplation": {
+      "name": "Contemplation",
+      "description": "The practice of deep reflection on the Gene Keys",
+      "method": "Daily contemplation of your Gene Key themes and patterns"
+    },
+    "programming_partners": {
+      "name": "Programming Partners",
+      "description": "Gene Keys that work together to create balance",
+      "method": "Study both keys in your programming partnership for deeper insight"
+    },
+    "frequency_shifting": {
+      "name": "Frequency Shifting",
+      "description": "The process of moving from Shadow to Gift to Siddhi",
+      "method": "Awareness, acceptance, and integration of all three frequencies"
+    }
+  }
+}

@@ -30,19 +30,19 @@ def main():
         print(f"❌ Failed to load numerology engine: {e}")
         return
 
-    # Demo with multiple examples
+    # Demo with multiple examples - Using real numerology data for validation
     test_cases = [
         {
-            "name": "John Doe",
-            "birth_date": date(1990, 5, 15),
+            "name": "Cumbipuram Nateshan Sheshnarayan",  # Real test data for validation
+            "birth_date": date(1991, 8, 13),
             "system": "pythagorean",
-            "description": "Classic American name"
+            "description": "Real numerology chart for validation - Pythagorean system"
         },
         {
-            "name": "Maria Elena Rodriguez",
-            "birth_date": date(1985, 12, 3),
-            "system": "pythagorean",
-            "description": "Spanish name with multiple elements"
+            "name": "Cumbipuram Nateshan Sheshnarayan",
+            "birth_date": date(1991, 8, 13),
+            "system": "chaldean",
+            "description": "Real numerology chart for validation - Chaldean system"
         },
         {
             "name": "Alexander Magnus",
@@ -135,8 +135,8 @@ def main():
     print("SYSTEM COMPARISON: Pythagorean vs Chaldean")
     print(f"{'='*60}")
 
-    test_name = "Einstein"
-    test_date = date(1955, 3, 14)  # Using a more recent date for validation
+    test_name = "Cumbipuram Nateshan Sheshnarayan"  # Real test data for validation
+    test_date = date(1991, 8, 13)
 
     for system in ["pythagorean", "chaldean"]:
         print(f"\n{system.upper()} SYSTEM:")

@@ -185,17 +185,17 @@ def main():
     # Test with sample data
     print("Testing with sample personal data...")
 
-    # Test data models
+    # Test data models - Using real data for validation
     personal_data = PersonalDataInput(
-        full_name="John Doe",
-        preferred_name="Johnny"
+        full_name="Cumbipuram Nateshan Sheshnarayan",  # Real test data for validation
+        preferred_name="Sheshnarayan"
     )
 
     birth_data = BirthDataInput(
-        birth_date=date(1990, 5, 15),
-        birth_time=time(14, 30),
-        birth_location=(40.7128, -74.0060),  # NYC
-        timezone="America/New_York"
+        birth_date=date(1991, 8, 13),
+        birth_time=time(13, 31),
+        birth_location=(12.9716, 77.5946),  # Bengaluru, Karnataka, India
+        timezone="Asia/Kolkata"
     )
 
     question = QuestionInput(
@@ -238,8 +238,8 @@ def main():
     # Test utilities
     print("\n=== UTILITY FUNCTIONS DEMO ===")
 
-    # Date parsing
-    test_dates = ["1990-05-15", "05/15/1990", "May 15, 1990"]
+    # Date parsing - Using real birth date for validation
+    test_dates = ["1991-08-13", "08/13/1991", "August 13, 1991"]
     print("Date parsing:")
     for date_str in test_dates:
         parsed = parse_date_flexible(date_str)

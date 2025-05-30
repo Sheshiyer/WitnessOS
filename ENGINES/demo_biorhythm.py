@@ -30,29 +30,29 @@ def main():
         print(f"❌ Failed to load biorhythm engine: {e}")
         return
     
-    # Demo with multiple examples
+    # Demo with multiple examples - Using real birth data for validation
     test_cases = [
         {
-            "name": "John Doe",
-            "birth_date": date(1990, 5, 15),
+            "name": "Cumbipuram Nateshan Sheshnarayan",  # Real test data for validation
+            "birth_date": date(1991, 8, 13),
             "target_date": date.today(),
             "forecast_days": 7,
-            "description": "Current biorhythm state"
+            "description": "Real biorhythm chart for validation - Current state"
         },
         {
-            "name": "Maria Rodriguez", 
-            "birth_date": date(1985, 12, 3),
+            "name": "Cumbipuram Nateshan Sheshnarayan",
+            "birth_date": date(1991, 8, 13),
             "target_date": date.today() + timedelta(days=5),
             "forecast_days": 14,
-            "description": "Future biorhythm forecast"
+            "description": "Real biorhythm chart - Future forecast"
         },
         {
-            "name": "Alex Chen",
-            "birth_date": date(1992, 7, 21),
+            "name": "Cumbipuram Nateshan Sheshnarayan",
+            "birth_date": date(1991, 8, 13),
             "target_date": date.today(),
             "include_extended_cycles": True,
             "forecast_days": 10,
-            "description": "Extended cycles analysis"
+            "description": "Real biorhythm chart - Extended cycles analysis"
         }
     ]
     

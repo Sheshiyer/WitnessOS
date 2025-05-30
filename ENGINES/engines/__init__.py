@@ -26,11 +26,27 @@ try:
 except ImportError:
     pass
 
+try:
+    from .tarot import TarotSequenceDecoder
+except ImportError:
+    pass
+
+try:
+    from .iching import IChingMutationOracle
+except ImportError:
+    pass
+
+try:
+    from .gene_keys import GeneKeysCompass
+except ImportError:
+    pass
+
+try:
+    from .enneagram import EnneagramResonator
+except ImportError:
+    pass
+
 # Future engines to be implemented:
-# from .tarot import TarotEngine
-# from .iching import IChingEngine
-# from .gene_keys import GeneKeysEngine
-# from .enneagram import EnneagramEngine
 # from .sacred_geometry import SacredGeometryEngine
 # from .sigil_forge import SigilForgeEngine
 
@@ -39,5 +55,9 @@ __all__ = [
     "BiorhythmEngine",
     "HumanDesignScanner",
     "VimshottariTimelineMapper",
+    "TarotSequenceDecoder",
+    "IChingMutationOracle",
+    "GeneKeysCompass",
+    "EnneagramResonator",
     # Will be populated as more engines are implemented
 ]
