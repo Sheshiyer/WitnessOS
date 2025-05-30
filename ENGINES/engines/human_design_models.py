@@ -116,7 +116,7 @@ class HumanDesignChart(BaseModel):
     definition_type: str = Field(default="", description="Definition type (Single, Split, etc.)")
 
     # Additional data
-    incarnation_cross: str = Field(default="", description="Incarnation cross")
+    incarnation_cross: Dict[str, Any] = Field(default_factory=dict, description="Incarnation cross data")
     variables: Dict[str, str] = Field(default_factory=dict, description="PHS variables")
 
 

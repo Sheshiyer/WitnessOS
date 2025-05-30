@@ -9,7 +9,8 @@
     },
     "reading_type": "Complete Human Design Analysis",
     "generated_date": "2024-12-19",
-    "data_sources": "WitnessOS Human Design Engine"
+    "data_sources": "WitnessOS Human Design Engine",
+    "calculation_note": "WitnessOS uses astronomically precise calculations with Swiss Ephemeris. Results may differ from some online calculators due to different calculation methodologies. Our method follows standard astronomical principles with 88° solar arc for design calculation."
   },
   "core_design": {
     "type": {
@@ -87,34 +88,42 @@
     }
   },
   "incarnation_cross": {
-    "name": "Right Angle Cross of the Four Ways",
-    "type": "Right Angle",
+    "name": "Right Angle Cross of Explanation (4/49 | 23/43)",
+    "type": "Right_Angle",
     "gates": {
-      "conscious_sun": 2,
-      "conscious_earth": 1,
+      "conscious_sun": 4,
+      "conscious_earth": 49,
       "unconscious_sun": 23,
       "unconscious_earth": 43
     },
-    "theme": "Personal Destiny - Individual Journey",
-    "description": "Your life purpose involves finding and expressing your unique direction while maintaining creative self-expression.",
-    "life_purpose": "To discover your authentic direction and express it creatively while sharing insights with others",
+    "theme": "Individual Life Purpose",
+    "description": "The Right Angle Cross of Explanation is about understanding and explaining the mysteries of life through personal experience and mental processes. These individuals are natural teachers and explainers who help others understand complex concepts through their own lived experience.",
+    "life_purpose": "To understand life's mysteries through experience and explain them to others in accessible ways",
     "key_themes": [
-      "Finding authentic direction (Gate 2)",
-      "Creative self-expression (Gate 1)",
-      "Simplifying complexity (Gate 23)",
-      "Individual insights (Gate 43)"
+      "Formulization and logical thinking (Gate 4)",
+      "Principles and revolution through values (Gate 49)",
+      "Assimilation and tasting life (Gate 23)",
+      "Insight and breakthrough understanding (Gate 43)"
     ],
     "challenges": [
-      "Pressure to know direction immediately",
-      "Forcing creativity instead of allowing it",
-      "Overcomplicating simple truths"
+      "Pressure to have all the answers",
+      "Mental overwhelm from processing complexity",
+      "Difficulty explaining intuitive insights",
+      "Impatience with others' learning pace"
     ],
     "gifts": [
-      "Natural sense of direction",
-      "Creative inspiration",
-      "Ability to simplify complex ideas",
-      "Unique individual insights"
-    ]
+      "Natural teaching and explanation abilities",
+      "Deep understanding through experience",
+      "Ability to make complex things simple",
+      "Breakthrough insights and mental clarity",
+      "Revolutionary thinking and new perspectives"
+    ],
+    "calculation_details": {
+      "personality_sun_longitude": "140.093°",
+      "design_sun_longitude": "52.094°",
+      "solar_arc_difference": "88.0°",
+      "design_date": "1991-05-13 13:59 UTC"
+    }
   },
   "centers_analysis": {
     "defined_centers": [

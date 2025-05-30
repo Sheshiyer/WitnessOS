@@ -131,7 +131,9 @@ class HumanDesignScanner(BaseEngine):
         definition_type = self._determine_definition_type(centers, defined_channels)
 
         # Calculate incarnation cross
-        incarnation_cross = self._calculate_incarnation_cross(personality_gates, design_gates)
+        incarnation_cross = self._calculate_incarnation_cross(
+            personality_gates, design_gates, hd_data.get('solar_arc_details')
+        )
 
         # Create complete chart
         chart = HumanDesignChart(
@@ -153,7 +155,8 @@ class HumanDesignScanner(BaseEngine):
             },
             'design_info': {
                 'datetime': hd_data['design_datetime'],
-                'calculation_method': '88 days before birth'
+                'calculation_method': '88 degrees solar arc (official Human Design method)',
+                'solar_arc_details': hd_data.get('solar_arc_details', {})
             },
             'chart': chart,
             'personality_gates': personality_gates,
@@ -175,7 +178,14 @@ class HumanDesignScanner(BaseEngine):
         for planet, gate_num in gate_numbers.items():
             if gate_num in self.gate_data:
                 # Calculate line, color, tone, base from position
-                longitude = positions[planet]['longitude']
+                # Handle Earth specially (opposite of Sun)
+                if planet == 'earth' and 'sun' in positions:
+                    longitude = (positions['sun']['longitude'] + 180) % 360
+                elif planet in positions:
+                    longitude = positions[planet]['longitude']
+                else:
+                    continue  # Skip if no position data available
+
                 line = self._calculate_line(longitude, gate_num)
                 color = self._calculate_color(longitude, gate_num)
                 tone = self._calculate_tone(longitude, gate_num)
@@ -360,10 +370,82 @@ class HumanDesignScanner(BaseEngine):
         else:
             return "Split Definition"
 
-    def _calculate_incarnation_cross(self, personality_gates: Dict, design_gates: Dict) -> str:
-        """Calculate incarnation cross."""
-        # Simplified - would use Sun/Earth gates from both personality and design
-        return "Right Angle Cross of the Four Ways"
+    def _calculate_incarnation_cross(self, personality_gates: Dict, design_gates: Dict,
+                                   solar_arc_details: Dict = None) -> Dict[str, Any]:
+        """Calculate incarnation cross from Sun/Earth gates."""
+        # Extract the four gates that form the incarnation cross
+        conscious_sun = personality_gates.get('sun', {}).number if 'sun' in personality_gates else None
+        conscious_earth = personality_gates.get('earth', {}).number if 'earth' in personality_gates else None
+        unconscious_sun = design_gates.get('sun', {}).number if 'sun' in design_gates else None
+        unconscious_earth = design_gates.get('earth', {}).number if 'earth' in design_gates else None
+
+        # If we don't have all four gates, return default
+        if not all([conscious_sun, conscious_earth, unconscious_sun, unconscious_earth]):
+            return {
+                "name": "Right Angle Cross of the Four Ways",
+                "type": "Right_Angle",
+                "gates": {
+                    "conscious_sun": conscious_sun or 1,
+                    "conscious_earth": conscious_earth or 2,
+                    "unconscious_sun": unconscious_sun or 7,
+                    "unconscious_earth": unconscious_earth or 13
+                },
+                "theme": "Creative Self-Expression and Direction",
+                "description": "Default cross - actual calculation requires complete gate data"
+            }
+
+        # Load incarnation crosses data
+        try:
+            import json
+            import os
+            data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'human_design', 'incarnation_crosses.json')
+            with open(data_path, 'r') as f:
+                crosses_data = json.load(f)
+
+            # Look for matching cross by gates
+            for cross_key, cross_info in crosses_data['crosses'].items():
+                gates = cross_info.get('gates', {})
+                if (gates.get('conscious_sun') == conscious_sun and
+                    gates.get('conscious_earth') == conscious_earth and
+                    gates.get('unconscious_sun') == unconscious_sun and
+                    gates.get('unconscious_earth') == unconscious_earth):
+                    # Add calculation details to the cross info
+                    cross_with_details = cross_info.copy()
+                    if solar_arc_details:
+                        cross_with_details['calculation_details'] = solar_arc_details
+                    return cross_with_details
+
+            # If no exact match found, return the gates with a generic description
+            cross_info = {
+                "name": f"Cross of {conscious_sun}/{conscious_earth} | {unconscious_sun}/{unconscious_earth}",
+                "type": "Right_Angle",  # Default to Right Angle
+                "gates": {
+                    "conscious_sun": conscious_sun,
+                    "conscious_earth": conscious_earth,
+                    "unconscious_sun": unconscious_sun,
+                    "unconscious_earth": unconscious_earth
+                },
+                "theme": "Individual Life Purpose",
+                "description": f"Incarnation cross formed by gates {conscious_sun}/{conscious_earth} | {unconscious_sun}/{unconscious_earth}"
+            }
+            if solar_arc_details:
+                cross_info['calculation_details'] = solar_arc_details
+            return cross_info
+
+        except Exception as e:
+            # Fallback if data loading fails
+            return {
+                "name": "Right Angle Cross of the Four Ways",
+                "type": "Right_Angle",
+                "gates": {
+                    "conscious_sun": conscious_sun or 1,
+                    "conscious_earth": conscious_earth or 2,
+                    "unconscious_sun": unconscious_sun or 7,
+                    "unconscious_earth": unconscious_earth or 13
+                },
+                "theme": "Creative Self-Expression and Direction",
+                "description": f"Error loading cross data: {str(e)}"
+            }
 
     def _interpret(self, calculation_results: Dict[str, Any], input_data: HumanDesignInput) -> str:
         """
@@ -437,7 +519,10 @@ Your Role: {profile.role}
 ═══════════════════════════════════════════════════════════════
 
 🔮 INCARNATION CROSS
-{calculation_results['incarnation_cross']}
+{calculation_results['incarnation_cross']['name']}
+Gates: {calculation_results['incarnation_cross']['gates']['conscious_sun']}/{calculation_results['incarnation_cross']['gates']['conscious_earth']} | {calculation_results['incarnation_cross']['gates']['unconscious_sun']}/{calculation_results['incarnation_cross']['gates']['unconscious_earth']}
+
+{calculation_results['incarnation_cross']['description']}
 
 Your life's purpose and the role you're here to play in this lifetime.
 

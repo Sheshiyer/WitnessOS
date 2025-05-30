@@ -193,6 +193,72 @@
         "Calming presence",
         "Present moment awareness"
       ]
+    },
+    "Right_Angle_Cross_of_Explanation": {
+      "name": "Right Angle Cross of Explanation",
+      "type": "Right_Angle",
+      "gates": {
+        "conscious_sun": 4,
+        "conscious_earth": 49,
+        "unconscious_sun": 23,
+        "unconscious_earth": 43
+      },
+      "theme": "Mental Clarity and Revolutionary Understanding",
+      "purpose": "To bring mental clarity and explanation to complex concepts, helping others understand revolutionary changes",
+      "description": "This cross combines the mental clarity and logical thinking of Gate 4 with the revolutionary change energy of Gate 49, supported by the simplification power of Gate 23 and the individual insights of Gate 43. These individuals are here to explain complex concepts and help others understand necessary changes.",
+      "keynotes": [
+        "Mental clarity and logic",
+        "Revolutionary thinking",
+        "Simplifying complexity",
+        "Individual insights",
+        "Teaching and explanation"
+      ],
+      "challenges": [
+        "Pressure to have all the answers",
+        "Impatience with others' understanding",
+        "Mental overwhelm from complexity",
+        "Forcing insights before they're ready"
+      ],
+      "gifts": [
+        "Natural teaching ability",
+        "Clear logical thinking",
+        "Revolutionary insights",
+        "Ability to simplify complex ideas",
+        "Individual breakthrough moments"
+      ]
+    },
+    "Right_Angle_Cross_of_Healing": {
+      "name": "Right Angle Cross of Healing",
+      "type": "Right_Angle",
+      "gates": {
+        "conscious_sun": 25,
+        "conscious_earth": 57,
+        "unconscious_sun": 10,
+        "unconscious_earth": 42
+      },
+      "theme": "Universal Love and Behavioral Healing",
+      "purpose": "To heal through universal love and help others understand proper behavior and self-love",
+      "description": "This cross combines the universal love of Gate 25 with the intuitive clarity of Gate 57, supported by the self-love and behavior of Gate 10 and the growth through experience of Gate 42. These individuals are natural healers who help others through love and proper behavior.",
+      "keynotes": [
+        "Universal love and compassion",
+        "Intuitive clarity and insight",
+        "Self-love and proper behavior",
+        "Growth through experience",
+        "Natural healing abilities"
+      ],
+      "challenges": [
+        "Taking on others' pain",
+        "Overwhelming sensitivity",
+        "Difficulty maintaining boundaries",
+        "Pressure to fix everyone"
+      ],
+      "gifts": [
+        "Deep compassion and empathy",
+        "Intuitive healing abilities",
+        "Understanding of human behavior",
+        "Ability to love unconditionally",
+        "Wisdom through experience"
+      ]
     }
   }
 }
