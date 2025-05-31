@@ -14,6 +14,7 @@ import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
 import type { PersonalData } from '@/types';
 import { useFrame } from '@react-three/fiber';
 import React, { useEffect, useMemo, useRef } from 'react';
+import * as THREE from 'three';
 import { Color, Group, Vector3 } from 'three';
 
 interface EnneagramEngineProps {
@@ -21,7 +22,7 @@ interface EnneagramEngineProps {
   position?: [number, number, number];
   scale?: number;
   visible?: boolean;
-  onCalculationComplete?: (result: any) => void;
+  onCalculationComplete?: (result: unknown) => void;
 }
 
 interface EnneagramType {
@@ -224,7 +225,7 @@ export const EnneagramEngine: React.FC<EnneagramEngineProps> = ({
       };
     }
 
-    const enneagramData = state.data as any; // Type assertion for engine-specific data
+    const enneagramData = state.data as Record<string, unknown>; // Type assertion for engine-specific data
 
     // Find primary type
     const primaryTypeNum = enneagramData?.primary_type || 1;
@@ -233,7 +234,7 @@ export const EnneagramEngine: React.FC<EnneagramEngineProps> = ({
     // Calculate type strengths from scores
     const strengths = new Map<number, number>();
     if (enneagramData?.type_scores) {
-      Object.entries(enneagramData.type_scores).forEach(([type, score]: [string, any]) => {
+      Object.entries(enneagramData.type_scores as Record<string, number>).forEach(([type, score]) => {
         strengths.set(parseInt(type), score);
       });
     }
@@ -304,7 +305,7 @@ export const EnneagramEngine: React.FC<EnneagramEngineProps> = ({
 
   // Generate fractal patterns for each type
   const typeFractals = useMemo(() => {
-    const fractals = new Map<number, any>();
+    const fractals = new Map<number, THREE.BufferGeometry>();
 
     ENNEAGRAM_TYPES.forEach(type => {
       const strength = typeStrengths.get(type.number) || 0.1;
@@ -337,7 +338,7 @@ export const EnneagramEngine: React.FC<EnneagramEngineProps> = ({
       groupRef.current.scale.setScalar(scale * breathScale);
 
       // Animate type nodes
-      groupRef.current.children.forEach((child, index) => {
+      groupRef.current.children.forEach(child => {
         if (child.userData.enneagramType) {
           const type = child.userData.enneagramType as EnneagramType;
 
@@ -347,7 +348,7 @@ export const EnneagramEngine: React.FC<EnneagramEngineProps> = ({
 
           // Consciousness-responsive glow
           if ('material' in child && child.material) {
-            const material = child.material as any;
+            const material = child.material as THREE.MeshStandardMaterial;
             if (material.emissiveIntensity !== undefined) {
               material.emissiveIntensity = 0.1 + type.strength * consciousnessLevel * 0.3;
             }
@@ -372,7 +373,7 @@ export const EnneagramEngine: React.FC<EnneagramEngineProps> = ({
         const strength = typeStrengths.get(type.number) || 0.1;
         const isPrimary = primaryType?.number === type.number;
         const isWing = wings.some(w => w.number === type.number);
-        const isArrow = arrows.some(a => a.type.number === type.number);
+        // const isArrow = arrows.some(a => a.type.number === type.number);
 
         return (
           <group
@@ -426,7 +427,7 @@ export const EnneagramEngine: React.FC<EnneagramEngineProps> = ({
 
       {/* Wing Connections */}
       {primaryType &&
-        wings.map((wing, index) => {
+        wings.map(wing => {
           const direction = wing.position.clone().sub(primaryType.position);
           const length = direction.length();
           const midpoint = primaryType.position.clone().add(direction.clone().multiplyScalar(0.5));
@@ -441,7 +442,7 @@ export const EnneagramEngine: React.FC<EnneagramEngineProps> = ({
 
       {/* Arrow Connections */}
       {primaryType &&
-        arrows.map((arrow, index) => {
+        arrows.map(arrow => {
           const direction = arrow.type.position.clone().sub(primaryType.position);
           const length = direction.length();
           const midpoint = primaryType.position.clone().add(direction.clone().multiplyScalar(0.5));

@@ -12,6 +12,7 @@ import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
 import type { BirthData } from '@/types';
 import { useFrame } from '@react-three/fiber';
 import React, { useEffect, useMemo, useRef } from 'react';
+import * as THREE from 'three';
 import { BufferGeometry, Color, Float32BufferAttribute, Mesh } from 'three';
 
 interface BiorhythmEngineProps {
@@ -19,7 +20,7 @@ interface BiorhythmEngineProps {
   position?: [number, number, number];
   scale?: number;
   visible?: boolean;
-  onCalculationComplete?: (result: any) => void;
+  onCalculationComplete?: (result: unknown) => void;
 }
 
 interface BiorhythmCycle {
@@ -107,7 +108,7 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
     geometry.setIndex(indices);
 
     return geometry;
-  }, [state.data]);
+  }, []);
 
   // Animate waves with breath synchronization
   useFrame((state, delta) => {
@@ -122,7 +123,10 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
       // Update wave animation
       const time = state.clock.elapsedTime;
       if (meshRef.current.material && 'uniforms' in meshRef.current.material) {
-        (meshRef.current.material as any).uniforms.time.value = time;
+        const material = meshRef.current.material as THREE.ShaderMaterial;
+        if (material.uniforms) {
+          material.uniforms.time.value = time;
+        }
       }
     }
   });

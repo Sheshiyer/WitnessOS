@@ -8,6 +8,7 @@
 
 'use client';
 
+import BreathingSun from '@/components/procedural-scenes/BreathingSun';
 import {
   createFractalOctahedron,
   modulateWithBreath,
@@ -410,6 +411,15 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
           distance={size * 2}
         />
       ))}
+
+      {/* Breathing Sun Effect - Phase 3.1 Enhancement */}
+      <BreathingSun
+        position={[0, 0, -0.5]}
+        baseRadius={size * 0.15}
+        breathState={breathWave.getCurrentState()}
+        consciousness={consciousness}
+        warmEarthTones={true}
+      />
     </group>
   );
 };

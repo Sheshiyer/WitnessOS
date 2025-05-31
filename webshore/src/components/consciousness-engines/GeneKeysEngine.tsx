@@ -13,6 +13,7 @@ import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
 import type { BirthData } from '@/types';
 import { useFrame } from '@react-three/fiber';
 import React, { useEffect, useMemo, useRef } from 'react';
+import * as THREE from 'three';
 import { CatmullRomCurve3, Color, Group, TubeGeometry, Vector3 } from 'three';
 
 interface GeneKeysEngineProps {
@@ -20,7 +21,7 @@ interface GeneKeysEngineProps {
   position?: [number, number, number];
   scale?: number;
   visible?: boolean;
-  onCalculationComplete?: (result: any) => void;
+  onCalculationComplete?: (result: unknown) => void;
 }
 
 interface GeneKey {
@@ -128,16 +129,17 @@ export const GeneKeysEngine: React.FC<GeneKeysEngineProps> = ({
       return { dnaStrands: [], activationSequence: [], consciousnessLevels: [] };
     }
 
-    const geneKeysData = state.data as any; // Type assertion for engine-specific data
+    const geneKeysData = state.data as Record<string, unknown>; // Type assertion for engine-specific data
     const geneKeys: GeneKey[] = [];
 
     // Process core Gene Keys
     if (geneKeysData?.profile) {
-      Object.entries(geneKeysData.profile).forEach(([position, keyData]: [string, any], index) => {
-        const gate = keyData.gate || index + 1;
-        const codon = keyData.codon || 'UUU';
-        const aminoAcid = keyData.amino_acid || 'Phe';
-        const sphere = keyData.sphere || 'physical';
+      Object.entries(geneKeysData.profile as Record<string, unknown>).forEach(([, keyData], index) => {
+        const keyDataRecord = keyData as Record<string, unknown>;
+        const gate = keyDataRecord.gate || index + 1;
+        const codon = keyDataRecord.codon || 'UUU';
+        const aminoAcid = keyDataRecord.amino_acid || 'Phe';
+        const sphere = keyDataRecord.sphere || 'physical';
 
         // Calculate position in DNA helix
         const angle = (index / 64) * Math.PI * 4; // 2 full rotations for 64 codons
@@ -199,7 +201,7 @@ export const GeneKeysEngine: React.FC<GeneKeysEngineProps> = ({
 
     // Create activation sequence based on consciousness level
     const activations = geneKeys
-      .filter(gk => Math.random() < consciousnessLevel)
+      .filter(() => Math.random() < consciousnessLevel)
       .slice(0, Math.floor(consciousnessLevel * 10));
 
     // Create consciousness level indicators
@@ -238,7 +240,7 @@ export const GeneKeysEngine: React.FC<GeneKeysEngineProps> = ({
       groupRef.current.scale.setScalar(scale * breathScale);
 
       // Animate gene key activations
-      groupRef.current.children.forEach((child, index) => {
+      groupRef.current.children.forEach(child => {
         if (child.userData.geneKey) {
           const geneKey = child.userData.geneKey as GeneKey;
 
@@ -249,7 +251,7 @@ export const GeneKeysEngine: React.FC<GeneKeysEngineProps> = ({
 
           // Consciousness-responsive glow
           if ('material' in child && child.material) {
-            const material = child.material as any;
+            const material = child.material as THREE.Material & { emissiveIntensity?: number };
             if (material.emissiveIntensity !== undefined) {
               material.emissiveIntensity = 0.1 + consciousnessLevel * 0.3;
             }
@@ -313,7 +315,7 @@ export const GeneKeysEngine: React.FC<GeneKeysEngineProps> = ({
       ))}
 
       {/* Consciousness Level Planes */}
-      {consciousnessLevels.map((level, index) => (
+      {consciousnessLevels.map(level => (
         <mesh key={level.name} position={[0, level.height, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[2, 2.5, 32]} />
           <meshBasicMaterial color={level.color} transparent opacity={level.opacity * consciousnessLevel} />

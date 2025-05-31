@@ -20,7 +20,7 @@ interface HumanDesignEngineProps {
   position?: [number, number, number];
   scale?: number;
   visible?: boolean;
-  onCalculationComplete?: (result: any) => void;
+  onCalculationComplete?: (result: unknown) => void;
 }
 
 interface EnergyCenter {
@@ -87,7 +87,7 @@ export const HumanDesignEngine: React.FC<HumanDesignEngineProps> = ({
       return { energyCenters: [], gates: [], channels: [] };
     }
 
-    const hdData = state.data as any; // Type assertion for engine-specific data
+    const hdData = state.data as Record<string, unknown>; // Type assertion for engine-specific data
 
     // Create energy centers with definition status
     const centers: EnergyCenter[] = ENERGY_CENTERS.map(center => ({
@@ -99,8 +99,9 @@ export const HumanDesignEngine: React.FC<HumanDesignEngineProps> = ({
     // Create gates from chart data
     const gateList: Gate[] = [];
     if (hdData?.gates) {
-      Object.entries(hdData.gates).forEach(([gateNum, gateData]: [string, any]) => {
-        const centerName = gateData.center || 'G';
+      Object.entries(hdData.gates as Record<string, unknown>).forEach(([gateNum, gateData]) => {
+        const gateDataRecord = gateData as Record<string, unknown>;
+        const centerName = gateDataRecord.center || 'G';
         const center = centers.find(c => c.name === centerName);
         if (center) {
           // Position gates around their center
@@ -119,8 +120,8 @@ export const HumanDesignEngine: React.FC<HumanDesignEngineProps> = ({
           gateList.push({
             number: parseInt(gateNum),
             position: gatePos,
-            line: gateData.line || 1,
-            planet: gateData.planet || 'Earth',
+            line: gateDataRecord.line || 1,
+            planet: gateDataRecord.planet || 'Earth',
             color: new Color().setHSL(parseInt(gateNum) / 64, 0.7, 0.6),
           });
         }
@@ -130,7 +131,7 @@ export const HumanDesignEngine: React.FC<HumanDesignEngineProps> = ({
     // Create channels (connections between gates)
     const channelList: Array<{ from: Vector3; to: Vector3; color: Color }> = [];
     if (hdData?.channels) {
-      hdData.channels.forEach((channel: any) => {
+      (hdData.channels as Array<Record<string, unknown>>).forEach(channel => {
         const fromGate = gateList.find(g => g.number === channel.gate1);
         const toGate = gateList.find(g => g.number === channel.gate2);
         if (fromGate && toGate) {

@@ -7,14 +7,13 @@
 
 'use client';
 
-import { createBreathWave } from '@/generators/wave-equations/consciousness-waves';
 import type { BreathState } from '@/types';
 import { CONSCIOUSNESS_CONSTANTS } from '@/utils/consciousness-constants';
 import { useFrame } from '@react-three/fiber';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Color, Mesh, MeshBasicMaterial } from 'three';
 
-const { BREATH_PATTERNS, SACRED_MATHEMATICS } = CONSCIOUSNESS_CONSTANTS;
+const { BREATH_PATTERNS } = CONSCIOUSNESS_CONSTANTS;
 
 interface BreathDetectionProps {
   onBreathStateChange: (breathState: BreathState) => void;
@@ -66,8 +65,8 @@ export const BreathDetection: React.FC<BreathDetectionProps> = ({
   const breathRingRef = useRef<Mesh>(null);
   const coherenceRingRef = useRef<Mesh>(null);
 
-  // Breath wave generator
-  const breathWave = useRef(createBreathWave());
+  // Breath wave generator (for future use)
+  // const breathWave = useRef(createBreathWave());
 
   // Audio data buffers
   const volumeHistory = useRef<number[]>([]);
@@ -107,59 +106,62 @@ export const BreathDetection: React.FC<BreathDetectionProps> = ({
     } catch (error) {
       console.error('Failed to initialize microphone:', error);
     }
-  }, [enabled]);
+  }, [enabled, startAnalysis]);
 
   /**
    * Start continuous audio analysis
    */
-  const startAnalysis = (analyserNode: AnalyserNode) => {
-    const analyze = () => {
-      if (!analyserNode || !audioContext) return;
+  const startAnalysis = useCallback(
+    (analyserNode: AnalyserNode) => {
+      const analyze = () => {
+        if (!analyserNode || !audioContext) return;
 
-      // Get frequency and time domain data
-      analyserNode.getByteFrequencyData(frequencyData.current);
-      analyserNode.getByteTimeDomainData(timeData.current);
+        // Get frequency and time domain data
+        analyserNode.getByteFrequencyData(frequencyData.current);
+        analyserNode.getByteTimeDomainData(timeData.current);
 
-      // Calculate volume (RMS)
-      let sum = 0;
-      for (let i = 0; i < timeData.current.length; i++) {
-        const sample = ((timeData.current[i] ?? 128) - 128) / 128;
-        sum += sample * sample;
-      }
-      const volume = Math.sqrt(sum / timeData.current.length);
-
-      // Calculate dominant frequency
-      let maxFreqIndex = 0;
-      let maxFreqValue = 0;
-      for (let i = 1; i < frequencyData.current.length / 2; i++) {
-        const currentValue = frequencyData.current[i] ?? 0;
-        if (currentValue > maxFreqValue) {
-          maxFreqValue = currentValue;
-          maxFreqIndex = i;
+        // Calculate volume (RMS)
+        let sum = 0;
+        for (let i = 0; i < timeData.current.length; i++) {
+          const sample = ((timeData.current[i] ?? 128) - 128) / 128;
+          sum += sample * sample;
         }
-      }
-      const frequency = audioContext ? (maxFreqIndex * audioContext.sampleRate) / analyserNode.fftSize : 0;
+        const volume = Math.sqrt(sum / timeData.current.length);
 
-      // Update volume history for pattern detection
-      volumeHistory.current.push(volume);
-      if (volumeHistory.current.length > 60) {
-        // Keep 1 second of history at 60fps
-        volumeHistory.current.shift();
-      }
+        // Calculate dominant frequency
+        let maxFreqIndex = 0;
+        let maxFreqValue = 0;
+        for (let i = 1; i < frequencyData.current.length / 2; i++) {
+          const currentValue = frequencyData.current[i] ?? 0;
+          if (currentValue > maxFreqValue) {
+            maxFreqValue = currentValue;
+            maxFreqIndex = i;
+          }
+        }
+        const frequency = audioContext ? (maxFreqIndex * audioContext.sampleRate) / analyserNode.fftSize : 0;
 
-      // Analyze breath pattern
-      const analysis = analyzeBreathPattern(volume, frequency);
-      setCurrentAnalysis(analysis);
+        // Update volume history for pattern detection
+        volumeHistory.current.push(volume);
+        if (volumeHistory.current.length > 60) {
+          // Keep 1 second of history at 60fps
+          volumeHistory.current.shift();
+        }
 
-      // Convert to breath state
-      const breathState = convertToBreathState(analysis);
-      onBreathStateChange(breathState);
+        // Analyze breath pattern
+        const analysis = analyzeBreathPattern(volume, frequency);
+        setCurrentAnalysis(analysis);
 
-      requestAnimationFrame(analyze);
-    };
+        // Convert to breath state
+        const breathState = convertToBreathState(analysis);
+        onBreathStateChange(breathState);
 
-    analyze();
-  };
+        requestAnimationFrame(analyze);
+      };
+
+      analyze();
+    },
+    [audioContext, onBreathStateChange, calibrationData, sensitivity]
+  );
 
   /**
    * Analyze breath pattern from audio data
@@ -312,7 +314,7 @@ export const BreathDetection: React.FC<BreathDetectionProps> = ({
         audioContext.close();
       }
     };
-  }, [enabled, initializeAudio]);
+  }, [enabled, initializeAudio, audioContext, microphone]);
 
   // Auto-calibrate after audio initialization
   useEffect(() => {

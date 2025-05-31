@@ -1,83 +1,110 @@
-import Image from 'next/image';
+'use client';
+
+import { type ConsciousnessProfile } from '@/components/ui/ConsciousnessDataCollector';
+import EnhancedWitnessOSBootSequence from '@/components/ui/EnhancedWitnessOSBootSequence';
+import IntegratedConsciousnessOnboarding from '@/components/ui/IntegratedConsciousnessOnboarding';
+import dynamic from 'next/dynamic';
+import { Suspense, useState } from 'react';
+
+// Dynamic import for Portal Chamber to avoid SSR issues
+const PortalChamberScene = dynamic(
+  () => import('@/components/procedural-scenes/PortalChamberScene'),
+  {
+    ssr: false,
+    loading: () => <EnhancedWitnessOSBootSequence />,
+  }
+);
 
 export default function Home() {
-  return (
-    <div className='grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]'>
-      <main className='flex flex-col gap-[32px] row-start-2 items-center sm:items-start'>
-        <Image
-          className='dark:invert'
-          src='/next.svg'
-          alt='Next.js logo'
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className='list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]'>
-          <li className='mb-2 tracking-[-.01em]'>
-            Get started by editing{' '}
-            <code className='bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold'>
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className='tracking-[-.01em]'>Save and see your changes instantly.</li>
-        </ol>
+  const [bootComplete, setBootComplete] = useState(false);
+  const [dataCollectionComplete, setDataCollectionComplete] = useState(false);
+  const [userProfile, setUserProfile] = useState<ConsciousnessProfile | null>(null);
+  const [userInitialized, setUserInitialized] = useState(false);
 
-        <div className='flex gap-4 items-center flex-col sm:flex-row'>
-          <a
-            className='rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto'
-            href='https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            <Image
-              className='dark:invert'
-              src='/vercel.svg'
-              alt='Vercel logomark'
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className='rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]'
-            href='https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Read our docs
-          </a>
+  // Debug logging
+  console.log('🔍 Debug - Current state:', {
+    bootComplete,
+    dataCollectionComplete,
+    userProfile: !!userProfile,
+    userInitialized,
+  });
+
+  const handleBootComplete = () => {
+    console.log('🚀 Boot sequence completed!');
+    setBootComplete(true);
+  };
+
+  const handleProfileComplete = (profile: ConsciousnessProfile) => {
+    console.log('✅ Consciousness profile created:', profile);
+    setUserProfile(profile);
+    setDataCollectionComplete(true);
+  };
+
+  const handleUserInitialization = () => {
+    setUserInitialized(true);
+  };
+
+  // Show boot sequence first
+  if (!bootComplete) {
+    return (
+      <div>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            background: 'red',
+            color: 'white',
+            padding: '10px',
+            zIndex: 9999,
+          }}
+        >
+          DEBUG: Boot sequence should show here
         </div>
-      </main>
-      <footer className='row-start-3 flex gap-[24px] flex-wrap items-center justify-center'>
-        <a
-          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-          href='https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <Image aria-hidden src='/file.svg' alt='File icon' width={16} height={16} />
-          Learn
-        </a>
-        <a
-          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-          href='https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <Image aria-hidden src='/window.svg' alt='Window icon' width={16} height={16} />
-          Examples
-        </a>
-        <a
-          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-          href='https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <Image aria-hidden src='/globe.svg' alt='Globe icon' width={16} height={16} />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <EnhancedWitnessOSBootSequence onBootComplete={handleBootComplete} />
+      </div>
+    );
+  }
+
+  // Show data collection after boot
+  if (!dataCollectionComplete) {
+    return (
+      <IntegratedConsciousnessOnboarding
+        onProfileComplete={handleProfileComplete}
+        onStepChange={(step, total) => {
+          console.log(`Data collection step ${step}/${total}`);
+        }}
+      />
+    );
+  }
+
+  // Show Portal Chamber after data collection
+  return (
+    <div className='w-full h-screen overflow-hidden bg-black'>
+      <Suspense fallback={<EnhancedWitnessOSBootSequence />}>
+        <PortalChamberScene
+          enableBreathDetection={true}
+          enableInfiniteZoom={true}
+          enablePerformanceStats={true}
+          onPortalEnter={handleUserInitialization}
+          onConsciousnessEvolution={consciousness => {
+            console.log('Consciousness evolution:', consciousness);
+          }}
+          userData={{
+            ...(userProfile?.birthData.birthDate && {
+              birthDate: new Date(userProfile.birthData.birthDate),
+            }),
+            ...(userProfile?.birthData.birthTime && {
+              birthTime: userProfile.birthData.birthTime,
+            }),
+            ...(userProfile?.personalData.fullName && {
+              name: userProfile.personalData.fullName,
+            }),
+          }}
+          humanDesignType={userProfile?.archetypalSignature.humanDesignType || 'generator'}
+          enneagramType={userProfile?.archetypalSignature.enneagramType || 9}
+        />
+      </Suspense>
     </div>
   );
 }

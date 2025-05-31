@@ -761,6 +761,104 @@ export const createFractalIcosahedron = (
 };
 
 /**
+ * Generate true octagonal chamber geometry with golden ratio proportions
+ */
+export const createOctagonalChamber = (
+  radius: number = 5,
+  consciousness?: ConsciousnessState,
+  nested: boolean = true
+): SacredGeometry => {
+  const modulation = consciousness ? 1.0 + consciousness.awarenessLevel * 0.1 : 1.0;
+  const phi = SACRED_MATHEMATICS.PHI;
+
+  // Create octagonal vertices using golden ratio proportions
+  const vertices: Vector3[] = [];
+  const faces: number[][] = [];
+  const edges: [number, number][] = [];
+
+  // Outer octagon vertices
+  for (let i = 0; i < 8; i++) {
+    const angle = (i * Math.PI) / 4;
+    const x = Math.cos(angle) * radius * modulation;
+    const y = Math.sin(angle) * radius * modulation;
+    vertices.push(new Vector3(x, y, 0));
+  }
+
+  if (nested) {
+    // Inner octagon with golden ratio scaling
+    const innerRadius = radius / phi;
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4 + Math.PI / 8; // Rotated 22.5 degrees
+      const x = Math.cos(angle) * innerRadius * modulation;
+      const y = Math.sin(angle) * innerRadius * modulation;
+      vertices.push(new Vector3(x, y, 0));
+    }
+
+    // Center point
+    vertices.push(new Vector3(0, 0, 0));
+
+    // Create faces connecting outer to inner octagon
+    for (let i = 0; i < 8; i++) {
+      const next = (i + 1) % 8;
+      // Outer to inner triangles
+      faces.push([i, next, i + 8]);
+      faces.push([next, ((next + 1) % 8) + 8, i + 8]);
+
+      // Inner to center triangles
+      faces.push([i + 8, ((i + 1) % 8) + 8, 16]);
+    }
+  } else {
+    // Simple octagon faces
+    for (let i = 1; i < 7; i++) {
+      faces.push([0, i, i + 1]);
+    }
+  }
+
+  // Create edges
+  for (let i = 0; i < 8; i++) {
+    edges.push([i, (i + 1) % 8]);
+    if (nested) {
+      edges.push([i + 8, ((i + 1) % 8) + 8]);
+      edges.push([i, i + 8]);
+    }
+  }
+
+  return {
+    vertices,
+    faces,
+    edges,
+    center: new Vector3(0, 0, 0),
+    radius: radius * modulation,
+  };
+};
+
+/**
+ * Convert SacredGeometry to Three.js BufferGeometry
+ */
+export const sacredGeometryToBufferGeometry = (geometry: SacredGeometry): THREE.BufferGeometry => {
+  const { BufferGeometry, Float32BufferAttribute } = require('three');
+  const bufferGeometry = new BufferGeometry();
+
+  // Convert vertices to flat array
+  const positions: number[] = [];
+  const indices: number[] = [];
+
+  geometry.vertices.forEach(vertex => {
+    positions.push(vertex.x, vertex.y, vertex.z);
+  });
+
+  geometry.faces.forEach(face => {
+    indices.push(...face);
+  });
+
+  bufferGeometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+  bufferGeometry.setIndex(indices);
+  bufferGeometry.computeVertexNormals();
+
+  return bufferGeometry;
+};
+
+/**
  * Generate sacred geometry for Three.js
  * This is the function our engine components expect
  */
