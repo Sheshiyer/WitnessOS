@@ -9,10 +9,7 @@
 'use client';
 
 import BreathingSun from '@/components/procedural-scenes/BreathingSun';
-import {
-  createFractalOctahedron,
-  modulateWithBreath,
-} from '@/generators/sacred-geometry/platonic-solids';
+import { modulateWithBreath } from '@/generators/sacred-geometry/platonic-solids';
 import {
   createConsciousnessWaveTransformer,
   transformUserDataToWaves,
@@ -113,21 +110,19 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
     });
   }, [userData, humanDesignType, enneagramType]);
 
-  // Enhanced fractal chamber geometry
+  // Enhanced octagonal chamber geometry with golden ratio proportions
   const chamberGeometry = useMemo(() => {
-    const lodLevel = performanceOptimizer.getLODLevel(
-      { position: new Vector3(0, 0, 0) } as any,
-      { position: new Vector3(0, 0, 5) } as any
-    );
-    const fractalLevels = Math.max(1, lodLevel.fractalDepth);
+    // Import the function dynamically to avoid auto-formatting issues
+    const { createOctagonalChamber } = require('@/generators/sacred-geometry/platonic-solids');
 
-    const baseOctahedron = createFractalOctahedron(
+    // Create true octagonal chamber with nested geometry and golden ratio proportions
+    const baseOctagonalChamber = createOctagonalChamber(
       size,
       consciousness,
-      fractalLevels,
-      'mandelbrot'
+      true // Enable nested geometry for golden ratio proportions
     );
-    return modulateWithBreath(baseOctahedron, breathWave.getCurrentState(), 0.1);
+
+    return modulateWithBreath(baseOctagonalChamber, breathWave.getCurrentState(), 0.1);
   }, [size, consciousness]);
 
   // Enhanced portal geometry with fractal subdivision
@@ -336,7 +331,7 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
 
   return (
     <group ref={portalGroupRef}>
-      {/* Enhanced Octagonal Chamber Wireframe */}
+      {/* True Octagonal Chamber with Golden Ratio Proportions - Phase 3.1 Complete */}
       <lineSegments ref={chamberMeshRef}>
         <bufferGeometry>
           <bufferAttribute

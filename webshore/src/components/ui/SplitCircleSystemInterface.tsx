@@ -22,6 +22,11 @@ interface SplitCircleSystemInterfaceProps {
   data?: Record<string, number>;
   onSegmentClick?: (segment: CircleSegment) => void;
   animated?: boolean;
+  binaryDualityMode?: boolean;
+  lightningVeinsEnabled?: boolean;
+  eyeOfStormCenter?: boolean;
+  mindMapVisualization?: boolean;
+  innerOuterCoherence?: boolean;
 }
 
 interface CircleSegment {
@@ -40,6 +45,31 @@ interface DataVisualization {
   totalValue: number;
 }
 
+interface LightningVein {
+  id: string;
+  startPosition: THREE.Vector3;
+  endPosition: THREE.Vector3;
+  intensity: number;
+  pulsePhase: number;
+  dataFlow: number;
+}
+
+interface BinaryDuality {
+  innerWorld: Record<string, number>;
+  outerWorld: Record<string, number>;
+  coherence: number;
+  balance: number;
+}
+
+interface MindMapNode {
+  id: string;
+  position: THREE.Vector3;
+  value: number;
+  connections: string[];
+  dataType: string;
+  color: THREE.Color;
+}
+
 export const SplitCircleSystemInterface: React.FC<SplitCircleSystemInterfaceProps> = ({
   position = [0, 0, 0],
   radius = 2,
@@ -47,10 +77,17 @@ export const SplitCircleSystemInterface: React.FC<SplitCircleSystemInterfaceProp
   data = {},
   onSegmentClick,
   animated = true,
+  binaryDualityMode = false,
+  lightningVeinsEnabled = true,
+  eyeOfStormCenter = true,
+  mindMapVisualization = false,
+  innerOuterCoherence = true,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
   const [rotationSpeed, setRotationSpeed] = useState(0.1);
+  const [lightningVeins, setLightningVeins] = useState<LightningVein[]>([]);
+  const [mindMapNodes, setMindMapNodes] = useState<MindMapNode[]>([]);
   const { consciousnessLevel } = useConsciousness();
 
   // Default consciousness data if none provided
@@ -69,6 +106,102 @@ export const SplitCircleSystemInterface: React.FC<SplitCircleSystemInterfaceProp
   );
 
   const visualizationData = useMemo(() => ({ ...defaultData, ...data }), [defaultData, data]);
+
+  // Binary duality data processing
+  const binaryDualityData = useMemo((): BinaryDuality => {
+    const keys = Object.keys(visualizationData);
+    const midpoint = Math.floor(keys.length / 2);
+
+    const innerWorld: Record<string, number> = {};
+    const outerWorld: Record<string, number> = {};
+
+    keys.forEach((key, index) => {
+      if (index < midpoint) {
+        innerWorld[key] = visualizationData[key];
+      } else {
+        outerWorld[key] = visualizationData[key];
+      }
+    });
+
+    const innerSum = Object.values(innerWorld).reduce((sum, val) => sum + val, 0);
+    const outerSum = Object.values(outerWorld).reduce((sum, val) => sum + val, 0);
+    const coherence = 1 - Math.abs(innerSum - outerSum) / (innerSum + outerSum);
+    const balance = Math.min(innerSum, outerSum) / Math.max(innerSum, outerSum);
+
+    return { innerWorld, outerWorld, coherence, balance };
+  }, [visualizationData]);
+
+  // Generate lightning veins for information pulses
+  const generateLightningVeins = useMemo((): LightningVein[] => {
+    if (!lightningVeinsEnabled) return [];
+
+    const veins: LightningVein[] = [];
+    const segments = Object.entries(visualizationData);
+
+    segments.forEach(([key, value], index) => {
+      const angle = (index * Math.PI * 2) / segments.length;
+      const startRadius = radius * 0.3;
+      const endRadius = radius * 0.9;
+
+      const startPosition = new THREE.Vector3(
+        Math.cos(angle) * startRadius,
+        Math.sin(angle) * startRadius,
+        0
+      );
+
+      const endPosition = new THREE.Vector3(
+        Math.cos(angle) * endRadius,
+        Math.sin(angle) * endRadius,
+        0.1
+      );
+
+      veins.push({
+        id: `vein-${key}`,
+        startPosition,
+        endPosition,
+        intensity: value / 100,
+        pulsePhase: Math.random() * Math.PI * 2,
+        dataFlow: value,
+      });
+    });
+
+    return veins;
+  }, [visualizationData, lightningVeinsEnabled, radius]);
+
+  // Generate mind map nodes
+  const generateMindMapNodes = useMemo((): MindMapNode[] => {
+    if (!mindMapVisualization) return [];
+
+    const nodes: MindMapNode[] = [];
+    const entries = Object.entries(visualizationData);
+
+    entries.forEach(([key, value], index) => {
+      const angle = (index * Math.PI * 2) / entries.length;
+      const nodeRadius = radius * (0.5 + value / 200); // Variable radius based on value
+
+      const position = new THREE.Vector3(
+        Math.cos(angle) * nodeRadius,
+        Math.sin(angle) * nodeRadius,
+        Math.sin(index) * 0.2
+      );
+
+      // Create connections to adjacent nodes
+      const connections: string[] = [];
+      if (index > 0) connections.push(`node-${entries[index - 1][0]}`);
+      if (index < entries.length - 1) connections.push(`node-${entries[index + 1][0]}`);
+
+      nodes.push({
+        id: `node-${key}`,
+        position,
+        value,
+        connections,
+        dataType: key,
+        color: new THREE.Color().setHSL(index / entries.length, 0.7, 0.6),
+      });
+    });
+
+    return nodes;
+  }, [visualizationData, mindMapVisualization, radius]);
 
   // Create split circle visualization
   const createSplitCircleVisualization = useMemo((): DataVisualization => {
@@ -242,7 +375,7 @@ export const SplitCircleSystemInterface: React.FC<SplitCircleSystemInterfaceProp
   return (
     <group ref={groupRef} position={position}>
       {/* Split Circle Segments */}
-      {visualizationData.segments.map(segment => {
+      {createSplitCircleVisualization.segments.map(segment => {
         const innerRadius = radius * 0.3;
         const outerRadius = radius * (0.6 + (segment.value / 100) * 0.4);
         const segmentGeometry = createSegmentGeometry(segment, innerRadius, outerRadius);
@@ -306,7 +439,7 @@ export const SplitCircleSystemInterface: React.FC<SplitCircleSystemInterfaceProp
 
       {/* Center value indicator */}
       <mesh position={[0, 0, 0.1]}>
-        <cylinderGeometry args={[0.02, 0.02, visualizationData.centerValue / 100]} />
+        <cylinderGeometry args={[0.02, 0.02, createSplitCircleVisualization.centerValue / 100]} />
         <meshBasicMaterial color='#FFD700' transparent opacity={0.9} />
       </mesh>
 
@@ -317,7 +450,7 @@ export const SplitCircleSystemInterface: React.FC<SplitCircleSystemInterfaceProp
       </mesh>
 
       {/* Data flow particles */}
-      {visualizationData.segments.map(segment => {
+      {createSplitCircleVisualization.segments.map(segment => {
         const particleCount = Math.floor(segment.value / 20);
         return Array.from({ length: particleCount }, (_, i) => {
           const angle =
@@ -339,6 +472,174 @@ export const SplitCircleSystemInterface: React.FC<SplitCircleSystemInterfaceProp
           );
         });
       })}
+
+      {/* Binary Duality Visualization */}
+      {binaryDualityMode && (
+        <group>
+          {/* Inner World (Left Half) */}
+          <mesh position={[-radius * 0.5, 0, 0.02]} rotation={[0, 0, Math.PI / 2]}>
+            <ringGeometry args={[radius * 0.2, radius * 0.8, 32, 1, 0, Math.PI]} />
+            <meshBasicMaterial
+              color='#4A90E2'
+              transparent
+              opacity={0.3 + binaryDualityData.coherence * 0.4}
+            />
+          </mesh>
+
+          {/* Outer World (Right Half) */}
+          <mesh position={[radius * 0.5, 0, 0.02]} rotation={[0, 0, -Math.PI / 2]}>
+            <ringGeometry args={[radius * 0.2, radius * 0.8, 32, 1, 0, Math.PI]} />
+            <meshBasicMaterial
+              color='#E91E63'
+              transparent
+              opacity={0.3 + binaryDualityData.balance * 0.4}
+            />
+          </mesh>
+
+          {/* Duality Balance Indicator */}
+          <mesh position={[0, 0, 0.15]}>
+            <cylinderGeometry args={[0.01, 0.01, binaryDualityData.balance * 0.5]} />
+            <meshBasicMaterial color='#FFD700' />
+          </mesh>
+        </group>
+      )}
+
+      {/* Lightning Vein Information Pulses */}
+      {lightningVeinsEnabled &&
+        generateLightningVeins.map(vein => {
+          const pulseIntensity = Math.sin(Date.now() * 0.003 + vein.pulsePhase) * 0.5 + 0.5;
+
+          return (
+            <group key={vein.id}>
+              {/* Lightning vein line */}
+              <mesh>
+                <cylinderGeometry
+                  args={[
+                    0.002 * vein.intensity,
+                    0.005 * vein.intensity,
+                    vein.startPosition.distanceTo(vein.endPosition),
+                    6,
+                  ]}
+                />
+                <meshBasicMaterial
+                  color='#00FFFF'
+                  transparent
+                  opacity={0.6 + pulseIntensity * 0.4}
+                />
+              </mesh>
+
+              {/* Data pulse particle */}
+              <mesh
+                position={[
+                  THREE.MathUtils.lerp(vein.startPosition.x, vein.endPosition.x, pulseIntensity),
+                  THREE.MathUtils.lerp(vein.startPosition.y, vein.endPosition.y, pulseIntensity),
+                  THREE.MathUtils.lerp(vein.startPosition.z, vein.endPosition.z, pulseIntensity),
+                ]}
+              >
+                <sphereGeometry args={[0.01 * vein.intensity, 6, 6]} />
+                <meshBasicMaterial color='#FFFFFF' transparent opacity={pulseIntensity} />
+              </mesh>
+            </group>
+          );
+        })}
+
+      {/* Eye of the Storm Navigation Center */}
+      {eyeOfStormCenter && (
+        <group position={[0, 0, 0.1]}>
+          {/* Storm eye center */}
+          <mesh>
+            <torusGeometry args={[radius * 0.15, radius * 0.05, 8, 16]} />
+            <meshBasicMaterial
+              color='#9C27B0'
+              transparent
+              opacity={0.7 + Math.sin(Date.now() * 0.002) * 0.3}
+            />
+          </mesh>
+
+          {/* Swirling energy */}
+          {Array.from({ length: 8 }, (_, i) => {
+            const angle = (i * Math.PI * 2) / 8 + Date.now() * 0.001;
+            const spiralRadius = radius * 0.12;
+            const x = Math.cos(angle) * spiralRadius;
+            const y = Math.sin(angle) * spiralRadius;
+
+            return (
+              <mesh key={i} position={[x, y, 0.02]}>
+                <sphereGeometry args={[0.005, 4, 4]} />
+                <meshBasicMaterial color='#FFFFFF' transparent opacity={0.8} />
+              </mesh>
+            );
+          })}
+        </group>
+      )}
+
+      {/* Mind Map Visualization */}
+      {mindMapVisualization &&
+        generateMindMapNodes.map(node => (
+          <group key={node.id} position={node.position.toArray()}>
+            {/* Node */}
+            <mesh>
+              <sphereGeometry args={[0.03 + node.value / 200, 8, 8]} />
+              <meshBasicMaterial color={node.color} transparent opacity={0.8} />
+            </mesh>
+
+            {/* Node connections */}
+            {node.connections.map(connectionId => {
+              const connectedNode = generateMindMapNodes.find(n => n.id === connectionId);
+              if (!connectedNode) return null;
+
+              const distance = node.position.distanceTo(connectedNode.position);
+              const midpoint = node.position
+                .clone()
+                .add(connectedNode.position)
+                .multiplyScalar(0.5);
+
+              return (
+                <mesh key={connectionId} position={midpoint.toArray()}>
+                  <cylinderGeometry args={[0.001, 0.001, distance, 4]} />
+                  <meshBasicMaterial color={node.color} transparent opacity={0.4} />
+                </mesh>
+              );
+            })}
+
+            {/* Data type label */}
+            <mesh position={[0, 0.05, 0]}>
+              <planeGeometry args={[0.02, 0.01]} />
+              <meshBasicMaterial color={node.color} transparent opacity={0.6} />
+            </mesh>
+          </group>
+        ))}
+
+      {/* Inner/Outer World Coherence Display */}
+      {innerOuterCoherence && (
+        <group position={[0, 0, 0.2]}>
+          {/* Coherence ring */}
+          <mesh>
+            <torusGeometry args={[radius * 1.2, radius * 0.02, 8, 32]} />
+            <meshBasicMaterial
+              color='#00BCD4'
+              transparent
+              opacity={binaryDualityData.coherence * 0.8}
+            />
+          </mesh>
+
+          {/* Coherence indicators */}
+          {Array.from({ length: 12 }, (_, i) => {
+            const angle = (i * Math.PI * 2) / 12;
+            const coherenceRadius = radius * 1.2;
+            const x = Math.cos(angle) * coherenceRadius;
+            const y = Math.sin(angle) * coherenceRadius;
+            const intensity = binaryDualityData.coherence;
+
+            return (
+              <mesh key={i} position={[x, y, 0]}>
+                <sphereGeometry args={[0.01 * intensity, 4, 4]} />
+                <meshBasicMaterial color='#FFFFFF' transparent opacity={intensity} />
+              </mesh>
+            );
+          })}
+        </group>
+      )}
 
       {/* Interactive overlay */}
       <mesh position={[0, 0, 0.01]}>

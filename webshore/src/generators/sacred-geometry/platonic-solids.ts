@@ -807,19 +807,24 @@ export const createOctagonalChamber = (
       // Inner to center triangles
       faces.push([i + 8, ((i + 1) % 8) + 8, 16]);
     }
-  } else {
-    // Simple octagon faces
-    for (let i = 1; i < 7; i++) {
-      faces.push([0, i, i + 1]);
-    }
-  }
 
-  // Create edges
-  for (let i = 0; i < 8; i++) {
-    edges.push([i, (i + 1) % 8]);
-    if (nested) {
+    // Create edges
+    for (let i = 0; i < 8; i++) {
+      const next = (i + 1) % 8;
+      // Outer octagon edges
+      edges.push([i, next]);
+      // Inner octagon edges
       edges.push([i + 8, ((i + 1) % 8) + 8]);
+      // Connecting edges
       edges.push([i, i + 8]);
+      // Center edges
+      edges.push([i + 8, 16]);
+    }
+  } else {
+    // Simple octagon
+    for (let i = 0; i < 8; i++) {
+      const next = (i + 1) % 8;
+      edges.push([i, next]);
     }
   }
 
@@ -830,32 +835,6 @@ export const createOctagonalChamber = (
     center: new Vector3(0, 0, 0),
     radius: radius * modulation,
   };
-};
-
-/**
- * Convert SacredGeometry to Three.js BufferGeometry
- */
-export const sacredGeometryToBufferGeometry = (geometry: SacredGeometry): THREE.BufferGeometry => {
-  const { BufferGeometry, Float32BufferAttribute } = require('three');
-  const bufferGeometry = new BufferGeometry();
-
-  // Convert vertices to flat array
-  const positions: number[] = [];
-  const indices: number[] = [];
-
-  geometry.vertices.forEach(vertex => {
-    positions.push(vertex.x, vertex.y, vertex.z);
-  });
-
-  geometry.faces.forEach(face => {
-    indices.push(...face);
-  });
-
-  bufferGeometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
-  bufferGeometry.setIndex(indices);
-  bufferGeometry.computeVertexNormals();
-
-  return bufferGeometry;
 };
 
 /**

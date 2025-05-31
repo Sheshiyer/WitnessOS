@@ -1,26 +1,29 @@
 /**
  * WitnessOS API Client for Python Engine Integration
- * 
+ *
  * Connects React Three Fiber frontend to Python consciousness engines
  * Handles data transformation and error management
  */
 
-import type { 
-  EngineAPIResponse, 
-  EngineName, 
-  EngineInput, 
+import type {
+  EngineAPIResponse,
+  EngineInput,
+  EngineName,
   EngineOutput,
-  NumerologyInput,
-  NumerologyOutput,
+  EnneagramInput,
+  EnneagramOutput,
   HumanDesignInput,
   HumanDesignOutput,
-  TarotInput,
-  TarotOutput,
   IChingInput,
   IChingOutput,
-  EnneagramInput,
-  EnneagramOutput
+  NumerologyInput,
+  NumerologyOutput,
+  TarotInput,
+  TarotOutput,
 } from '@/types';
+
+// Import mock server for fallback
+const { MockAPIServer } = require('./mock-api-server');
 
 // API Configuration
 const API_CONFIG = {
@@ -28,6 +31,7 @@ const API_CONFIG = {
   TIMEOUT: 30000, // 30 seconds
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000, // 1 second
+  USE_MOCK_FALLBACK: process.env.NODE_ENV === 'development', // Use mock in development
 } as const;
 
 // API Endpoints mapping
@@ -73,7 +77,7 @@ async function withRetry<T>(
     if (attempts <= 1) {
       throw error;
     }
-    
+
     await new Promise(resolve => setTimeout(resolve, delay));
     return withRetry(operation, attempts - 1, delay * 2);
   }
@@ -88,11 +92,11 @@ async function apiRequest<T>(
 ): Promise<EngineAPIResponse<T>> {
   const url = `${API_CONFIG.BASE_URL}${endpoint}`;
   const startTime = Date.now();
-  
+
   const defaultOptions: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      Accept: 'application/json',
     },
     signal: AbortSignal.timeout(API_CONFIG.TIMEOUT),
     ...options,
@@ -101,16 +105,16 @@ async function apiRequest<T>(
   try {
     const response = await fetch(url, defaultOptions);
     const processingTime = Date.now() - startTime;
-    
+
     if (!response.ok) {
       throw new WitnessOSAPIError(
         `API request failed: ${response.status} ${response.statusText}`,
         response.status
       );
     }
-    
+
     const data = await response.json();
-    
+
     return {
       success: true,
       data,
@@ -119,11 +123,11 @@ async function apiRequest<T>(
     };
   } catch (error) {
     const processingTime = Date.now() - startTime;
-    
+
     if (error instanceof WitnessOSAPIError) {
       throw error;
     }
-    
+
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -145,30 +149,43 @@ export class WitnessOSAPIClient {
     input: TInput
   ): Promise<EngineAPIResponse<TOutput>> {
     const endpoint = API_ENDPOINTS[engineName];
-    
+
     if (!endpoint) {
       throw new WitnessOSAPIError(`Unknown engine: ${engineName}`, undefined, engineName);
     }
 
-    return withRetry(async () => {
-      return apiRequest<TOutput>(endpoint, {
-        method: 'POST',
-        body: JSON.stringify(input),
+    try {
+      return await withRetry(async () => {
+        return apiRequest<TOutput>(endpoint, {
+          method: 'POST',
+          body: JSON.stringify(input),
+        });
       });
-    });
+    } catch (error) {
+      // Fallback to mock server if real API fails and mock is enabled
+      if (API_CONFIG.USE_MOCK_FALLBACK) {
+        console.warn(`Real API failed for ${engineName}, using mock server:`, error);
+        return MockAPIServer.calculateEngine<TOutput>(engineName, input);
+      }
+      throw error;
+    }
   }
 
   /**
    * Numerology calculation
    */
-  static async calculateNumerology(input: NumerologyInput): Promise<EngineAPIResponse<NumerologyOutput>> {
+  static async calculateNumerology(
+    input: NumerologyInput
+  ): Promise<EngineAPIResponse<NumerologyOutput>> {
     return this.calculateEngine<NumerologyInput, NumerologyOutput>('numerology', input);
   }
 
   /**
    * Human Design calculation
    */
-  static async calculateHumanDesign(input: HumanDesignInput): Promise<EngineAPIResponse<HumanDesignOutput>> {
+  static async calculateHumanDesign(
+    input: HumanDesignInput
+  ): Promise<EngineAPIResponse<HumanDesignOutput>> {
     return this.calculateEngine<HumanDesignInput, HumanDesignOutput>('human_design', input);
   }
 
@@ -189,7 +206,9 @@ export class WitnessOSAPIClient {
   /**
    * Enneagram assessment
    */
-  static async calculateEnneagram(input: EnneagramInput): Promise<EngineAPIResponse<EnneagramOutput>> {
+  static async calculateEnneagram(
+    input: EnneagramInput
+  ): Promise<EngineAPIResponse<EnneagramOutput>> {
     return this.calculateEngine<EnneagramInput, EnneagramOutput>('enneagram', input);
   }
 
@@ -197,9 +216,18 @@ export class WitnessOSAPIClient {
    * Health check for API connectivity
    */
   static async healthCheck(): Promise<EngineAPIResponse<{ status: string; engines: string[] }>> {
-    return withRetry(async () => {
-      return apiRequest<{ status: string; engines: string[] }>('/api/health');
-    });
+    try {
+      return await withRetry(async () => {
+        return apiRequest<{ status: string; engines: string[] }>('/api/health');
+      });
+    } catch (error) {
+      // Fallback to mock server if real API fails and mock is enabled
+      if (API_CONFIG.USE_MOCK_FALLBACK) {
+        console.warn('Real API health check failed, using mock server:', error);
+        return MockAPIServer.healthCheck();
+      }
+      throw error;
+    }
   }
 
   /**
@@ -235,21 +263,23 @@ export class DataTransformer {
    */
   static pythonToTypeScript<T>(data: Record<string, unknown>): T {
     const transformed: Record<string, unknown> = {};
-    
+
     for (const [key, value] of Object.entries(data)) {
       const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-      
+
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         transformed[camelKey] = this.pythonToTypeScript(value as Record<string, unknown>);
       } else if (Array.isArray(value)) {
-        transformed[camelKey] = value.map(item => 
-          item && typeof item === 'object' ? this.pythonToTypeScript(item as Record<string, unknown>) : item
+        transformed[camelKey] = value.map(item =>
+          item && typeof item === 'object'
+            ? this.pythonToTypeScript(item as Record<string, unknown>)
+            : item
         );
       } else {
         transformed[camelKey] = value;
       }
     }
-    
+
     return transformed as T;
   }
 
@@ -258,21 +288,23 @@ export class DataTransformer {
    */
   static typeScriptToPython<T>(data: Record<string, unknown>): T {
     const transformed: Record<string, unknown> = {};
-    
+
     for (const [key, value] of Object.entries(data)) {
       const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-      
+
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         transformed[snakeKey] = this.typeScriptToPython(value as Record<string, unknown>);
       } else if (Array.isArray(value)) {
-        transformed[snakeKey] = value.map(item => 
-          item && typeof item === 'object' ? this.typeScriptToPython(item as Record<string, unknown>) : item
+        transformed[snakeKey] = value.map(item =>
+          item && typeof item === 'object'
+            ? this.typeScriptToPython(item as Record<string, unknown>)
+            : item
         );
       } else {
         transformed[snakeKey] = value;
       }
     }
-    
+
     return transformed as T;
   }
 

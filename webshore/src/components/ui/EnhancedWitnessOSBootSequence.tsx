@@ -210,14 +210,20 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
   const progressRef = useRef<HTMLDivElement>(null);
   const geometryRef = useRef<HTMLDivElement>(null);
 
-  const [currentMessage, setCurrentMessage] = useState<BootMessage | null>(null);
-  const [displayText, setDisplayText] = useState('');
+  const [visibleMessages, setVisibleMessages] = useState<BootMessage[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [bootProgress, setBootProgress] = useState(0);
-  const [isMorphing, setIsMorphing] = useState(false);
-  const [morphProgress, setMorphProgress] = useState(0);
-  const [morphingChar, setMorphingChar] = useState('');
-  const [morphIntensity, setMorphIntensity] = useState(0);
+  const [messageStates, setMessageStates] = useState<
+    Record<
+      number,
+      {
+        displayText: string;
+        isMorphing: boolean;
+        morphProgress: number;
+        isComplete: boolean;
+      }
+    >
+  >({});
 
   // Enhanced Matrix-style character morphing with consciousness-themed characters
   const matrixChars =
@@ -232,20 +238,34 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
     standard: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
   };
 
-  const morphText = (targetText: string, callback?: () => void) => {
+  const morphText = (targetText: string, messageIndex: number, callback?: () => void) => {
     const duration = 35; // Optimized timing for smooth effect
     const morphDuration = 15; // More morphing iterations for better effect
     let currentText = '';
     let charIndex = 0;
 
-    setIsMorphing(true);
-    setMorphProgress(0);
+    // Initialize message state
+    setMessageStates(prev => ({
+      ...prev,
+      [messageIndex]: {
+        displayText: '',
+        isMorphing: true,
+        morphProgress: 0,
+        isComplete: false,
+      },
+    }));
 
     const morphChar = () => {
       if (charIndex >= targetText.length) {
-        setDisplayText(targetText);
-        setIsMorphing(false);
-        setMorphProgress(100);
+        setMessageStates(prev => ({
+          ...prev,
+          [messageIndex]: {
+            displayText: targetText,
+            isMorphing: false,
+            morphProgress: 100,
+            isComplete: true,
+          },
+        }));
         callback?.();
         return;
       }
@@ -255,7 +275,13 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
 
       // Update progress
       const progress = (charIndex / targetText.length) * 100;
-      setMorphProgress(progress);
+      setMessageStates(prev => ({
+        ...prev,
+        [messageIndex]: {
+          ...prev[messageIndex],
+          morphProgress: progress,
+        },
+      }));
 
       // Choose character set based on message content with enhanced logic
       let charSet = matrixChars;
@@ -292,17 +318,19 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
       const morphInterval = setInterval(() => {
         if (morphCount >= morphDuration) {
           currentText += targetChar;
-          setDisplayText(currentText);
+          setMessageStates(prev => ({
+            ...prev,
+            [messageIndex]: {
+              ...prev[messageIndex],
+              displayText: currentText,
+            },
+          }));
           charIndex++;
           clearInterval(morphInterval);
           setTimeout(morphChar, duration / 4); // Faster transition between characters
         } else {
           const randomChar =
             targetChar === ' ' ? ' ' : charSet[Math.floor(Math.random() * charSet.length)];
-
-          // Track current morphing character and intensity
-          setMorphingChar(randomChar);
-          setMorphIntensity((morphCount / morphDuration) * 100);
 
           // Enhanced preview with consciousness-themed effects
           const remainingText = targetText.slice(charIndex + 1);
@@ -316,7 +344,13 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
             })
             .join('');
 
-          setDisplayText(currentText + randomChar + fadedRemaining);
+          setMessageStates(prev => ({
+            ...prev,
+            [messageIndex]: {
+              ...prev[messageIndex],
+              displayText: currentText + randomChar + fadedRemaining,
+            },
+          }));
           morphCount++;
         }
       }, duration);
@@ -328,13 +362,14 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
   // Initialize GSAP animations
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Animate background gradient
+      // Animate background gradient with smooth CHADUI-inspired movement
       if (backgroundRef.current) {
         gsap.to(backgroundRef.current, {
-          backgroundPosition: '200% 200%',
-          duration: 8,
+          backgroundPosition: '100% 100%',
+          duration: 12,
           repeat: -1,
-          ease: 'none',
+          yoyo: true,
+          ease: 'power1.inOut',
         });
       }
 
@@ -360,7 +395,7 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
     return () => ctx.revert();
   }, []);
 
-  // Handle boot message progression with GSAP animations (single line)
+  // Handle boot message progression - Linux-style multiple messages
   useEffect(() => {
     if (currentIndex >= BOOT_MESSAGES.length) {
       // Boot complete with final animation
@@ -384,67 +419,20 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
     const message = BOOT_MESSAGES[currentIndex];
     if (message) {
       const timer = setTimeout(() => {
-        // Animate out current message if exists
-        if (messagesRef.current && currentMessage) {
-          gsap.to(messagesRef.current, {
-            opacity: 0,
-            y: -10,
-            duration: 0.2,
-            ease: 'power2.in',
-            onComplete: () => {
-              // Set new message and start Matrix morphing
-              setCurrentMessage(message);
-              setCurrentIndex(prev => prev + 1);
-              setBootProgress(((currentIndex + 1) / BOOT_MESSAGES.length) * 100);
+        // Add message to visible list
+        setVisibleMessages(prev => [...prev, message]);
+        setCurrentIndex(prev => prev + 1);
+        setBootProgress(((currentIndex + 1) / BOOT_MESSAGES.length) * 100);
 
-              if (messagesRef.current) {
-                gsap.fromTo(
-                  messagesRef.current,
-                  { opacity: 0, y: 10 },
-                  {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.3,
-                    ease: 'power2.out',
-                    onComplete: () => {
-                      // Start Matrix morphing effect
-                      morphText(message.message);
-                    },
-                  }
-                );
-              }
-            },
-          });
-        } else {
-          // First message - just animate in and start morphing
-          setCurrentMessage(message);
-          setCurrentIndex(prev => prev + 1);
-          setBootProgress(((currentIndex + 1) / BOOT_MESSAGES.length) * 100);
-
-          if (messagesRef.current) {
-            gsap.fromTo(
-              messagesRef.current,
-              { opacity: 0, y: 10 },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.3,
-                ease: 'power2.out',
-                onComplete: () => {
-                  // Start Matrix morphing effect
-                  morphText(message.message);
-                },
-              }
-            );
-          }
-        }
+        // Start morphing animation for this message
+        morphText(message.message, currentIndex);
       }, message.delay);
 
       return () => clearTimeout(timer);
     }
 
     return () => {};
-  }, [currentIndex, currentMessage, onBootComplete]);
+  }, [currentIndex, onBootComplete]);
 
   const getMessageColor = (level: BootMessage['level']) => {
     switch (level) {
@@ -499,19 +487,20 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
       className='w-full h-screen font-mono text-sm overflow-hidden flex flex-col relative'
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
     >
-      {/* Enhanced Moving Gradient Background with Noise */}
+      {/* Enhanced Moving Gradient Background - CHADUI Inspired */}
       <div
         ref={backgroundRef}
-        className='absolute inset-0 opacity-90'
+        className='absolute inset-0 opacity-95'
         style={{
           background: `
-            radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(120, 219, 226, 0.3) 0%, transparent 50%),
-            linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0a0a0a 100%)
+            radial-gradient(ellipse at 25% 75%, rgba(120, 119, 198, 0.4) 0%, rgba(120, 119, 198, 0.1) 40%, transparent 70%),
+            radial-gradient(ellipse at 75% 25%, rgba(255, 119, 198, 0.4) 0%, rgba(255, 119, 198, 0.1) 40%, transparent 70%),
+            radial-gradient(ellipse at 50% 50%, rgba(120, 219, 226, 0.3) 0%, rgba(120, 219, 226, 0.1) 35%, transparent 65%),
+            linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 20%, #16213e 40%, #0f3460 60%, #1a1a2e 80%, #0a0a0a 100%)
           `,
-          backgroundSize: '400% 400%',
-          filter: 'contrast(1.1) brightness(0.9)',
+          backgroundSize: '200% 200%',
+          backgroundPosition: '0% 0%',
+          filter: 'contrast(1.05) brightness(0.95) blur(0.5px)',
         }}
       />
 
@@ -563,66 +552,48 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
         </div>
       </div>
 
-      {/* Current Boot Message - Centered */}
-      <div className='relative z-10 flex-1 flex items-center justify-center p-6'>
-        {currentMessage && (
-          <div ref={messagesRef} className='text-center max-w-4xl mx-auto'>
-            <div className='flex items-center justify-center space-x-4 mb-4'>
-              <span className='text-gray-500 text-sm font-mono'>[{currentMessage.timestamp}]</span>
-              <span className={`text-sm font-mono ${getComponentColor(currentMessage.component)}`}>
-                {currentMessage.component}:
-              </span>
-            </div>
-            <div
-              className={`text-lg font-mono leading-relaxed ${getMessageColor(currentMessage.level)} ${
-                isMorphing ? 'animate-pulse' : ''
-              }`}
-              style={{
-                textShadow: isMorphing
-                  ? `0 0 ${10 + morphIntensity * 0.5}px currentColor, 0 0 ${20 + morphIntensity}px currentColor, 0 0 ${30 + morphIntensity * 1.5}px currentColor`
-                  : '0 0 5px currentColor',
-                transition: 'text-shadow 0.1s ease',
-                filter: isMorphing ? `hue-rotate(${morphIntensity * 3.6}deg)` : 'none',
-              }}
-            >
-              {displayText || currentMessage.message}
-              {isMorphing && (
-                <span className='inline-block ml-2 text-cyan-400 animate-spin'>⚡</span>
-              )}
-            </div>
-            {isMorphing && (
-              <div className='mt-3 space-y-2'>
-                <div className='flex items-center justify-between text-xs text-gray-400'>
-                  <span>Consciousness decoding: {morphProgress.toFixed(0)}%</span>
-                  <span className='text-cyan-400 font-mono'>
-                    Current: <span className='text-purple-400'>{morphingChar}</span>
+      {/* Linux-Style Boot Messages */}
+      <div className='relative z-10 flex-1 p-6 overflow-hidden'>
+        <div ref={messagesRef} className='space-y-1 max-h-full overflow-y-auto'>
+          {visibleMessages.map((message, index) => {
+            const messageState = messageStates[index] || {
+              displayText: message.message,
+              isMorphing: false,
+              morphProgress: 100,
+              isComplete: true,
+            };
+
+            return (
+              <div key={index} className='flex items-start space-x-2 text-sm font-mono'>
+                <span className='text-gray-500 text-xs shrink-0'>[{message.timestamp}]</span>
+                <span className={`shrink-0 ${getComponentColor(message.component)}`}>
+                  {message.component}:
+                </span>
+                <div className='flex-1'>
+                  <span
+                    className={`${getMessageColor(message.level)} ${
+                      messageState.isMorphing ? 'animate-pulse' : ''
+                    }`}
+                    style={{
+                      textShadow: messageState.isMorphing
+                        ? `0 0 5px currentColor, 0 0 10px currentColor`
+                        : '0 0 2px currentColor',
+                      transition: 'text-shadow 0.1s ease',
+                    }}
+                  >
+                    {messageState.displayText}
                   </span>
-                </div>
-                <div className='w-full bg-gray-800 rounded-full h-1'>
-                  <div
-                    className='bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 h-1 rounded-full transition-all duration-100'
-                    style={{ width: `${morphProgress}%` }}
-                  />
-                </div>
-                <div className='flex justify-center'>
-                  <div className='flex space-x-1'>
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className={`w-1 h-1 rounded-full transition-all duration-200 ${
-                          i < morphIntensity / 20 ? 'bg-cyan-400' : 'bg-gray-600'
-                        }`}
-                        style={{
-                          animationDelay: `${i * 100}ms`,
-                        }}
-                      />
-                    ))}
-                  </div>
+                  {messageState.isMorphing && (
+                    <span className='inline-block ml-2 text-cyan-400 animate-spin text-xs'>⚡</span>
+                  )}
+                  {messageState.isComplete && (
+                    <span className='inline-block ml-2 text-green-400 text-xs'>✓</span>
+                  )}
                 </div>
               </div>
-            )}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </div>
 
       {/* Progress Bar */}

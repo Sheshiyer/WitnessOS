@@ -21,21 +21,11 @@ export default function Home() {
   const [userProfile, setUserProfile] = useState<ConsciousnessProfile | null>(null);
   const [userInitialized, setUserInitialized] = useState(false);
 
-  // Debug logging
-  console.log('🔍 Debug - Current state:', {
-    bootComplete,
-    dataCollectionComplete,
-    userProfile: !!userProfile,
-    userInitialized,
-  });
-
   const handleBootComplete = () => {
-    console.log('🚀 Boot sequence completed!');
     setBootComplete(true);
   };
 
   const handleProfileComplete = (profile: ConsciousnessProfile) => {
-    console.log('✅ Consciousness profile created:', profile);
     setUserProfile(profile);
     setDataCollectionComplete(true);
   };
@@ -46,24 +36,7 @@ export default function Home() {
 
   // Show boot sequence first
   if (!bootComplete) {
-    return (
-      <div>
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            background: 'red',
-            color: 'white',
-            padding: '10px',
-            zIndex: 9999,
-          }}
-        >
-          DEBUG: Boot sequence should show here
-        </div>
-        <EnhancedWitnessOSBootSequence onBootComplete={handleBootComplete} />
-      </div>
-    );
+    return <EnhancedWitnessOSBootSequence onBootComplete={handleBootComplete} />;
   }
 
   // Show data collection after boot
@@ -72,7 +45,7 @@ export default function Home() {
       <IntegratedConsciousnessOnboarding
         onProfileComplete={handleProfileComplete}
         onStepChange={(step, total) => {
-          console.log(`Data collection step ${step}/${total}`);
+          // Data collection progress tracking
         }}
       />
     );
