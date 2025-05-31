@@ -1,13 +1,13 @@
 /**
  * Performance Optimization System for WitnessOS Webshore
- * 
+ *
  * Level of Detail (LOD) system using fractal mathematics
  * Mobile WebGL optimization with 267-character GLSL techniques
  */
 
-import { Vector3, Camera, Object3D } from 'three';
-import type { ConsciousnessState, BreathState } from '@/types';
 import type { SacredGeometry } from '@/generators/sacred-geometry/platonic-solids';
+import type { ConsciousnessState } from '@/types';
+import { Camera, Object3D, Vector3 } from 'three';
 
 /**
  * Performance metrics interface
@@ -71,23 +71,25 @@ export class PerformanceOptimizer {
   private detectDeviceCapabilities(): DeviceCapabilities {
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-    
+
     if (!gl) {
       throw new Error('WebGL not supported');
     }
 
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
     const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
     const maxVertexUniforms = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
     const maxFragmentUniforms = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
-    
+
     // Detect low-end devices
-    const isLowEnd = isMobile && (
-      maxTextureSize < 2048 ||
-      maxVertexUniforms < 128 ||
-      maxFragmentUniforms < 16 ||
-      navigator.hardwareConcurrency < 4
-    );
+    const isLowEnd =
+      isMobile &&
+      (maxTextureSize < 2048 ||
+        maxVertexUniforms < 128 ||
+        maxFragmentUniforms < 16 ||
+        navigator.hardwareConcurrency < 4);
 
     return {
       isMobile,
@@ -187,8 +189,9 @@ export class PerformanceOptimizer {
       this.frameTimeHistory.shift();
     }
 
-    const avgFrameTime = this.frameTimeHistory.reduce((sum, time) => sum + time, 0) / this.frameTimeHistory.length;
-    
+    const avgFrameTime =
+      this.frameTimeHistory.reduce((sum, time) => sum + time, 0) / this.frameTimeHistory.length;
+
     this.metrics = {
       fps: 1000 / avgFrameTime,
       frameTime: avgFrameTime,
@@ -209,7 +212,7 @@ export class PerformanceOptimizer {
   private updateAdaptiveQuality(): void {
     const targetFrameTime = 16.67; // 60 FPS
     const currentFrameTime = this.metrics.frameTime;
-    
+
     if (currentFrameTime > targetFrameTime * 1.5) {
       // Performance is poor, reduce quality
       this.adaptiveQuality = Math.max(0.3, this.adaptiveQuality - 0.05);
@@ -225,10 +228,10 @@ export class PerformanceOptimizer {
   getLODLevel(object: Object3D, camera: Camera): LODLevel {
     const distance = camera.position.distanceTo(object.position);
     const qualityModifier = this.adaptiveQuality;
-    
+
     // Find appropriate LOD level
-    let selectedLevel = this.lodLevels[this.lodLevels.length - 1]; // Default to lowest quality
-    
+    let selectedLevel: LODLevel = this.lodLevels[this.lodLevels.length - 1]!; // Default to lowest quality
+
     for (const level of this.lodLevels) {
       if (distance <= level.distance * qualityModifier) {
         selectedLevel = level;
@@ -239,10 +242,10 @@ export class PerformanceOptimizer {
     // Further reduce quality if performance is poor
     if (this.metrics.isLowPerformance) {
       return {
-        ...selectedLevel,
+        distance: selectedLevel.distance,
         fractalDepth: Math.max(1, selectedLevel.fractalDepth - 1),
         subdivisionLevels: Math.max(1, selectedLevel.subdivisionLevels - 1),
-        shaderComplexity: 'minimal',
+        shaderComplexity: 'minimal' as const,
         particleCount: Math.floor(selectedLevel.particleCount * 0.5),
         updateFrequency: Math.max(5, selectedLevel.updateFrequency * 0.5),
       };
@@ -262,7 +265,7 @@ export class PerformanceOptimizer {
     // Reduce vertex count based on LOD
     const vertexReduction = 1.0 - (lodLevel.fractalDepth / 6.0) * 0.5;
     const targetVertexCount = Math.floor(geometry.vertices.length * vertexReduction);
-    
+
     if (geometry.vertices.length <= targetVertexCount) {
       return geometry;
     }
@@ -270,10 +273,10 @@ export class PerformanceOptimizer {
     // Simplify geometry by removing vertices
     const step = Math.ceil(geometry.vertices.length / targetVertexCount);
     const optimizedVertices = geometry.vertices.filter((_, index) => index % step === 0);
-    
+
     // Rebuild faces for simplified geometry
     const optimizedFaces = this.rebuildFaces(optimizedVertices, geometry.faces, step);
-    
+
     return {
       ...geometry,
       vertices: optimizedVertices,
@@ -288,11 +291,11 @@ export class PerformanceOptimizer {
     if (this.capabilities.isLowEnd || this.metrics.isLowPerformance) {
       return 'minimal';
     }
-    
+
     if (this.capabilities.isMobile && lodLevel.shaderComplexity === 'enhanced') {
       return 'standard';
     }
-    
+
     return lodLevel.shaderComplexity;
   }
 
@@ -302,7 +305,7 @@ export class PerformanceOptimizer {
   getUpdateFrequency(lodLevel: LODLevel): number {
     const baseFrequency = lodLevel.updateFrequency;
     const performanceModifier = this.adaptiveQuality;
-    
+
     return Math.max(5, Math.floor(baseFrequency * performanceModifier));
   }
 
@@ -310,7 +313,9 @@ export class PerformanceOptimizer {
    * Check if consciousness effects should be reduced
    */
   shouldReduceConsciousnessEffects(): boolean {
-    return this.capabilities.isLowEnd || this.metrics.isLowPerformance || this.adaptiveQuality < 0.6;
+    return (
+      this.capabilities.isLowEnd || this.metrics.isLowPerformance || this.adaptiveQuality < 0.6
+    );
   }
 
   /**
@@ -360,7 +365,9 @@ export class PerformanceOptimizer {
     });
 
     return originalFaces
-      .map(face => face.map(vertexIndex => indexMap.get(vertexIndex)).filter(index => index !== undefined))
+      .map(face =>
+        face.map(vertexIndex => indexMap.get(vertexIndex)).filter(index => index !== undefined)
+      )
       .filter(face => face.length >= 3) as number[][];
   }
 }
@@ -369,13 +376,18 @@ export class PerformanceOptimizer {
 export const performanceOptimizer = new PerformanceOptimizer();
 
 // Export utility functions
-export const getOptimalLOD = (object: Object3D, camera: Camera) => 
+export const getOptimalLOD = (object: Object3D, camera: Camera) =>
   performanceOptimizer.getLODLevel(object, camera);
 
-export const optimizeForDevice = (geometry: SacredGeometry, consciousness: ConsciousnessState, camera: Camera, object: Object3D) => {
+export const optimizeForDevice = (
+  geometry: SacredGeometry,
+  consciousness: ConsciousnessState,
+  camera: Camera,
+  object: Object3D
+) => {
   const lodLevel = performanceOptimizer.getLODLevel(object, camera);
   return performanceOptimizer.optimizeGeometry(geometry, lodLevel, consciousness);
 };
 
-export const shouldUseMinimalShaders = () => 
+export const shouldUseMinimalShaders = () =>
   performanceOptimizer.shouldReduceConsciousnessEffects();

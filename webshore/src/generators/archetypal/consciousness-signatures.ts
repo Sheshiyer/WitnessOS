@@ -1,14 +1,21 @@
 /**
  * Archetypal Consciousness Signatures for WitnessOS Webshore
- * 
+ *
  * Fractal signatures for Human Design types, Enneagram centers, and other archetypal patterns
  * Each archetype gets unique fractal characteristics and wave interference patterns
  */
 
-import { Vector3 } from 'three';
+import type { BreathState, ConsciousnessState } from '@/types';
 import { CONSCIOUSNESS_CONSTANTS } from '@/utils/consciousness-constants';
-import type { ConsciousnessState, BreathState } from '@/types';
-import { SacredGeometry, createTetrahedron, createCube, createOctahedron, createDodecahedron, createIcosahedron } from '../sacred-geometry/platonic-solids';
+import { Vector3 } from 'three';
+import {
+  SacredGeometry,
+  createCube,
+  createDodecahedron,
+  createIcosahedron,
+  createOctahedron,
+  createTetrahedron,
+} from '../sacred-geometry/platonic-solids';
 
 const { SACRED_MATHEMATICS, CONSCIOUSNESS_FREQUENCIES } = CONSCIOUSNESS_CONSTANTS;
 
@@ -120,7 +127,7 @@ export class HumanDesignFractals {
     const breathPhase = this.getBreathPhase(breath);
     const timeModulation = Math.sin(time * signature.waveFrequency * 0.001) * 0.1;
     const awarenessModulation = consciousness.awarenessLevel * signature.awarenessAmplification;
-    
+
     // Apply fractal transformation to base geometry
     const modifiedVertices = signature.baseGeometry.vertices.map((vertex, index) => {
       const vertexPhase = (index / signature.baseGeometry.vertices.length) * SACRED_MATHEMATICS.TAU;
@@ -131,7 +138,7 @@ export class HumanDesignFractals {
         breathPhase + vertexPhase,
         timeModulation
       );
-      
+
       return vertex.clone().add(fractalDisplacement);
     });
 
@@ -172,17 +179,18 @@ export class HumanDesignFractals {
   }
 
   private static mandelbrotDisplacement(x: number, y: number, z: number, scale: number): Vector3 {
-    let zx = x, zy = y;
+    let zx = x,
+      zy = y;
     let iterations = 0;
     const maxIter = 8;
-    
-    while (iterations < maxIter && (zx * zx + zy * zy) < 4) {
+
+    while (iterations < maxIter && zx * zx + zy * zy < 4) {
       const temp = zx * zx - zy * zy + x;
       zy = 2 * zx * zy + y;
       zx = temp;
       iterations++;
     }
-    
+
     const displacement = (iterations / maxIter) * scale;
     return new Vector3(
       displacement * Math.cos(z),
@@ -193,17 +201,18 @@ export class HumanDesignFractals {
 
   private static juliaDisplacement(x: number, y: number, z: number, scale: number): Vector3 {
     const c = { x: -0.7269, y: 0.1889 };
-    let zx = x, zy = y;
+    let zx = x,
+      zy = y;
     let iterations = 0;
     const maxIter = 8;
-    
-    while (iterations < maxIter && (zx * zx + zy * zy) < 4) {
+
+    while (iterations < maxIter && zx * zx + zy * zy < 4) {
       const temp = zx * zx - zy * zy + c.x;
       zy = 2 * zx * zy + c.y;
       zx = temp;
       iterations++;
     }
-    
+
     const displacement = (iterations / maxIter) * scale;
     return new Vector3(
       displacement * Math.sin(z * SACRED_MATHEMATICS.PHI),
@@ -212,11 +221,17 @@ export class HumanDesignFractals {
     );
   }
 
-  private static dragonDisplacement(x: number, y: number, z: number, scale: number, phase: number): Vector3 {
+  private static dragonDisplacement(
+    x: number,
+    y: number,
+    z: number,
+    scale: number,
+    phase: number
+  ): Vector3 {
     const dragonAngle = Math.atan2(y, x) + phase;
     const radius = Math.sqrt(x * x + y * y);
     const displacement = scale * Math.sin(dragonAngle * 4 + z);
-    
+
     return new Vector3(
       displacement * Math.cos(dragonAngle + phase),
       displacement * Math.sin(dragonAngle + phase),
@@ -229,18 +244,18 @@ export class HumanDesignFractals {
     const level = 3;
     let displacement = 0;
     let currentScale = scale;
-    
+
     for (let i = 0; i < level; i++) {
       const triangleX = Math.floor(x * Math.pow(2, i)) % 2;
       const triangleY = Math.floor(y * Math.pow(2, i)) % 2;
       const triangleZ = Math.floor(z * Math.pow(2, i)) % 2;
-      
+
       if ((triangleX + triangleY + triangleZ) % 2 === 1) {
         displacement += currentScale;
       }
       currentScale *= 0.5;
     }
-    
+
     return new Vector3(
       displacement * Math.cos(x + y),
       displacement * Math.sin(y + z),
@@ -273,63 +288,72 @@ export class EnneagramFractals {
    */
   static getTypeSignature(type: number, consciousness: ConsciousnessState): EnneagramSignature {
     const baseSignatures: Record<number, Partial<EnneagramSignature>> = {
-      1: { // The Perfectionist
+      1: {
+        // The Perfectionist
         center: 'body',
         baseGeometry: createCube(1.0, consciousness),
         fractalDepth: 4,
         resonanceFrequency: CONSCIOUSNESS_FREQUENCIES.SOLFEGGIO.UT,
         colorHarmony: [0.8, 0.2, 0.2], // Red - anger/perfection
       },
-      2: { // The Helper
+      2: {
+        // The Helper
         center: 'heart',
         baseGeometry: createOctahedron(1.0, consciousness),
         fractalDepth: 3,
         resonanceFrequency: CONSCIOUSNESS_FREQUENCIES.SOLFEGGIO.RE,
         colorHarmony: [0.9, 0.6, 0.3], // Orange - pride/love
       },
-      3: { // The Achiever
+      3: {
+        // The Achiever
         center: 'heart',
         baseGeometry: createTetrahedron(1.0, consciousness),
         fractalDepth: 5,
         resonanceFrequency: CONSCIOUSNESS_FREQUENCIES.SOLFEGGIO.MI,
         colorHarmony: [0.9, 0.9, 0.2], // Yellow - deceit/hope
       },
-      4: { // The Individualist
+      4: {
+        // The Individualist
         center: 'heart',
         baseGeometry: createIcosahedron(1.0, consciousness),
         fractalDepth: 6,
         resonanceFrequency: CONSCIOUSNESS_FREQUENCIES.SOLFEGGIO.FA,
         colorHarmony: [0.6, 0.3, 0.9], // Purple - envy/originality
       },
-      5: { // The Investigator
+      5: {
+        // The Investigator
         center: 'head',
         baseGeometry: createDodecahedron(1.0, consciousness),
         fractalDepth: 7,
         resonanceFrequency: CONSCIOUSNESS_FREQUENCIES.SOLFEGGIO.SOL,
         colorHarmony: [0.2, 0.6, 0.8], // Blue - avarice/understanding
       },
-      6: { // The Loyalist
+      6: {
+        // The Loyalist
         center: 'head',
         baseGeometry: createOctahedron(1.0, consciousness),
         fractalDepth: 3,
         resonanceFrequency: CONSCIOUSNESS_FREQUENCIES.SOLFEGGIO.LA,
         colorHarmony: [0.4, 0.8, 0.4], // Green - fear/faith
       },
-      7: { // The Enthusiast
+      7: {
+        // The Enthusiast
         center: 'head',
         baseGeometry: createTetrahedron(1.0, consciousness),
         fractalDepth: 8,
         resonanceFrequency: CONSCIOUSNESS_FREQUENCIES.SOLFEGGIO.SI,
         colorHarmony: [0.9, 0.9, 0.9], // White - gluttony/sobriety
       },
-      8: { // The Challenger
+      8: {
+        // The Challenger
         center: 'body',
         baseGeometry: createCube(1.0, consciousness),
         fractalDepth: 4,
         resonanceFrequency: CONSCIOUSNESS_FREQUENCIES.CHAKRA.ROOT,
         colorHarmony: [0.1, 0.1, 0.1], // Black - lust/innocence
       },
-      9: { // The Peacemaker
+      9: {
+        // The Peacemaker
         center: 'body',
         baseGeometry: createIcosahedron(1.0, consciousness),
         fractalDepth: 2,
@@ -339,16 +363,28 @@ export class EnneagramFractals {
     };
 
     const base = baseSignatures[type] || baseSignatures[9];
-    
+
+    if (!base) {
+      throw new Error(`Base signature not found for type ${type}`);
+    }
+
     return {
-      center: base.center!,
+      center: base.center || 'body',
       number: type as any,
-      baseGeometry: base.baseGeometry!,
-      fractalDepth: base.fractalDepth!,
-      resonanceFrequency: base.resonanceFrequency!,
+      baseGeometry:
+        base.baseGeometry ||
+        ({
+          vertices: [],
+          faces: [],
+          edges: [],
+          center: new Vector3(),
+          radius: 1,
+        } as SacredGeometry),
+      fractalDepth: base.fractalDepth || 3,
+      resonanceFrequency: base.resonanceFrequency || 528,
       integrationVector: this.getIntegrationVector(type),
       disintegrationVector: this.getDisintegrationVector(type),
-      colorHarmony: base.colorHarmony!,
+      colorHarmony: base.colorHarmony || [0.5, 0.5, 0.5],
     };
   }
 
@@ -364,7 +400,7 @@ export class EnneagramFractals {
       8: new Vector3(0.2, 0.8, 0.2), // 8 → 2
       9: new Vector3(0.3, 0.9, 0.3), // 9 → 3
     };
-    
+
     return integrationMap[type] || new Vector3(0.5, 0.5, 0.5);
   }
 
@@ -380,7 +416,7 @@ export class EnneagramFractals {
       8: new Vector3(0.5, 0.5, 1.0), // 8 → 5
       9: new Vector3(0.6, 0.6, 0.6), // 9 → 6
     };
-    
+
     return disintegrationMap[type] || new Vector3(0.5, 0.5, 0.5);
   }
 }
@@ -396,9 +432,6 @@ export const createHumanDesignFractal = (
   return HumanDesignFractals.generateTypeFractal(signature, consciousness, breath, time);
 };
 
-export const createEnneagramFractal = (
-  type: number,
-  consciousness: ConsciousnessState
-) => {
+export const createEnneagramFractal = (type: number, consciousness: ConsciousnessState) => {
   return EnneagramFractals.getTypeSignature(type, consciousness);
 };

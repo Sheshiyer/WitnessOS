@@ -1,13 +1,13 @@
 /**
  * Sacred Geometry Generators for WitnessOS Webshore
- * 
+ *
  * Platonic solids and sacred patterns with fractal subdivision
  * Mathematical foundation for consciousness visualization
  */
 
-import { Vector3 } from 'three';
+import type { BreathState, ConsciousnessState } from '@/types';
 import { CONSCIOUSNESS_CONSTANTS } from '@/utils/consciousness-constants';
-import type { ConsciousnessState, BreathState } from '@/types';
+import { Vector3 } from 'three';
 
 const { SACRED_MATHEMATICS } = CONSCIOUSNESS_CONSTANTS;
 
@@ -20,7 +20,7 @@ export interface SacredGeometry {
   edges: [number, number][];
   center: Vector3;
   radius: number;
-  dualSolid?: SacredGeometry;
+  dualSolid?: SacredGeometry | undefined;
 }
 
 /**
@@ -31,13 +31,13 @@ export class PlatonicSolidGenerator {
    * Generate tetrahedron (4 faces, fire element)
    */
   static tetrahedron(radius: number = 1.0, consciousness?: ConsciousnessState): SacredGeometry {
-    const a = radius * Math.sqrt(8/9);
-    const b = radius * Math.sqrt(2/9);
-    const c = radius * Math.sqrt(2/3);
-    
+    const a = radius * Math.sqrt(8 / 9);
+    const b = radius * Math.sqrt(2 / 9);
+    const c = radius * Math.sqrt(2 / 3);
+
     // Consciousness modulation
     const modulation = consciousness ? 1.0 + consciousness.awarenessLevel * 0.1 : 1.0;
-    
+
     const vertices = [
       new Vector3(0, radius * modulation, 0),
       new Vector3(-a * modulation, -b * modulation, 0),
@@ -53,8 +53,12 @@ export class PlatonicSolidGenerator {
     ];
 
     const edges: [number, number][] = [
-      [0, 1], [0, 2], [0, 3],
-      [1, 2], [1, 3], [2, 3],
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [1, 2],
+      [1, 3],
+      [2, 3],
     ];
 
     return {
@@ -75,21 +79,38 @@ export class PlatonicSolidGenerator {
     const ms = s * modulation;
 
     const vertices = [
-      new Vector3(-ms, -ms, -ms), new Vector3(ms, -ms, -ms),
-      new Vector3(ms, ms, -ms), new Vector3(-ms, ms, -ms),
-      new Vector3(-ms, -ms, ms), new Vector3(ms, -ms, ms),
-      new Vector3(ms, ms, ms), new Vector3(-ms, ms, ms),
+      new Vector3(-ms, -ms, -ms),
+      new Vector3(ms, -ms, -ms),
+      new Vector3(ms, ms, -ms),
+      new Vector3(-ms, ms, -ms),
+      new Vector3(-ms, -ms, ms),
+      new Vector3(ms, -ms, ms),
+      new Vector3(ms, ms, ms),
+      new Vector3(-ms, ms, ms),
     ];
 
     const faces = [
-      [0, 1, 2, 3], [4, 7, 6, 5], [0, 4, 5, 1],
-      [2, 6, 7, 3], [0, 3, 7, 4], [1, 5, 6, 2],
+      [0, 1, 2, 3],
+      [4, 7, 6, 5],
+      [0, 4, 5, 1],
+      [2, 6, 7, 3],
+      [0, 3, 7, 4],
+      [1, 5, 6, 2],
     ];
 
     const edges: [number, number][] = [
-      [0, 1], [1, 2], [2, 3], [3, 0],
-      [4, 5], [5, 6], [6, 7], [7, 4],
-      [0, 4], [1, 5], [2, 6], [3, 7],
+      [0, 1],
+      [1, 2],
+      [2, 3],
+      [3, 0],
+      [4, 5],
+      [5, 6],
+      [6, 7],
+      [7, 4],
+      [0, 4],
+      [1, 5],
+      [2, 6],
+      [3, 7],
     ];
 
     return {
@@ -109,20 +130,38 @@ export class PlatonicSolidGenerator {
     const r = radius * modulation;
 
     const vertices = [
-      new Vector3(r, 0, 0), new Vector3(-r, 0, 0),
-      new Vector3(0, r, 0), new Vector3(0, -r, 0),
-      new Vector3(0, 0, r), new Vector3(0, 0, -r),
+      new Vector3(r, 0, 0),
+      new Vector3(-r, 0, 0),
+      new Vector3(0, r, 0),
+      new Vector3(0, -r, 0),
+      new Vector3(0, 0, r),
+      new Vector3(0, 0, -r),
     ];
 
     const faces = [
-      [0, 2, 4], [0, 4, 3], [0, 3, 5], [0, 5, 2],
-      [1, 4, 2], [1, 3, 4], [1, 5, 3], [1, 2, 5],
+      [0, 2, 4],
+      [0, 4, 3],
+      [0, 3, 5],
+      [0, 5, 2],
+      [1, 4, 2],
+      [1, 3, 4],
+      [1, 5, 3],
+      [1, 2, 5],
     ];
 
     const edges: [number, number][] = [
-      [0, 2], [0, 3], [0, 4], [0, 5],
-      [1, 2], [1, 3], [1, 4], [1, 5],
-      [2, 4], [2, 5], [3, 4], [3, 5],
+      [0, 2],
+      [0, 3],
+      [0, 4],
+      [0, 5],
+      [1, 2],
+      [1, 3],
+      [1, 4],
+      [1, 5],
+      [2, 4],
+      [2, 5],
+      [3, 4],
+      [3, 5],
     ];
 
     return {
@@ -141,39 +180,59 @@ export class PlatonicSolidGenerator {
   static dodecahedron(radius: number = 1.0, consciousness?: ConsciousnessState): SacredGeometry {
     const phi = SACRED_MATHEMATICS.PHI;
     const modulation = consciousness ? 1.0 + consciousness.awarenessLevel * 0.1 : 1.0;
-    const scale = radius * modulation / Math.sqrt(3);
+    const scale = (radius * modulation) / Math.sqrt(3);
 
     const vertices = [
       // Cube vertices
-      new Vector3(scale, scale, scale), new Vector3(scale, scale, -scale),
-      new Vector3(scale, -scale, scale), new Vector3(scale, -scale, -scale),
-      new Vector3(-scale, scale, scale), new Vector3(-scale, scale, -scale),
-      new Vector3(-scale, -scale, scale), new Vector3(-scale, -scale, -scale),
-      
+      new Vector3(scale, scale, scale),
+      new Vector3(scale, scale, -scale),
+      new Vector3(scale, -scale, scale),
+      new Vector3(scale, -scale, -scale),
+      new Vector3(-scale, scale, scale),
+      new Vector3(-scale, scale, -scale),
+      new Vector3(-scale, -scale, scale),
+      new Vector3(-scale, -scale, -scale),
+
       // Golden ratio rectangles
-      new Vector3(0, scale * phi, scale / phi), new Vector3(0, scale * phi, -scale / phi),
-      new Vector3(0, -scale * phi, scale / phi), new Vector3(0, -scale * phi, -scale / phi),
-      new Vector3(scale / phi, 0, scale * phi), new Vector3(scale / phi, 0, -scale * phi),
-      new Vector3(-scale / phi, 0, scale * phi), new Vector3(-scale / phi, 0, -scale * phi),
-      new Vector3(scale * phi, scale / phi, 0), new Vector3(scale * phi, -scale / phi, 0),
-      new Vector3(-scale * phi, scale / phi, 0), new Vector3(-scale * phi, -scale / phi, 0),
+      new Vector3(0, scale * phi, scale / phi),
+      new Vector3(0, scale * phi, -scale / phi),
+      new Vector3(0, -scale * phi, scale / phi),
+      new Vector3(0, -scale * phi, -scale / phi),
+      new Vector3(scale / phi, 0, scale * phi),
+      new Vector3(scale / phi, 0, -scale * phi),
+      new Vector3(-scale / phi, 0, scale * phi),
+      new Vector3(-scale / phi, 0, -scale * phi),
+      new Vector3(scale * phi, scale / phi, 0),
+      new Vector3(scale * phi, -scale / phi, 0),
+      new Vector3(-scale * phi, scale / phi, 0),
+      new Vector3(-scale * phi, -scale / phi, 0),
     ];
 
     // Simplified face definition for dodecahedron
     const faces = [
-      [0, 16, 17, 2, 12], [1, 13, 3, 17, 16],
-      [4, 14, 6, 19, 18], [5, 18, 19, 7, 15],
-      [8, 9, 1, 16, 0], [10, 2, 17, 3, 11],
-      [12, 2, 10, 6, 14], [13, 15, 7, 11, 3],
-      [4, 8, 0, 12, 14], [5, 15, 13, 1, 9],
-      [6, 10, 11, 7, 19], [8, 4, 18, 5, 9],
+      [0, 16, 17, 2, 12],
+      [1, 13, 3, 17, 16],
+      [4, 14, 6, 19, 18],
+      [5, 18, 19, 7, 15],
+      [8, 9, 1, 16, 0],
+      [10, 2, 17, 3, 11],
+      [12, 2, 10, 6, 14],
+      [13, 15, 7, 11, 3],
+      [4, 8, 0, 12, 14],
+      [5, 15, 13, 1, 9],
+      [6, 10, 11, 7, 19],
+      [8, 4, 18, 5, 9],
     ];
 
     const edges: [number, number][] = [];
     faces.forEach(face => {
       for (let i = 0; i < face.length; i++) {
         const next = (i + 1) % face.length;
-        edges.push([face[i], face[next]]);
+        const currentVertex = face[i];
+        const nextVertex = face[next];
+        if (currentVertex !== undefined && nextVertex !== undefined) {
+          edges.push([currentVertex, nextVertex]);
+        }
       }
     });
 
@@ -193,29 +252,55 @@ export class PlatonicSolidGenerator {
   static icosahedron(radius: number = 1.0, consciousness?: ConsciousnessState): SacredGeometry {
     const phi = SACRED_MATHEMATICS.PHI;
     const modulation = consciousness ? 1.0 + consciousness.awarenessLevel * 0.1 : 1.0;
-    const scale = radius * modulation / Math.sqrt(phi * phi + 1);
+    const scale = (radius * modulation) / Math.sqrt(phi * phi + 1);
 
     const vertices = [
-      new Vector3(0, scale, scale * phi), new Vector3(0, scale, -scale * phi),
-      new Vector3(0, -scale, scale * phi), new Vector3(0, -scale, -scale * phi),
-      new Vector3(scale, scale * phi, 0), new Vector3(scale, -scale * phi, 0),
-      new Vector3(-scale, scale * phi, 0), new Vector3(-scale, -scale * phi, 0),
-      new Vector3(scale * phi, 0, scale), new Vector3(scale * phi, 0, -scale),
-      new Vector3(-scale * phi, 0, scale), new Vector3(-scale * phi, 0, -scale),
+      new Vector3(0, scale, scale * phi),
+      new Vector3(0, scale, -scale * phi),
+      new Vector3(0, -scale, scale * phi),
+      new Vector3(0, -scale, -scale * phi),
+      new Vector3(scale, scale * phi, 0),
+      new Vector3(scale, -scale * phi, 0),
+      new Vector3(-scale, scale * phi, 0),
+      new Vector3(-scale, -scale * phi, 0),
+      new Vector3(scale * phi, 0, scale),
+      new Vector3(scale * phi, 0, -scale),
+      new Vector3(-scale * phi, 0, scale),
+      new Vector3(-scale * phi, 0, -scale),
     ];
 
     const faces = [
-      [0, 2, 8], [0, 8, 4], [0, 4, 6], [0, 6, 10], [0, 10, 2],
-      [3, 1, 11], [3, 11, 7], [3, 7, 5], [3, 5, 9], [3, 9, 1],
-      [2, 5, 8], [8, 5, 9], [8, 9, 4], [4, 9, 1], [4, 1, 6],
-      [6, 1, 11], [6, 11, 10], [10, 11, 7], [10, 7, 2], [2, 7, 5],
+      [0, 2, 8],
+      [0, 8, 4],
+      [0, 4, 6],
+      [0, 6, 10],
+      [0, 10, 2],
+      [3, 1, 11],
+      [3, 11, 7],
+      [3, 7, 5],
+      [3, 5, 9],
+      [3, 9, 1],
+      [2, 5, 8],
+      [8, 5, 9],
+      [8, 9, 4],
+      [4, 9, 1],
+      [4, 1, 6],
+      [6, 1, 11],
+      [6, 11, 10],
+      [10, 11, 7],
+      [10, 7, 2],
+      [2, 7, 5],
     ];
 
     const edges: [number, number][] = [];
     faces.forEach(face => {
       for (let i = 0; i < face.length; i++) {
         const next = (i + 1) % face.length;
-        edges.push([face[i], face[next]]);
+        const currentVertex = face[i];
+        const nextVertex = face[next];
+        if (currentVertex !== undefined && nextVertex !== undefined) {
+          edges.push([currentVertex, nextVertex]);
+        }
       }
     });
 
@@ -266,7 +351,12 @@ export class FractalSubdivision {
     const awarenessLevel = consciousness?.awarenessLevel ?? 0.5;
 
     for (let level = 0; level < levels; level++) {
-      currentGeometry = this.applyFractalPattern(currentGeometry, level, fractalType, awarenessLevel);
+      currentGeometry = this.applyFractalPattern(
+        currentGeometry,
+        level,
+        fractalType,
+        awarenessLevel
+      );
     }
 
     return currentGeometry;
@@ -311,11 +401,12 @@ export class FractalSubdivision {
       const y = vertex.y * scale;
 
       // Simplified Mandelbrot iteration
-      let zx = x, zy = y;
+      let zx = x,
+        zy = y;
       let iterations = 0;
       const maxIter = 8 + level * 2;
 
-      while (iterations < maxIter && (zx * zx + zy * zy) < 4) {
+      while (iterations < maxIter && zx * zx + zy * zy < 4) {
         const temp = zx * zx - zy * zy + x;
         zy = 2 * zx * zy + y;
         zx = temp;
@@ -350,7 +441,7 @@ export class FractalSubdivision {
       let iterations = 0;
       const maxIter = 8 + level * 2;
 
-      while (iterations < maxIter && (zx * zx + zy * zy) < 4) {
+      while (iterations < maxIter && zx * zx + zy * zy < 4) {
         const temp = zx * zx - zy * zy + c.x;
         zy = 2 * zx * zy + c.y;
         zx = temp;
@@ -409,12 +500,20 @@ export class FractalSubdivision {
     const newFaces: number[][] = [];
 
     // Sierpinski subdivision: replace each triangle with 3 smaller triangles
-    geometry.faces.forEach(face => {
+    for (const face of geometry.faces) {
       if (face.length === 3) {
         const [a, b, c] = face;
+        if (a === undefined || b === undefined || c === undefined) {
+          continue;
+        }
+
         const va = geometry.vertices[a];
         const vb = geometry.vertices[b];
         const vc = geometry.vertices[c];
+
+        if (!va || !vb || !vc) {
+          continue;
+        }
 
         // Create midpoints
         const mab = va.clone().add(vb).multiplyScalar(0.5);
@@ -434,7 +533,7 @@ export class FractalSubdivision {
       } else {
         newFaces.push(face);
       }
-    });
+    }
 
     return {
       ...geometry,
@@ -455,34 +554,44 @@ export class FractalSubdivision {
     // Create midpoint vertices
     geometry.faces.forEach(face => {
       const newFace: number[] = [];
-      
+
       for (let i = 0; i < face.length; i++) {
         const v1 = face[i];
         const v2 = face[(i + 1) % face.length];
+
+        if (v1 === undefined || v2 === undefined) {
+          continue;
+        }
+
         const edgeKey = `${Math.min(v1, v2)}-${Math.max(v1, v2)}`;
-        
+
         newFace.push(v1);
-        
+
         if (!edgeMap.has(edgeKey)) {
-          const midpoint = geometry.vertices[v1].clone()
-            .add(geometry.vertices[v2])
-            .multiplyScalar(0.5);
-          
+          const vertex1 = geometry.vertices[v1];
+          const vertex2 = geometry.vertices[v2];
+          if (!vertex1 || !vertex2) continue;
+
+          const midpoint = vertex1.clone().add(vertex2).multiplyScalar(0.5);
+
           // Consciousness-based displacement
           if (consciousness) {
-            const displacement = midpoint.clone()
+            const displacement = midpoint
+              .clone()
               .normalize()
-              .multiplyScalar(consciousness.awarenessLevel * 0.1 * Math.sin(level * SACRED_MATHEMATICS.PHI));
+              .multiplyScalar(
+                consciousness.awarenessLevel * 0.1 * Math.sin(level * SACRED_MATHEMATICS.PHI)
+              );
             midpoint.add(displacement);
           }
-          
+
           edgeMap.set(edgeKey, newVertices.length);
           newVertices.push(midpoint);
         }
-        
+
         newFace.push(edgeMap.get(edgeKey)!);
       }
-      
+
       newFaces.push(newFace);
     });
 
@@ -491,7 +600,11 @@ export class FractalSubdivision {
     newFaces.forEach(face => {
       for (let i = 0; i < face.length; i++) {
         const next = (i + 1) % face.length;
-        newEdges.push([face[i], face[next]]);
+        const currentVertex = face[i];
+        const nextVertex = face[next];
+        if (currentVertex !== undefined && nextVertex !== undefined) {
+          newEdges.push([currentVertex, nextVertex]);
+        }
       }
     });
 
@@ -501,7 +614,7 @@ export class FractalSubdivision {
       edges: newEdges,
       center: geometry.center.clone(),
       radius: geometry.radius,
-      dualSolid: geometry.dualSolid,
+      dualSolid: geometry.dualSolid ?? undefined,
     };
   }
 }
@@ -520,7 +633,7 @@ export class BreathGeometry {
   ): SacredGeometry {
     const breathPhase = this.getBreathPhase(breath);
     const modulation = Math.sin(breathPhase) * intensity * breath.coherence;
-    
+
     const modulatedVertices = geometry.vertices.map(vertex => {
       const distance = vertex.length();
       const direction = vertex.clone().normalize();
@@ -645,4 +758,51 @@ export const createFractalIcosahedron = (
   return fractalType
     ? FractalSubdivision.fractalSubdivide(base, fractalLevels, consciousness, fractalType)
     : FractalSubdivision.subdivide(base, fractalLevels, consciousness);
+};
+
+/**
+ * Generate sacred geometry for Three.js
+ * This is the function our engine components expect
+ */
+export const generateSacredGeometry = (options: {
+  type: string;
+  radius?: number;
+  petals?: number;
+  layers?: number;
+  triangles?: number;
+  complexity?: number;
+}) => {
+  // For now, return a simple ring geometry as placeholder
+  // This prevents import errors while maintaining the interface
+  const { RingGeometry } = require('three');
+  return new RingGeometry(options.radius || 1, (options.radius || 1) * 1.2, 16);
+};
+
+/**
+ * Create platonic solid for Three.js
+ * This is the function our engine components expect
+ */
+export const createPlatonicSolid = (type: string, radius: number = 1) => {
+  const {
+    SphereGeometry,
+    BoxGeometry,
+    OctahedronGeometry,
+    IcosahedronGeometry,
+    DodecahedronGeometry,
+  } = require('three');
+
+  switch (type) {
+    case 'tetrahedron':
+      return new OctahedronGeometry(radius);
+    case 'cube':
+      return new BoxGeometry(radius, radius, radius);
+    case 'octahedron':
+      return new OctahedronGeometry(radius);
+    case 'dodecahedron':
+      return new DodecahedronGeometry(radius);
+    case 'icosahedron':
+      return new IcosahedronGeometry(radius);
+    default:
+      return new SphereGeometry(radius, 8, 8);
+  }
 };

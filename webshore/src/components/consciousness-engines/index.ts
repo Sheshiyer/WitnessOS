@@ -1,29 +1,42 @@
 /**
  * Consciousness Engines Export Index
- * 
+ *
  * Centralized exports for all 10 WitnessOS consciousness engine 3D visualizations
  * Each engine provides specialized consciousness calculations with fractal 3D experiences
  */
 
 // Core engine components
-export { default as NumerologyEngine } from './NumerologyEngine';
-export { default as BiorhythmEngine } from './BiorhythmEngine';
-export { default as HumanDesignEngine } from './HumanDesignEngine';
-export { default as VimshottariEngine } from './VimshottariEngine';
-export { default as TarotEngine } from './TarotEngine';
-export { default as IChingEngine } from './IChingEngine';
-export { default as GeneKeysEngine } from './GeneKeysEngine';
-export { default as EnneagramEngine } from './EnneagramEngine';
-export { default as SacredGeometryEngine } from './SacredGeometryEngine';
-export { default as SigilForgeEngine } from './SigilForgeEngine';
+import BiorhythmEngineComponent from './BiorhythmEngine';
+import BreathDetectionComponent from './BreathDetection';
+import EnneagramEngineComponent from './EnneagramEngine';
+import GeneKeysEngineComponent from './GeneKeysEngine';
+import HumanDesignEngineComponent from './HumanDesignEngine';
+import IChingEngineComponent from './IChingEngine';
+import NumerologyEngineComponent from './NumerologyEngine';
+import SacredGeometryEngineComponent from './SacredGeometryEngine';
+import SigilForgeEngineComponent from './SigilForgeEngine';
+import TarotEngineComponent from './TarotEngine';
+import VimshottariEngineComponent from './VimshottariEngine';
 
-// Utility components
-export { default as BreathDetection } from './BreathDetection';
+// Re-export with consistent names
+export {
+  BiorhythmEngineComponent as BiorhythmEngine,
+  BreathDetectionComponent as BreathDetection,
+  EnneagramEngineComponent as EnneagramEngine,
+  GeneKeysEngineComponent as GeneKeysEngine,
+  HumanDesignEngineComponent as HumanDesignEngine,
+  IChingEngineComponent as IChingEngine,
+  NumerologyEngineComponent as NumerologyEngine,
+  SacredGeometryEngineComponent as SacredGeometryEngine,
+  SigilForgeEngineComponent as SigilForgeEngine,
+  TarotEngineComponent as TarotEngine,
+  VimshottariEngineComponent as VimshottariEngine,
+};
 
 // Engine type definitions for easy reference
-export type EngineComponent = 
+export type EngineComponent =
   | 'numerology'
-  | 'biorhythm' 
+  | 'biorhythm'
   | 'human_design'
   | 'vimshottari'
   | 'tarot'
@@ -44,8 +57,8 @@ export const ENGINE_METADATA = {
     element: 'spirit',
   },
   biorhythm: {
-    name: 'Biorhythm Synchronizer', 
-    description: 'Temporal wave visualization using Nishitsuji\'s wave equations',
+    name: 'Biorhythm Synchronizer',
+    description: "Temporal wave visualization using Nishitsuji's wave equations",
     layer: 1, // Awakening layer
     color: '#FF6B6B',
     frequency: 396,
@@ -131,16 +144,16 @@ export const getEngineMetadata = (engine: EngineComponent) => {
 
 // Engine component mapping for dynamic loading
 export const ENGINE_COMPONENTS = {
-  numerology: NumerologyEngine,
-  biorhythm: BiorhythmEngine,
-  human_design: HumanDesignEngine,
-  vimshottari: VimshottariEngine,
-  tarot: TarotEngine,
-  iching: IChingEngine,
-  gene_keys: GeneKeysEngine,
-  enneagram: EnneagramEngine,
-  sacred_geometry: SacredGeometryEngine,
-  sigil_forge: SigilForgeEngine,
+  numerology: NumerologyEngineComponent,
+  biorhythm: BiorhythmEngineComponent,
+  human_design: HumanDesignEngineComponent,
+  vimshottari: VimshottariEngineComponent,
+  tarot: TarotEngineComponent,
+  iching: IChingEngineComponent,
+  gene_keys: GeneKeysEngineComponent,
+  enneagram: EnneagramEngineComponent,
+  sacred_geometry: SacredGeometryEngineComponent,
+  sigil_forge: SigilForgeEngineComponent,
 } as const;
 
 // Discovery layer engine distribution
@@ -153,10 +166,7 @@ export const LAYER_ENGINES = {
 
 // Consciousness frequency mapping for engine harmonics
 export const ENGINE_FREQUENCIES = Object.fromEntries(
-  Object.entries(ENGINE_METADATA).map(([engine, metadata]) => [
-    engine,
-    metadata.frequency
-  ])
+  Object.entries(ENGINE_METADATA).map(([engine, metadata]) => [engine, metadata.frequency])
 );
 
 // Engine element groupings for thematic organization
@@ -173,25 +183,25 @@ export const ENGINE_ELEMENTS = {
 
 export default {
   // Components
-  NumerologyEngine,
-  BiorhythmEngine,
-  HumanDesignEngine,
-  VimshottariEngine,
-  TarotEngine,
-  IChingEngine,
-  GeneKeysEngine,
-  EnneagramEngine,
-  SacredGeometryEngine,
-  SigilForgeEngine,
-  BreathDetection,
-  
+  NumerologyEngine: NumerologyEngineComponent,
+  BiorhythmEngine: BiorhythmEngineComponent,
+  HumanDesignEngine: HumanDesignEngineComponent,
+  VimshottariEngine: VimshottariEngineComponent,
+  TarotEngine: TarotEngineComponent,
+  IChingEngine: IChingEngineComponent,
+  GeneKeysEngine: GeneKeysEngineComponent,
+  EnneagramEngine: EnneagramEngineComponent,
+  SacredGeometryEngine: SacredGeometryEngineComponent,
+  SigilForgeEngine: SigilForgeEngineComponent,
+  BreathDetection: BreathDetectionComponent,
+
   // Metadata
   ENGINE_METADATA,
   ENGINE_COMPONENTS,
   LAYER_ENGINES,
   ENGINE_FREQUENCIES,
   ENGINE_ELEMENTS,
-  
+
   // Utilities
   getEnginesByLayer,
   getEngineMetadata,

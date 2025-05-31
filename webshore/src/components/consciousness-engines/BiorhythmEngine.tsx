@@ -1,18 +1,18 @@
 /**
  * Biorhythm Engine 3D Visualization Component
- * 
+ *
  * Temporal wave visualization using Nishitsuji's wave equations
  * Displays physical, emotional, and intellectual cycles as fractal waves
  */
 
 'use client';
 
-import React, { useRef, useMemo, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Vector3, BufferGeometry, Float32BufferAttribute, Color } from 'three';
-import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
 import { useConsciousness } from '@/hooks/useConsciousness';
+import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
 import type { BirthData } from '@/types';
+import { useFrame } from '@react-three/fiber';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { BufferGeometry, Color, Float32BufferAttribute, Mesh } from 'three';
 
 interface BiorhythmEngineProps {
   birthData: BirthData;
@@ -43,7 +43,7 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
   visible = true,
   onCalculationComplete,
 }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<Mesh>(null);
   const { calculateBiorhythm, state } = useWitnessOSAPI();
   const { breathPhase, consciousnessLevel } = useConsciousness();
 
@@ -56,11 +56,13 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
         birth_location: birthData.location,
         current_date: new Date().toISOString().split('T')[0],
         cycles: ['physical', 'emotional', 'intellectual'],
-      }).then((result) => {
-        if (result.success && onCalculationComplete) {
-          onCalculationComplete(result.data);
-        }
-      }).catch(console.error);
+      })
+        .then(result => {
+          if (result.success && onCalculationComplete) {
+            onCalculationComplete(result.data);
+          }
+        })
+        .catch(console.error);
     }
   }, [birthData, visible, calculateBiorhythm, onCalculationComplete]);
 
@@ -69,7 +71,7 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
     const geometry = new BufferGeometry();
     const segments = 200;
     const timeRange = 60; // days
-    
+
     const positions: number[] = [];
     const colors: number[] = [];
     const indices: number[] = [];
@@ -77,21 +79,21 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
     BIORHYTHM_CYCLES.forEach((cycle, cycleIndex) => {
       for (let i = 0; i <= segments; i++) {
         const t = (i / segments) * timeRange;
-        
+
         // Calculate biorhythm value using sine wave
         const radians = (2 * Math.PI * t) / cycle.period;
         const value = Math.sin(radians + cycle.phase) * cycle.amplitude;
-        
+
         // Create 3D wave positions
         const x = (t / timeRange - 0.5) * 10; // Spread over 10 units
         const y = value * 2; // Amplitude scaling
         const z = cycleIndex * 0.5 - 1; // Separate cycles in Z
-        
+
         positions.push(x, y, z);
-        
+
         // Apply cycle color
         colors.push(cycle.color.r, cycle.color.g, cycle.color.b);
-        
+
         // Create line indices
         if (i < segments) {
           const baseIndex = cycleIndex * (segments + 1) + i;
@@ -103,7 +105,7 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
     geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
     geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
     geometry.setIndex(indices);
-    
+
     return geometry;
   }, [state.data]);
 
@@ -112,11 +114,11 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
     if (meshRef.current && visible) {
       // Rotate based on consciousness level
       meshRef.current.rotation.y += delta * 0.1 * consciousnessLevel;
-      
+
       // Pulse with breath
       const breathScale = 1 + Math.sin(breathPhase * Math.PI * 2) * 0.1;
       meshRef.current.scale.setScalar(scale * breathScale);
-      
+
       // Update wave animation
       const time = state.clock.elapsedTime;
       if (meshRef.current.material && 'uniforms' in meshRef.current.material) {
@@ -126,8 +128,9 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
   });
 
   // Wave shader material
-  const waveMaterial = useMemo(() => ({
-    vertexShader: `
+  const waveMaterial = useMemo(
+    () => ({
+      vertexShader: `
       attribute vec3 color;
       varying vec3 vColor;
       uniform float time;
@@ -145,7 +148,7 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
       }
     `,
-    fragmentShader: `
+      fragmentShader: `
       varying vec3 vColor;
       uniform float consciousnessLevel;
       
@@ -155,24 +158,26 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
         gl_FragColor = vec4(vColor * glow, 0.8);
       }
     `,
-    uniforms: {
-      time: { value: 0 },
-      breathPhase: { value: breathPhase },
-      consciousnessLevel: { value: consciousnessLevel },
-    },
-    transparent: true,
-    vertexColors: true,
-  }), [breathPhase, consciousnessLevel]);
+      uniforms: {
+        time: { value: 0 },
+        breathPhase: { value: breathPhase },
+        consciousnessLevel: { value: consciousnessLevel },
+      },
+      transparent: true,
+      vertexColors: true,
+    }),
+    [breathPhase, consciousnessLevel]
+  );
 
   if (!visible) return null;
 
   return (
     <group position={position}>
       {/* Main biorhythm wave visualization */}
-      <line ref={meshRef} geometry={waveGeometry}>
+      <lineSegments ref={meshRef} geometry={waveGeometry}>
         <shaderMaterial {...waveMaterial} />
-      </line>
-      
+      </lineSegments>
+
       {/* Cycle labels and indicators */}
       {BIORHYTHM_CYCLES.map((cycle, index) => (
         <group key={cycle.name} position={[0, 0, index * 0.5 - 1]}>
@@ -181,7 +186,7 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
             <sphereGeometry args={[0.1, 8, 8]} />
             <meshBasicMaterial color={cycle.color} />
           </mesh>
-          
+
           {/* Cycle name text (placeholder for future text implementation) */}
           <mesh position={[5.5, 0, 0]}>
             <boxGeometry args={[0.02, 0.02, 0.02]} />
@@ -189,18 +194,18 @@ export const BiorhythmEngine: React.FC<BiorhythmEngineProps> = ({
           </mesh>
         </group>
       ))}
-      
+
       {/* Current day indicator */}
       <mesh position={[0, 0, 0]}>
         <cylinderGeometry args={[0.05, 0.05, 4, 8]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.5} />
+        <meshBasicMaterial color='#ffffff' transparent opacity={0.5} />
       </mesh>
-      
+
       {/* Loading indicator */}
       {state.loading && (
         <mesh>
           <ringGeometry args={[0.8, 1.0, 8]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.3} />
+          <meshBasicMaterial color='#ffffff' transparent opacity={0.3} />
         </mesh>
       )}
     </group>

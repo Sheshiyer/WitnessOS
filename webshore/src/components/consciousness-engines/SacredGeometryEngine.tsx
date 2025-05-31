@@ -1,20 +1,20 @@
 /**
  * Sacred Geometry Engine 3D Visualization Component
- * 
+ *
  * Interactive fractal pattern exploration with infinite zoom
  * Displays sacred geometric patterns as consciousness-responsive 3D structures
  */
 
 'use client';
 
-import React, { useRef, useMemo, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Vector3, Color, Group, Euler } from 'three';
-import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
-import { useConsciousness } from '@/hooks/useConsciousness';
-import { generateSacredGeometry, createPlatonicSolid } from '@/generators/sacred-geometry';
 import { createFractalGeometry } from '@/generators/fractal-noise';
+import { createPlatonicSolid, generateSacredGeometry } from '@/generators/sacred-geometry';
+import { useConsciousness } from '@/hooks/useConsciousness';
+import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
 import type { PersonalData } from '@/types';
+import { useFrame } from '@react-three/fiber';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { Color, Euler, Group, Vector3 } from 'three';
 
 interface SacredGeometryEngineProps {
   personalData: PersonalData;
@@ -85,11 +85,13 @@ export const SacredGeometryEngine: React.FC<SacredGeometryEngineProps> = ({
         include_harmonics: true,
         pattern_types: SACRED_PATTERNS,
         consciousness_level: consciousnessLevel,
-      }).then((result) => {
-        if (result.success && onCalculationComplete) {
-          onCalculationComplete(result.data);
-        }
-      }).catch(console.error);
+      })
+        .then(result => {
+          if (result.success && onCalculationComplete) {
+            onCalculationComplete(result.data);
+          }
+        })
+        .catch(console.error);
     }
   }, [personalData, visible, calculateSacredGeometry, onCalculationComplete, consciousnessLevel]);
 
@@ -99,11 +101,11 @@ export const SacredGeometryEngine: React.FC<SacredGeometryEngineProps> = ({
       return { patterns: [], harmonics: [], centerGeometry: null };
     }
 
-    const geometryData = state.data;
-    
+    const geometryData = state.data as any; // Type assertion for engine-specific data
+
     // Create sacred patterns
     const patternList: SacredPattern[] = [];
-    
+
     // Flower of Life
     const flowerGeometry = generateSacredGeometry({
       type: 'flower_of_life',
@@ -161,15 +163,11 @@ export const SacredGeometryEngine: React.FC<SacredGeometryEngineProps> = ({
       const angle = (index / PLATONIC_SOLIDS.length) * Math.PI * 2;
       const radius = 2.5;
       const solidGeometry = createPlatonicSolid(solid.name, 0.3);
-      
+
       patternList.push({
         name: solid.name,
         geometry: solidGeometry,
-        position: new Vector3(
-          Math.cos(angle) * radius,
-          Math.sin(angle) * radius,
-          0
-        ),
+        position: new Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0),
         rotation: new Euler(0, 0, 0),
         scale: 0.5,
         color: solid.color,
@@ -180,7 +178,7 @@ export const SacredGeometryEngine: React.FC<SacredGeometryEngineProps> = ({
 
     // Generate harmonics based on personal data
     const harmonicList: GeometricHarmonic[] = [];
-    if (geometryData.harmonics) {
+    if (geometryData?.harmonics) {
       geometryData.harmonics.forEach((harmonic: any, index: number) => {
         harmonicList.push({
           ratio: harmonic.ratio || GOLDEN_RATIO,
@@ -207,26 +205,26 @@ export const SacredGeometryEngine: React.FC<SacredGeometryEngineProps> = ({
   useFrame((state, delta) => {
     if (groupRef.current && visible) {
       const time = state.clock.elapsedTime;
-      
+
       // Rotate entire group based on golden ratio
       groupRef.current.rotation.y += delta * 0.01 * GOLDEN_RATIO * consciousnessLevel;
-      
+
       // Breath synchronization
       const breathScale = 1 + Math.sin(breathPhase * Math.PI * 2) * 0.05;
       groupRef.current.scale.setScalar(scale * breathScale);
-      
+
       // Animate individual patterns
       groupRef.current.children.forEach((child, index) => {
         if (child.userData.pattern) {
           const pattern = child.userData.pattern as SacredPattern;
-          
+
           // Rotate based on pattern frequency
           child.rotation.z += delta * (pattern.frequency / 1000) * consciousnessLevel;
-          
+
           // Harmonic scaling
-          const harmonicScale = 1 + Math.sin(time * pattern.frequency / 100) * 0.1;
+          const harmonicScale = 1 + Math.sin((time * pattern.frequency) / 100) * 0.1;
           child.scale.setScalar(pattern.scale * harmonicScale);
-          
+
           // Consciousness-responsive glow
           if ('material' in child && child.material) {
             const material = child.material as any;
@@ -263,42 +261,31 @@ export const SacredGeometryEngine: React.FC<SacredGeometryEngineProps> = ({
           />
         </mesh>
       ))}
-      
+
       {/* Center Fractal Mandala */}
       {centerGeometry && (
         <mesh geometry={centerGeometry}>
           <meshStandardMaterial
-            color="#ffffff"
+            color='#ffffff'
             transparent
             opacity={0.8}
-            emissive="#ffffff"
+            emissive='#ffffff'
             emissiveIntensity={consciousnessLevel * 0.2}
             wireframe
           />
         </mesh>
       )}
-      
+
       {/* Harmonic Resonance Rings */}
       {harmonics.map((harmonic, index) => (
-        <mesh
-          key={`harmonic-${index}`}
-          rotation={[Math.PI / 2, 0, 0]}
-        >
-          <ringGeometry 
-            args={[
-              harmonic.ratio * (index + 1) * 0.5,
-              harmonic.ratio * (index + 1) * 0.5 + 0.05,
-              32
-            ]} 
+        <mesh key={`harmonic-${index}`} rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry
+            args={[harmonic.ratio * (index + 1) * 0.5, harmonic.ratio * (index + 1) * 0.5 + 0.05, 32]}
           />
-          <meshBasicMaterial
-            color={harmonic.color}
-            transparent
-            opacity={0.3 + harmonic.amplitude * 0.2}
-          />
+          <meshBasicMaterial color={harmonic.color} transparent opacity={0.3 + harmonic.amplitude * 0.2} />
         </mesh>
       ))}
-      
+
       {/* Golden Ratio Spiral */}
       <group>
         {Array.from({ length: 8 }, (_, i) => {
@@ -307,39 +294,26 @@ export const SacredGeometryEngine: React.FC<SacredGeometryEngineProps> = ({
           return (
             <mesh
               key={`spiral-${i}`}
-              position={[
-                Math.cos(angle) * radius,
-                Math.sin(angle) * radius,
-                i * 0.1
-              ]}
+              position={[Math.cos(angle) * radius, Math.sin(angle) * radius, i * 0.1]}
             >
               <sphereGeometry args={[0.05, 8, 8]} />
-              <meshStandardMaterial
-                color="#FFD700"
-                emissive="#FFD700"
-                emissiveIntensity={0.2}
-              />
+              <meshStandardMaterial color='#FFD700' emissive='#FFD700' emissiveIntensity={0.2} />
             </mesh>
           );
         })}
       </group>
-      
+
       {/* Consciousness Field Visualization */}
       <mesh>
         <sphereGeometry args={[4, 32, 32]} />
-        <meshBasicMaterial
-          color="#ffffff"
-          transparent
-          opacity={0.02 + consciousnessLevel * 0.03}
-          wireframe
-        />
+        <meshBasicMaterial color='#ffffff' transparent opacity={0.02 + consciousnessLevel * 0.03} wireframe />
       </mesh>
-      
+
       {/* Loading indicator */}
       {state.loading && (
         <mesh>
           <torusGeometry args={[2, 0.1, 8, 32]} />
-          <meshBasicMaterial color="#FFD700" transparent opacity={0.5} />
+          <meshBasicMaterial color='#FFD700' transparent opacity={0.5} />
         </mesh>
       )}
     </group>

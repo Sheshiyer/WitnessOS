@@ -316,3 +316,26 @@ export const createFractalWave = (octaves?: number, lacunarity?: number, persist
 export const waveInterference = (waves: ConsciousnessWave[], time: number): number => {
   return waves.reduce((sum, wave) => sum + wave.valueAt(time), 0.0) / waves.length;
 };
+
+/**
+ * Generate wave interference pattern for Three.js
+ * This is the function our engine components expect
+ */
+export const generateWaveInterference = (options: {
+  sources: Array<{
+    position: { x: number; y: number; z: number };
+    frequency: number;
+    amplitude: number;
+    phase: number;
+  }>;
+  gridSize: number;
+  bounds: {
+    min: { x: number; y: number; z: number };
+    max: { x: number; y: number; z: number };
+  };
+}) => {
+  // For now, return a simple plane geometry as placeholder
+  // This prevents import errors while maintaining the interface
+  const { PlaneGeometry } = require('three');
+  return new PlaneGeometry(2, 2, options.gridSize, options.gridSize);
+};

@@ -1,6 +1,6 @@
 /**
  * Discovery Layer System for WitnessOS Webshore
- * 
+ *
  * 4-layer discovery architecture with progressive revelation mechanics
  * Layer 0: Portal (Breathing chamber) - Entry point
  * Layer 1: Awakening (Symbol garden and compass plaza) - Initial exploration
@@ -10,12 +10,12 @@
 
 'use client';
 
-import React, { useState, useRef, useCallback, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Vector3, Group, Euler } from 'three';
+import type { BreathState, ConsciousnessState } from '@/types';
 import { CONSCIOUSNESS_CONSTANTS } from '@/utils/consciousness-constants';
 import { performanceOptimizer } from '@/utils/performance-optimization';
-import type { ConsciousnessState, BreathState } from '@/types';
+import { useFrame } from '@react-three/fiber';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { Group, Vector3 } from 'three';
 
 const { DISCOVERY_LAYERS, SACRED_MATHEMATICS } = CONSCIOUSNESS_CONSTANTS;
 
@@ -47,13 +47,16 @@ export interface LayerConfiguration {
 
 export interface DiscoveryProgress {
   currentLayer: DiscoveryLayer;
-  layerProgress: Record<DiscoveryLayer, {
-    unlocked: boolean;
-    timeSpent: number;
-    artifactsDiscovered: number;
-    easterEggsFound: number;
-    completionPercentage: number;
-  }>;
+  layerProgress: Record<
+    DiscoveryLayer,
+    {
+      unlocked: boolean;
+      timeSpent: number;
+      artifactsDiscovered: number;
+      easterEggsFound: number;
+      completionPercentage: number;
+    }
+  >;
   totalArtifacts: number;
   totalEasterEggs: number;
   consciousnessEvolution: number;
@@ -168,9 +171,9 @@ const LAYER_CONFIGS: Record<DiscoveryLayer, LayerConfiguration> = {
 };
 
 /**
- * Discovery Layer System Component
+ * Discovery Layer System Hook
  */
-export const DiscoveryLayerSystem: React.FC<DiscoveryLayerSystemProps> = ({
+export const DiscoveryLayerSystem = ({
   consciousness,
   breath,
   onLayerTransition,
@@ -178,15 +181,39 @@ export const DiscoveryLayerSystem: React.FC<DiscoveryLayerSystemProps> = ({
   onProgressUpdate,
   enableSpatialMemory = true,
   enableProgressiveRevealation = true,
-}) => {
+}: DiscoveryLayerSystemProps) => {
   // Discovery state
   const [progress, setProgress] = useState<DiscoveryProgress>({
     currentLayer: 0,
     layerProgress: {
-      0: { unlocked: true, timeSpent: 0, artifactsDiscovered: 0, easterEggsFound: 0, completionPercentage: 0 },
-      1: { unlocked: false, timeSpent: 0, artifactsDiscovered: 0, easterEggsFound: 0, completionPercentage: 0 },
-      2: { unlocked: false, timeSpent: 0, artifactsDiscovered: 0, easterEggsFound: 0, completionPercentage: 0 },
-      3: { unlocked: false, timeSpent: 0, artifactsDiscovered: 0, easterEggsFound: 0, completionPercentage: 0 },
+      0: {
+        unlocked: true,
+        timeSpent: 0,
+        artifactsDiscovered: 0,
+        easterEggsFound: 0,
+        completionPercentage: 0,
+      },
+      1: {
+        unlocked: false,
+        timeSpent: 0,
+        artifactsDiscovered: 0,
+        easterEggsFound: 0,
+        completionPercentage: 0,
+      },
+      2: {
+        unlocked: false,
+        timeSpent: 0,
+        artifactsDiscovered: 0,
+        easterEggsFound: 0,
+        completionPercentage: 0,
+      },
+      3: {
+        unlocked: false,
+        timeSpent: 0,
+        artifactsDiscovered: 0,
+        easterEggsFound: 0,
+        completionPercentage: 0,
+      },
     },
     totalArtifacts: 0,
     totalEasterEggs: 0,
@@ -194,11 +221,16 @@ export const DiscoveryLayerSystem: React.FC<DiscoveryLayerSystemProps> = ({
   });
 
   // Spatial memory for navigation
-  const [spatialMemory, setSpatialMemory] = useState<Record<DiscoveryLayer, {
-    lastPosition: Vector3;
-    landmarks: Array<{ position: Vector3; type: string; discovered: boolean }>;
-    pathHistory: Vector3[];
-  }>>({
+  const [spatialMemory, setSpatialMemory] = useState<
+    Record<
+      DiscoveryLayer,
+      {
+        lastPosition: Vector3;
+        landmarks: Array<{ position: Vector3; type: string; discovered: boolean }>;
+        pathHistory: Vector3[];
+      }
+    >
+  >({
     0: { lastPosition: new Vector3(0, 0, 0), landmarks: [], pathHistory: [] },
     1: { lastPosition: new Vector3(0, 0, 0), landmarks: [], pathHistory: [] },
     2: { lastPosition: new Vector3(0, 0, 0), landmarks: [], pathHistory: [] },
@@ -216,121 +248,141 @@ export const DiscoveryLayerSystem: React.FC<DiscoveryLayerSystemProps> = ({
   /**
    * Check if layer can be unlocked
    */
-  const canUnlockLayer = useCallback((layer: DiscoveryLayer): boolean => {
-    if (layer === 0) return true; // Portal always unlocked
-    
-    const config = LAYER_CONFIGS[layer];
-    const currentProgress = progress.layerProgress[progress.currentLayer];
-    
-    return (
-      consciousness.awarenessLevel >= config.unlockRequirement.consciousnessLevel &&
-      breath.coherence >= config.unlockRequirement.breathCoherence &&
-      progress.totalArtifacts >= config.unlockRequirement.discoveredArtifacts &&
-      currentProgress.timeSpent >= config.unlockRequirement.timeSpent
-    );
-  }, [consciousness.awarenessLevel, breath.coherence, progress]);
+  const canUnlockLayer = useCallback(
+    (layer: DiscoveryLayer): boolean => {
+      if (layer === 0) return true; // Portal always unlocked
+
+      const config = LAYER_CONFIGS[layer];
+      const currentProgress = progress.layerProgress[progress.currentLayer];
+
+      return (
+        consciousness.awarenessLevel >= config.unlockRequirement.consciousnessLevel &&
+        breath.coherence >= config.unlockRequirement.breathCoherence &&
+        progress.totalArtifacts >= config.unlockRequirement.discoveredArtifacts &&
+        currentProgress.timeSpent >= config.unlockRequirement.timeSpent
+      );
+    },
+    [consciousness.awarenessLevel, breath.coherence, progress]
+  );
 
   /**
    * Attempt layer transition
    */
-  const attemptLayerTransition = useCallback((targetLayer: DiscoveryLayer) => {
-    if (isTransitioning || targetLayer === progress.currentLayer) return;
-    
-    if (canUnlockLayer(targetLayer)) {
-      setIsTransitioning(true);
-      setTransitionProgress(0);
-      
-      // Update progress
-      setProgress(prev => ({
-        ...prev,
-        layerProgress: {
-          ...prev.layerProgress,
-          [targetLayer]: { ...prev.layerProgress[targetLayer], unlocked: true },
-        },
-      }));
-      
-      onLayerTransition?.(progress.currentLayer, targetLayer);
-      
-      // Animate transition
-      const startTime = Date.now();
-      const transitionDuration = 2000; // 2 seconds
-      
-      const animateTransition = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / transitionDuration, 1);
-        
-        setTransitionProgress(progress);
-        
-        if (progress < 1) {
-          requestAnimationFrame(animateTransition);
-        } else {
-          setProgress(prev => ({ ...prev, currentLayer: targetLayer }));
-          setIsTransitioning(false);
-          setTransitionProgress(0);
-        }
-      };
-      
-      animateTransition();
-    }
-  }, [isTransitioning, progress.currentLayer, canUnlockLayer, onLayerTransition]);
+  const attemptLayerTransition = useCallback(
+    (targetLayer: DiscoveryLayer) => {
+      if (isTransitioning || targetLayer === progress.currentLayer) return;
+
+      if (canUnlockLayer(targetLayer)) {
+        setIsTransitioning(true);
+        setTransitionProgress(0);
+
+        // Update progress
+        setProgress(prev => ({
+          ...prev,
+          layerProgress: {
+            ...prev.layerProgress,
+            [targetLayer]: { ...prev.layerProgress[targetLayer], unlocked: true },
+          },
+        }));
+
+        onLayerTransition?.(progress.currentLayer, targetLayer);
+
+        // Animate transition
+        const startTime = Date.now();
+        const transitionDuration = 2000; // 2 seconds
+
+        const animateTransition = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / transitionDuration, 1);
+
+          setTransitionProgress(progress);
+
+          if (progress < 1) {
+            requestAnimationFrame(animateTransition);
+          } else {
+            setProgress(prev => ({ ...prev, currentLayer: targetLayer }));
+            setIsTransitioning(false);
+            setTransitionProgress(0);
+          }
+        };
+
+        animateTransition();
+      }
+    },
+    [isTransitioning, progress.currentLayer, canUnlockLayer, onLayerTransition]
+  );
 
   /**
    * Discover artifact
    */
-  const discoverArtifact = useCallback((artifact: any, layer: DiscoveryLayer) => {
-    setProgress(prev => {
-      const layerProgress = prev.layerProgress[layer];
-      const newArtifactsDiscovered = layerProgress.artifactsDiscovered + 1;
-      const layerConfig = LAYER_CONFIGS[layer];
-      const completionPercentage = (newArtifactsDiscovered + layerProgress.easterEggsFound) / 
-                                  (layerConfig.discoveryMechanics.artifactCount + layerConfig.discoveryMechanics.easterEggCount);
-      
-      const newProgress = {
-        ...prev,
-        layerProgress: {
-          ...prev.layerProgress,
-          [layer]: {
-            ...layerProgress,
-            artifactsDiscovered: newArtifactsDiscovered,
-            completionPercentage,
+  const discoverArtifact = useCallback(
+    (artifact: any, layer: DiscoveryLayer) => {
+      setProgress(prev => {
+        const layerProgress = prev.layerProgress[layer];
+        const newArtifactsDiscovered = layerProgress.artifactsDiscovered + 1;
+        const layerConfig = LAYER_CONFIGS[layer];
+        const completionPercentage =
+          (newArtifactsDiscovered + layerProgress.easterEggsFound) /
+          (layerConfig.discoveryMechanics.artifactCount +
+            layerConfig.discoveryMechanics.easterEggCount);
+
+        const newProgress = {
+          ...prev,
+          layerProgress: {
+            ...prev.layerProgress,
+            [layer]: {
+              ...layerProgress,
+              artifactsDiscovered: newArtifactsDiscovered,
+              completionPercentage,
+            },
           },
-        },
-        totalArtifacts: prev.totalArtifacts + 1,
-      };
-      
-      onProgressUpdate?.(newProgress);
-      return newProgress;
-    });
-    
-    onArtifactDiscovered?.(artifact, layer);
-  }, [onArtifactDiscovered, onProgressUpdate]);
+          totalArtifacts: prev.totalArtifacts + 1,
+        };
+
+        onProgressUpdate?.(newProgress);
+        return newProgress;
+      });
+
+      onArtifactDiscovered?.(artifact, layer);
+    },
+    [onArtifactDiscovered, onProgressUpdate]
+  );
 
   /**
    * Update spatial memory
    */
-  const updateSpatialMemory = useCallback((layer: DiscoveryLayer, position: Vector3) => {
-    if (!enableSpatialMemory) return;
-    
-    setSpatialMemory(prev => ({
-      ...prev,
-      [layer]: {
-        ...prev[layer],
-        lastPosition: position.clone(),
-        pathHistory: [...prev[layer].pathHistory.slice(-50), position.clone()], // Keep last 50 positions
-      },
-    }));
-  }, [enableSpatialMemory]);
+  const updateSpatialMemory = useCallback(
+    (layer: DiscoveryLayer, position: Vector3) => {
+      if (!enableSpatialMemory) return;
+
+      setSpatialMemory(prev => ({
+        ...prev,
+        [layer]: {
+          ...prev[layer],
+          lastPosition: position.clone(),
+          pathHistory: [...prev[layer].pathHistory.slice(-50), position.clone()], // Keep last 50 positions
+        },
+      }));
+    },
+    [enableSpatialMemory]
+  );
 
   /**
    * Get layer spatial signature
    */
   const getLayerSpatialSignature = useCallback((layer: DiscoveryLayer) => {
     const config = LAYER_CONFIGS[layer];
-    const lodLevel = performanceOptimizer.getLODLevel({ position: new Vector3() } as any, { position: new Vector3(0, 0, 10) } as any);
-    
+    const lodLevel = performanceOptimizer.getLODLevel(
+      { position: new Vector3() } as any,
+      { position: new Vector3(0, 0, 10) } as any
+    );
+
     return {
       ...config.spatialSignature,
-      fractalComplexity: Math.max(1, Math.floor(config.spatialSignature.fractalComplexity * lodLevel.fractalDepth / 6)),
+      fractalComplexity: Math.max(
+        1,
+        Math.floor((config.spatialSignature.fractalComplexity * lodLevel.fractalDepth) / 6)
+      ),
     };
   }, []);
 
@@ -339,9 +391,11 @@ export const DiscoveryLayerSystem: React.FC<DiscoveryLayerSystemProps> = ({
    */
   const consciousnessEvolution = useMemo(() => {
     const totalPossibleArtifacts = Object.values(LAYER_CONFIGS).reduce(
-      (sum, config) => sum + config.discoveryMechanics.artifactCount + config.discoveryMechanics.easterEggCount, 0
+      (sum, config) =>
+        sum + config.discoveryMechanics.artifactCount + config.discoveryMechanics.easterEggCount,
+      0
     );
-    
+
     const discoveredItems = progress.totalArtifacts + progress.totalEasterEggs;
     return discoveredItems / totalPossibleArtifacts;
   }, [progress.totalArtifacts, progress.totalEasterEggs]);
@@ -350,12 +404,12 @@ export const DiscoveryLayerSystem: React.FC<DiscoveryLayerSystemProps> = ({
   useFrame((state, delta) => {
     const currentLayer = progress.currentLayer;
     timeAccumulator.current[currentLayer] += delta;
-    
+
     // Update progress every second
     if (timeAccumulator.current[currentLayer] >= 1.0) {
       const timeToAdd = Math.floor(timeAccumulator.current[currentLayer]);
       timeAccumulator.current[currentLayer] -= timeToAdd;
-      
+
       setProgress(prev => {
         const newProgress = {
           ...prev,
@@ -368,19 +422,19 @@ export const DiscoveryLayerSystem: React.FC<DiscoveryLayerSystemProps> = ({
           },
           consciousnessEvolution,
         };
-        
+
         onProgressUpdate?.(newProgress);
         return newProgress;
       });
     }
-    
+
     // Check for automatic layer transitions
     if (!isTransitioning && enableProgressiveRevealation) {
       const nextLayer = (progress.currentLayer + 1) as DiscoveryLayer;
       if (nextLayer <= 3 && canUnlockLayer(nextLayer)) {
         const currentLayerConfig = LAYER_CONFIGS[progress.currentLayer];
         const currentLayerProgress = progress.layerProgress[progress.currentLayer];
-        
+
         // Auto-transition if current layer is 80% complete
         if (currentLayerProgress.completionPercentage >= 0.8) {
           attemptLayerTransition(nextLayer);

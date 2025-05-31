@@ -1,23 +1,26 @@
 /**
  * Consciousness State Management Hook
- * 
+ *
  * Central state management for consciousness exploration
  * Integrates breath synchronization and archetypal patterns
  */
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { createBreathWave, createConsciousnessField } from '@/generators/wave-equations/consciousness-waves';
-import { CONSCIOUSNESS_CONSTANTS } from '@/utils/consciousness-constants';
-import type { 
-  ConsciousnessState, 
-  BreathState, 
-  BreathPattern, 
+import {
+  createBreathWave,
+  createConsciousnessField,
+} from '@/generators/wave-equations/consciousness-waves';
+import type {
+  ArchetypalPattern,
+  BreathPattern,
+  BreathState,
+  ConsciousnessState,
   DiscoveryEvent,
   DiscoveryLayer,
-  ArchetypalPattern 
 } from '@/types';
+import { CONSCIOUSNESS_CONSTANTS } from '@/utils/consciousness-constants';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const { CONSCIOUSNESS_STATES, BREATH_PATTERNS, DISCOVERY_LAYERS } = CONSCIOUSNESS_CONSTANTS;
 
@@ -33,21 +36,31 @@ interface UseConsciousnessReturn {
   consciousness: ConsciousnessState;
   breathState: BreathState;
   currentLayer: DiscoveryLayer;
-  
+
+  // Backward compatibility properties for engine components
+  breathPhase: number; // 0-1 representing phase in breath cycle
+  breathPhaseString: 'inhale' | 'hold' | 'exhale' | 'pause'; // string version
+  consciousnessLevel: number;
+
   // Actions
   updateConsciousness: (updates: Partial<ConsciousnessState>) => void;
   setBreathPattern: (pattern: BreathPattern) => void;
   triggerDiscoveryEvent: (event: DiscoveryEvent) => void;
   evolveConsciousness: (delta: number) => void;
-  
+
   // Computed values
   overallProgress: number;
   archetypalResonance: ArchetypalPattern[];
   fieldSignature: string;
-  
+
   // Utilities
   isLayerUnlocked: (layerId: number) => boolean;
-  getConsciousnessLevel: () => 'UNCONSCIOUS' | 'SUBCONSCIOUS' | 'CONSCIOUS' | 'SUPERCONSCIOUS' | 'COSMIC';
+  getConsciousnessLevel: () =>
+    | 'UNCONSCIOUS'
+    | 'SUBCONSCIOUS'
+    | 'CONSCIOUS'
+    | 'SUPERCONSCIOUS'
+    | 'COSMIC';
   getCoherenceLevel: () => 'CHAOTIC' | 'SCATTERED' | 'FOCUSED' | 'ALIGNED' | 'UNIFIED';
 }
 
@@ -105,37 +118,43 @@ export const useConsciousness = (options: UseConsciousnessOptions = {}): UseCons
   }, []);
 
   // Trigger discovery event
-  const triggerDiscoveryEvent = useCallback((event: DiscoveryEvent) => {
-    if (!discoveryTracking) return;
+  const triggerDiscoveryEvent = useCallback(
+    (event: DiscoveryEvent) => {
+      if (!discoveryTracking) return;
 
-    setDiscoveredEvents(prev => {
-      const exists = prev.find(e => e.id === event.id);
-      if (exists) return prev;
-      
-      const newEvents = [...prev, { ...event, unlocked: true, timestamp: new Date().toISOString() }];
-      
-      // Check for layer progression
-      const layerEvents = newEvents.filter(e => e.layer === event.layer);
-      const layerProgress = layerEvents.length / 10; // Assume 10 events per layer
-      
-      if (layerProgress >= 0.8 && event.layer === currentLayerId) {
-        setCurrentLayerId(prev => Math.min(prev + 1, 3));
+      setDiscoveredEvents(prev => {
+        const exists = prev.find(e => e.id === event.id);
+        if (exists) return prev;
+
+        const newEvents = [
+          ...prev,
+          { ...event, unlocked: true, timestamp: new Date().toISOString() },
+        ];
+
+        // Check for layer progression
+        const layerEvents = newEvents.filter(e => e.layer === event.layer);
+        const layerProgress = layerEvents.length / 10; // Assume 10 events per layer
+
+        if (layerProgress >= 0.8 && event.layer === currentLayerId) {
+          setCurrentLayerId(prev => Math.min(prev + 1, 3));
+        }
+
+        return newEvents;
+      });
+
+      // Consciousness evolution from discovery
+      if (consciousnessEvolution) {
+        evolveConsciousness(0.05);
       }
-      
-      return newEvents;
-    });
-
-    // Consciousness evolution from discovery
-    if (consciousnessEvolution) {
-      evolveConsciousness(0.05);
-    }
-  }, [discoveryTracking, consciousnessEvolution, currentLayerId]);
+    },
+    [discoveryTracking, consciousnessEvolution, currentLayerId]
+  );
 
   // Evolve consciousness level
   const evolveConsciousness = useCallback((delta: number) => {
     setConsciousness(prev => {
       const newAwarenessLevel = Math.min(prev.awarenessLevel + delta, 1.0);
-      
+
       // Generate new integration points based on evolution
       const newIntegrationPoints = [...prev.integrationPoints];
       if (newAwarenessLevel > 0.25 && !newIntegrationPoints.includes('Breath Mastery')) {
@@ -163,7 +182,7 @@ export const useConsciousness = (options: UseConsciousnessOptions = {}): UseCons
     const updateBreathState = () => {
       const newBreathState = breathWaveRef.current.getCurrentState();
       setBreathState(newBreathState);
-      
+
       // Consciousness evolution through breath coherence
       if (consciousnessEvolution && newBreathState.coherence > 0.8) {
         evolveConsciousness(0.001);
@@ -179,22 +198,30 @@ export const useConsciousness = (options: UseConsciousnessOptions = {}): UseCons
     if (!consciousnessEvolution) return;
 
     evolutionTimerRef.current = setInterval(() => {
-      const fieldValues = Array.from({ length: 10 }, (_, i) => 
+      const fieldValues = Array.from({ length: 10 }, (_, i) =>
         consciousnessFieldRef.current.fieldValueAt(i, i, i, Date.now() / 1000)
       );
-      
+
       const newConsciousnessState = consciousnessFieldRef.current.generateConsciousnessState(
         fieldValues,
         breathState.coherence
       );
-      
+
       // Gradual evolution
       setConsciousness(prev => ({
         awarenessLevel: prev.awarenessLevel * 0.99 + newConsciousnessState.awarenessLevel * 0.01,
-        integrationPoints: [...new Set([...prev.integrationPoints, ...newConsciousnessState.integrationPoints])],
-        expansionVectors: [...new Set([...prev.expansionVectors, ...newConsciousnessState.expansionVectors])],
-        shadowTerritories: [...new Set([...prev.shadowTerritories, ...newConsciousnessState.shadowTerritories])],
-        lightFrequencies: [...new Set([...prev.lightFrequencies, ...newConsciousnessState.lightFrequencies])],
+        integrationPoints: [
+          ...new Set([...prev.integrationPoints, ...newConsciousnessState.integrationPoints]),
+        ],
+        expansionVectors: [
+          ...new Set([...prev.expansionVectors, ...newConsciousnessState.expansionVectors]),
+        ],
+        shadowTerritories: [
+          ...new Set([...prev.shadowTerritories, ...newConsciousnessState.shadowTerritories]),
+        ],
+        lightFrequencies: [
+          ...new Set([...prev.lightFrequencies, ...newConsciousnessState.lightFrequencies]),
+        ],
       }));
     }, 5000); // Every 5 seconds
 
@@ -210,13 +237,13 @@ export const useConsciousness = (options: UseConsciousnessOptions = {}): UseCons
     const layerProgress = currentLayerId / 3;
     const awarenessProgress = consciousness.awarenessLevel;
     const discoveryProgress = discoveredEvents.length / 40; // Assume 40 total events
-    
+
     return (layerProgress + awarenessProgress + discoveryProgress) / 3;
   }, [currentLayerId, consciousness.awarenessLevel, discoveredEvents.length]);
 
   const archetypalResonance = useMemo((): ArchetypalPattern[] => {
     const patterns: ArchetypalPattern[] = [];
-    
+
     // Generate patterns based on consciousness state
     consciousness.integrationPoints.forEach((point, index) => {
       patterns.push({
@@ -226,7 +253,7 @@ export const useConsciousness = (options: UseConsciousnessOptions = {}): UseCons
         guidance: `Continue developing ${point} through practice`,
       });
     });
-    
+
     return patterns.slice(0, 5); // Top 5 patterns
   }, [consciousness]);
 
@@ -237,15 +264,23 @@ export const useConsciousness = (options: UseConsciousnessOptions = {}): UseCons
       currentLayerId.toString(),
       discoveredEvents.length.toString(),
     ].join('-');
-    
+
     return `WOS-${signature}`;
-  }, [consciousness.awarenessLevel, breathState.coherence, currentLayerId, discoveredEvents.length]);
+  }, [
+    consciousness.awarenessLevel,
+    breathState.coherence,
+    currentLayerId,
+    discoveredEvents.length,
+  ]);
 
   // Utility functions
-  const isLayerUnlocked = useCallback((layerId: number) => {
-    const layer = Object.values(DISCOVERY_LAYERS)[layerId];
-    return layer ? consciousness.awarenessLevel >= layer.unlockThreshold : false;
-  }, [consciousness.awarenessLevel]);
+  const isLayerUnlocked = useCallback(
+    (layerId: number) => {
+      const layer = Object.values(DISCOVERY_LAYERS)[layerId];
+      return layer ? consciousness.awarenessLevel >= layer.unlockThreshold : false;
+    },
+    [consciousness.awarenessLevel]
+  );
 
   const getConsciousnessLevel = useCallback(() => {
     const level = consciousness.awarenessLevel;
@@ -271,23 +306,39 @@ export const useConsciousness = (options: UseConsciousnessOptions = {}): UseCons
     return DISCOVERY_LAYERS[layerKey];
   }, [currentLayerId]);
 
+  // Calculate numeric breath phase (0-1) from string phase
+  const breathPhaseNumeric = useMemo(() => {
+    const phaseMap = {
+      inhale: 0.0,
+      hold: 0.25,
+      exhale: 0.5,
+      pause: 0.75,
+    };
+    return phaseMap[breathState.phase] || 0.0;
+  }, [breathState.phase]);
+
   return {
     // Core state
     consciousness,
     breathState,
     currentLayer,
-    
+
+    // Backward compatibility properties
+    breathPhase: breathPhaseNumeric,
+    breathPhaseString: breathState.phase,
+    consciousnessLevel: consciousness.awarenessLevel,
+
     // Actions
     updateConsciousness,
     setBreathPattern,
     triggerDiscoveryEvent,
     evolveConsciousness,
-    
+
     // Computed values
     overallProgress,
     archetypalResonance,
     fieldSignature,
-    
+
     // Utilities
     isLayerUnlocked,
     getConsciousnessLevel,

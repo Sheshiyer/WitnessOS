@@ -8,44 +8,39 @@
 
 'use client';
 
-import React, { useRef, useMemo, useEffect, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
 import {
-  ShaderMaterial,
-  PlaneGeometry,
-  Mesh,
-  Vector3,
-  Group,
-  BufferGeometry,
-  BufferAttribute,
-  Points,
-  PointsMaterial,
-  Color
-} from 'three';
-import { consciousnessPortalShader, type ConsciousnessShaderUniforms } from '@/shaders/consciousness/emptiness-infinity';
+  createFractalOctahedron,
+  modulateWithBreath,
+} from '@/generators/sacred-geometry/platonic-solids';
+import {
+  createConsciousnessWaveTransformer,
+  transformUserDataToWaves,
+} from '@/generators/wave-equations/consciousness-transformations';
+import {
+  createBreathWave,
+  createConsciousnessField,
+} from '@/generators/wave-equations/consciousness-waves';
 import {
   createArchetypalFractalMaterial,
   FractalType,
-  HumanDesignType,
-  getHumanDesignTypeFromString
+  getHumanDesignTypeFromString,
 } from '@/shaders/fractals/archetypal-fractals';
-import {
-  createOctahedron,
-  modulateWithBreath,
-  createFractalOctahedron,
-  fractalSubdivide
-} from '@/generators/sacred-geometry/platonic-solids';
-import {
-  createBreathWave,
-  createConsciousnessField
-} from '@/generators/wave-equations/consciousness-waves';
-import {
-  createConsciousnessWaveTransformer,
-  transformUserDataToWaves
-} from '@/generators/wave-equations/consciousness-transformations';
-import { performanceOptimizer } from '@/utils/performance-optimization';
+import type { BreathState, ConsciousnessState } from '@/types';
 import { CONSCIOUSNESS_CONSTANTS } from '@/utils/consciousness-constants';
-import type { ConsciousnessState, BreathState } from '@/types';
+import { performanceOptimizer } from '@/utils/performance-optimization';
+import { useFrame } from '@react-three/fiber';
+import React, { useMemo, useRef, useState } from 'react';
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Color,
+  Group,
+  Mesh,
+  PlaneGeometry,
+  Points,
+  ShaderMaterial,
+  Vector3,
+} from 'three';
 
 const { ARCHETYPAL_COLORS, DISCOVERY_LAYERS } = CONSCIOUSNESS_CONSTANTS;
 
@@ -97,7 +92,7 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
   const breathWave = useMemo(() => createBreathWave(), []);
   const waveTransformer = useMemo(() => createConsciousnessWaveTransformer(), []);
   const consciousnessField = useMemo(() => createConsciousnessField(), []);
-  
+
   // Enhanced archetypal fractal material
   const archetypalMaterial = useMemo(() => {
     const hdType = getHumanDesignTypeFromString(humanDesignType);
@@ -110,8 +105,8 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
     if (!userData) return null;
     return transformUserDataToWaves({
       birthDate: userData.birthDate || new Date(),
-      birthTime: userData.birthTime,
-      name: userData.name,
+      birthTime: userData.birthTime || '12:00',
+      name: userData.name || 'Anonymous',
       humanDesignType,
       enneagramType,
     });
@@ -119,10 +114,18 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
 
   // Enhanced fractal chamber geometry
   const chamberGeometry = useMemo(() => {
-    const lodLevel = performanceOptimizer.getLODLevel({ position: new Vector3(0, 0, 0) } as any, { position: new Vector3(0, 0, 5) } as any);
+    const lodLevel = performanceOptimizer.getLODLevel(
+      { position: new Vector3(0, 0, 0) } as any,
+      { position: new Vector3(0, 0, 5) } as any
+    );
     const fractalLevels = Math.max(1, lodLevel.fractalDepth);
 
-    const baseOctahedron = createFractalOctahedron(size, consciousness, fractalLevels, 'mandelbrot');
+    const baseOctahedron = createFractalOctahedron(
+      size,
+      consciousness,
+      fractalLevels,
+      'mandelbrot'
+    );
     return modulateWithBreath(baseOctahedron, breathWave.getCurrentState(), 0.1);
   }, [size, consciousness]);
 
@@ -131,23 +134,29 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
     const geometry = new PlaneGeometry(size * 0.8, size * 0.8, 64, 64);
 
     // Create octagonal portal shape with fractal edges
-    const positions = geometry.attributes.position.array as Float32Array;
+    const positionAttribute = geometry.attributes.position;
+    if (!positionAttribute) return geometry;
+
+    const positions = positionAttribute.array as Float32Array;
     for (let i = 0; i < positions.length; i += 3) {
-      const x = positions[i];
-      const y = positions[i + 1];
+      const x = positions[i] ?? 0;
+      const y = positions[i + 1] ?? 0;
       const distance = Math.sqrt(x * x + y * y);
 
       // Octagonal mask with fractal modulation
       const angle = Math.atan2(y, x);
       const octagonRadius = (size * 0.35) / Math.cos((angle % (Math.PI / 4)) - Math.PI / 8);
-      const fractalModulation = Math.sin(angle * 8 + distance * 2) * 0.1 * consciousness.awarenessLevel;
+      const fractalModulation =
+        Math.sin(angle * 8 + distance * 2) * 0.1 * consciousness.awarenessLevel;
 
       if (distance > octagonRadius + fractalModulation) {
         positions[i + 2] = -10; // Push vertices behind for portal effect
       }
     }
 
-    geometry.attributes.position.needsUpdate = true;
+    if (geometry.attributes.position) {
+      geometry.attributes.position.needsUpdate = true;
+    }
     return geometry;
   }, [size, consciousness]);
 
@@ -231,43 +240,54 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
     // Enhanced chamber animation with wave modulation
     if (chamberMeshRef.current) {
       const breathIntensity = breathState.intensity * breathState.coherence;
-      const waveModulation = userWaveTransformation ?
-        Math.sin(time * userWaveTransformation.baseFrequency * 0.001) * 0.02 : 0;
+      const waveModulation = userWaveTransformation
+        ? Math.sin(time * userWaveTransformation.baseFrequency * 0.001) * 0.02
+        : 0;
 
       const chamberScale = 1.0 + breathIntensity * 0.05 + waveModulation;
       chamberMeshRef.current.scale.setScalar(chamberScale);
 
       // Archetypal rotation based on Human Design type
-      const rotationSpeed = humanDesignType === 'manifestor' ? 0.08 :
-                           humanDesignType === 'projector' ? 0.03 : 0.05;
+      const rotationSpeed =
+        humanDesignType === 'manifestor' ? 0.08 : humanDesignType === 'projector' ? 0.03 : 0.05;
       chamberMeshRef.current.rotation.y = time * rotationSpeed;
     }
 
     // Animate consciousness particles
-    if (particlesRef.current) {
-      const positions = particlesRef.current.geometry.attributes.position.array as Float32Array;
+    if (particlesRef.current?.geometry.attributes.position) {
+      const positionAttribute = particlesRef.current.geometry.attributes.position;
+      const positions = positionAttribute.array as Float32Array;
       const breathPhase = getBreathPhase(breathState);
 
       for (let i = 0; i < positions.length; i += 3) {
         // Spiral motion synchronized with breath and consciousness
         const particleIndex = i / 3;
         const angle = time * 0.5 + particleIndex * 0.01;
-        const breathModulation = Math.sin(breathPhase + particleIndex * 0.1) * breathState.coherence;
+        const breathModulation =
+          Math.sin(breathPhase + particleIndex * 0.1) * breathState.coherence;
 
         // Update particle positions with wave interference
-        positions[i] += Math.cos(angle) * delta * 0.1 * breathModulation;
-        positions[i + 2] += Math.sin(angle) * delta * 0.1 * breathModulation;
+        if (i < positions.length) {
+          positions[i] = (positions[i] || 0) + Math.cos(angle) * delta * 0.1 * breathModulation;
+        }
+        if (i + 2 < positions.length) {
+          positions[i + 2] =
+            (positions[i + 2] || 0) + Math.sin(angle) * delta * 0.1 * breathModulation;
+        }
 
         // Vertical oscillation with consciousness modulation
         const verticalWave = Math.sin(time + particleIndex * 0.1) * consciousness.awarenessLevel;
-        positions[i + 1] += verticalWave * delta * 0.05;
+        if (i + 1 < positions.length) {
+          positions[i + 1] = (positions[i + 1] || 0) + verticalWave * delta * 0.05;
+        }
       }
-      particlesRef.current.geometry.attributes.position.needsUpdate = true;
+      positionAttribute.needsUpdate = true;
     }
 
     // Performance monitoring and adaptive quality
-    const triangleCount = portalGeometry.attributes.position.count +
-                         (particlesRef.current?.geometry.attributes.position.count || 0);
+    const triangleCount =
+      (portalGeometry.attributes.position?.count ?? 0) +
+      (particlesRef.current?.geometry.attributes.position?.count ?? 0);
     performanceOptimizer.updateMetrics(delta * 1000, 3, triangleCount);
 
     // Notify parent components
@@ -279,10 +299,7 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
     if (onConsciousnessUpdate) {
       const updatedConsciousness: ConsciousnessState = {
         ...consciousness,
-        awarenessLevel: Math.min(
-          consciousness.awarenessLevel + breathState.coherence * 0.001,
-          1.0
-        ),
+        awarenessLevel: Math.min(consciousness.awarenessLevel + breathState.coherence * 0.001, 1.0),
       };
       onConsciousnessUpdate(updatedConsciousness);
     }
@@ -296,27 +313,34 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
   // Create chamber wireframe
   const chamberWireframe = useMemo(() => {
     const positions: number[] = [];
-    
+
     chamberGeometry.edges.forEach(([start, end]) => {
       const startVertex = chamberVertices[start];
       const endVertex = chamberVertices[end];
-      
-      positions.push(
-        startVertex.x, startVertex.y, startVertex.z,
-        endVertex.x, endVertex.y, endVertex.z
-      );
+
+      if (startVertex && endVertex) {
+        positions.push(
+          startVertex.x,
+          startVertex.y,
+          startVertex.z,
+          endVertex.x,
+          endVertex.y,
+          endVertex.z
+        );
+      }
     });
-    
+
     return new Float32Array(positions);
   }, [chamberGeometry, chamberVertices]);
 
   return (
     <group ref={portalGroupRef}>
       {/* Enhanced Octagonal Chamber Wireframe */}
-      <line ref={chamberMeshRef}>
+      <lineSegments ref={chamberMeshRef}>
         <bufferGeometry>
           <bufferAttribute
-            attach="attributes-position"
+            attach='attributes-position'
+            args={[chamberWireframe, 3]}
             count={chamberWireframe.length / 3}
             array={chamberWireframe}
             itemSize={3}
@@ -327,7 +351,7 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
           transparent
           opacity={0.3 + consciousness.awarenessLevel * 0.4}
         />
-      </line>
+      </lineSegments>
 
       {/* Enhanced Central Portal with Archetypal Fractals */}
       <mesh ref={portalMeshRef} geometry={portalGeometry}>
@@ -346,21 +370,22 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
       </points>
 
       {/* Infinite Zoom Portal Rings */}
-      {enableInfiniteZoom && Array.from({ length: 3 }, (_, i) => (
-        <mesh
-          key={i}
-          position={[0, 0, -i * 2 - 1]}
-          rotation={[0, 0, (Date.now() * 0.001 + i) * 0.5]}
-        >
-          <ringGeometry args={[size * 0.4 + i * 0.2, size * 0.5 + i * 0.2, 8]} />
-          <meshBasicMaterial
-            color={archetypalColor}
-            transparent
-            opacity={0.2 * (1 - i * 0.3) * consciousness.awarenessLevel}
-            wireframe
-          />
-        </mesh>
-      ))}
+      {enableInfiniteZoom &&
+        Array.from({ length: 3 }, (_, i) => (
+          <mesh
+            key={i}
+            position={[0, 0, -i * 2 - 1]}
+            rotation={[0, 0, (Date.now() * 0.001 + i) * 0.5]}
+          >
+            <ringGeometry args={[size * 0.4 + i * 0.2, size * 0.5 + i * 0.2, 8]} />
+            <meshBasicMaterial
+              color={archetypalColor}
+              transparent
+              opacity={0.2 * (1 - i * 0.3) * consciousness.awarenessLevel}
+              wireframe
+            />
+          </mesh>
+        ))}
 
       {/* Ambient Consciousness Field */}
       <ambientLight
@@ -392,7 +417,7 @@ export const PortalChamber: React.FC<PortalChamberProps> = ({
 // Helper function to convert breath state to shader phase
 const getBreathPhase = (breathState: BreathState): number => {
   const { phase, intensity } = breathState;
-  
+
   switch (phase) {
     case 'inhale':
       return intensity * Math.PI;
@@ -408,19 +433,27 @@ const getBreathPhase = (breathState: BreathState): number => {
 };
 
 // Portal Chamber with different archetypal configurations
-export const GeneratorPortalChamber: React.FC<Omit<PortalChamberProps, 'archetypalColor'>> = (props) => (
+export const GeneratorPortalChamber: React.FC<
+  Omit<PortalChamberProps, 'archetypalColor'>
+> = props => (
   <PortalChamber {...props} archetypalColor={ARCHETYPAL_COLORS.HUMAN_DESIGN.GENERATOR} />
 );
 
-export const ProjectorPortalChamber: React.FC<Omit<PortalChamberProps, 'archetypalColor'>> = (props) => (
+export const ProjectorPortalChamber: React.FC<
+  Omit<PortalChamberProps, 'archetypalColor'>
+> = props => (
   <PortalChamber {...props} archetypalColor={ARCHETYPAL_COLORS.HUMAN_DESIGN.PROJECTOR} />
 );
 
-export const ManifestorPortalChamber: React.FC<Omit<PortalChamberProps, 'archetypalColor'>> = (props) => (
+export const ManifestorPortalChamber: React.FC<
+  Omit<PortalChamberProps, 'archetypalColor'>
+> = props => (
   <PortalChamber {...props} archetypalColor={ARCHETYPAL_COLORS.HUMAN_DESIGN.MANIFESTOR} />
 );
 
-export const ReflectorPortalChamber: React.FC<Omit<PortalChamberProps, 'archetypalColor'>> = (props) => (
+export const ReflectorPortalChamber: React.FC<
+  Omit<PortalChamberProps, 'archetypalColor'>
+> = props => (
   <PortalChamber {...props} archetypalColor={ARCHETYPAL_COLORS.HUMAN_DESIGN.REFLECTOR} />
 );
 

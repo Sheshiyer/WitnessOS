@@ -1,18 +1,17 @@
 /**
  * Progressive Revelation System for WitnessOS Webshore
- * 
+ *
  * Discovery triggers based on user interaction and consciousness level
  * Easter egg placement algorithms and achievement tracking
  */
 
 'use client';
 
-import React, { useState, useRef, useCallback, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Vector3, Group, Mesh, SphereGeometry, MeshBasicMaterial } from 'three';
+import type { BreathState, ConsciousnessState } from '@/types';
 import { CONSCIOUSNESS_CONSTANTS } from '@/utils/consciousness-constants';
-import { performanceOptimizer } from '@/utils/performance-optimization';
-import type { ConsciousnessState, BreathState } from '@/types';
+import { useFrame } from '@react-three/fiber';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { Group, Vector3 } from 'three';
 import type { DiscoveryLayer, DiscoveryProgress } from '../discovery-layers/DiscoveryLayerSystem';
 
 const { DISCOVERY_LAYERS, SACRED_MATHEMATICS } = CONSCIOUSNESS_CONSTANTS;
@@ -31,7 +30,12 @@ interface ProgressiveRevelationProps {
 interface EasterEgg {
   id: string;
   name: string;
-  type: 'hidden-symbol' | 'secret-sequence' | 'consciousness-threshold' | 'time-based' | 'interaction-combo';
+  type:
+    | 'hidden-symbol'
+    | 'secret-sequence'
+    | 'consciousness-threshold'
+    | 'time-based'
+    | 'interaction-combo';
   layer: DiscoveryLayer;
   position: Vector3;
   discoveryCondition: {
@@ -97,7 +101,7 @@ export const ProgressiveRevelation: React.FC<ProgressiveRevelationProps> = ({
   enabled = true,
 }) => {
   const groupRef = useRef<Group>(null);
-  
+
   // Easter eggs state
   const [easterEggs, setEasterEggs] = useState<EasterEgg[]>([
     {
@@ -276,7 +280,10 @@ export const ProgressiveRevelation: React.FC<ProgressiveRevelationProps> = ({
   // Interaction tracking
   const [interactionHistory, setInteractionHistory] = useState<string[]>([]);
   const [timeSpentInLayer, setTimeSpentInLayer] = useState<Record<DiscoveryLayer, number>>({
-    0: 0, 1: 0, 2: 0, 3: 0,
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
   });
 
   /**
@@ -284,140 +291,169 @@ export const ProgressiveRevelation: React.FC<ProgressiveRevelationProps> = ({
    */
   const generateEasterEggPositions = useMemo(() => {
     const positions: Vector3[] = [];
-    
+
     // Golden ratio spiral placement
     for (let i = 0; i < easterEggs.length; i++) {
       const angle = i * SACRED_MATHEMATICS.PHI * SACRED_MATHEMATICS.TAU;
       const radius = Math.sqrt(i + 1) * 3;
       const height = Math.sin(i * SACRED_MATHEMATICS.PHI) * 2;
-      
-      positions.push(new Vector3(
-        Math.cos(angle) * radius,
-        height,
-        Math.sin(angle) * radius
-      ));
+
+      positions.push(new Vector3(Math.cos(angle) * radius, height, Math.sin(angle) * radius));
     }
-    
+
     return positions;
   }, [easterEggs.length]);
 
   /**
    * Check easter egg discovery conditions
    */
-  const checkEasterEggDiscovery = useCallback((eggId: string, userPosition?: Vector3) => {
-    const eggIndex = easterEggs.findIndex(egg => egg.id === eggId);
-    if (eggIndex === -1) return;
-    
-    const egg = easterEggs[eggIndex];
-    if (egg.discovered || egg.layer !== currentLayer) return;
-    
-    const condition = egg.discoveryCondition;
-    let conditionMet = true;
-    
-    // Check consciousness level
-    if (condition.consciousnessLevel && consciousness.awarenessLevel < condition.consciousnessLevel) {
-      conditionMet = false;
-    }
-    
-    // Check breath coherence
-    if (condition.breathCoherence && breath.coherence < condition.breathCoherence) {
-      conditionMet = false;
-    }
-    
-    // Check time spent
-    if (condition.timeSpent && timeSpentInLayer[currentLayer] < condition.timeSpent) {
-      conditionMet = false;
-    }
-    
-    // Check interaction sequence
-    if (condition.interactionSequence) {
-      const recentInteractions = interactionHistory.slice(-condition.interactionSequence.length);
-      if (!arraysEqual(recentInteractions, condition.interactionSequence)) {
+  const checkEasterEggDiscovery = useCallback(
+    (eggId: string, userPosition?: Vector3) => {
+      const eggIndex = easterEggs.findIndex(egg => egg.id === eggId);
+      if (eggIndex === -1) return;
+
+      const egg = easterEggs[eggIndex];
+      if (!egg || egg.discovered || egg.layer !== currentLayer) return;
+
+      const condition = egg.discoveryCondition;
+      let conditionMet = true;
+
+      // Check consciousness level
+      if (
+        condition.consciousnessLevel &&
+        consciousness.awarenessLevel < condition.consciousnessLevel
+      ) {
         conditionMet = false;
       }
-    }
-    
-    // Check proximity for hidden symbols
-    if (condition.hiddenSymbol && userPosition) {
-      const distance = userPosition.distanceTo(egg.position);
-      if (distance > 2) {
+
+      // Check breath coherence
+      if (condition.breathCoherence && breath.coherence < condition.breathCoherence) {
         conditionMet = false;
       }
-    }
-    
-    if (conditionMet) {
-      // Discover easter egg
-      setEasterEggs(prev => prev.map((e, i) => 
-        i === eggIndex ? { ...e, discovered: true } : e
-      ));
-      
-      onEasterEggDiscovered?.(egg);
-      
-      // Unlock documentation if specified
-      if (egg.reward.documentationUnlock) {
-        revealDocumentation(egg.reward.documentationUnlock);
+
+      // Check time spent
+      if (condition.timeSpent && timeSpentInLayer[currentLayer] < condition.timeSpent) {
+        conditionMet = false;
       }
-    }
-  }, [easterEggs, currentLayer, consciousness.awarenessLevel, breath.coherence, timeSpentInLayer, interactionHistory, onEasterEggDiscovered]);
+
+      // Check interaction sequence
+      if (condition.interactionSequence) {
+        const recentInteractions = interactionHistory.slice(-condition.interactionSequence.length);
+        if (!arraysEqual(recentInteractions, condition.interactionSequence)) {
+          conditionMet = false;
+        }
+      }
+
+      // Check proximity for hidden symbols
+      if (condition.hiddenSymbol && userPosition) {
+        const distance = userPosition.distanceTo(egg.position);
+        if (distance > 2) {
+          conditionMet = false;
+        }
+      }
+
+      if (conditionMet) {
+        // Discover easter egg
+        setEasterEggs(prev =>
+          prev.map((e, i) => (i === eggIndex ? { ...e, discovered: true } : e))
+        );
+
+        onEasterEggDiscovered?.(egg);
+
+        // Unlock documentation if specified
+        if (egg.reward.documentationUnlock) {
+          revealDocumentation(egg.reward.documentationUnlock);
+        }
+      }
+    },
+    [
+      easterEggs,
+      currentLayer,
+      consciousness.awarenessLevel,
+      breath.coherence,
+      timeSpentInLayer,
+      interactionHistory,
+      onEasterEggDiscovered,
+    ]
+  );
 
   /**
    * Check achievement unlock conditions
    */
-  const checkAchievementUnlock = useCallback((achievementId: string) => {
-    const achievementIndex = achievements.findIndex(ach => ach.id === achievementId);
-    if (achievementIndex === -1) return;
-    
-    const achievement = achievements[achievementIndex];
-    if (achievement.unlocked) return;
-    
-    const condition = achievement.unlockCondition;
-    let conditionMet = true;
-    
-    // Check various conditions
-    if (condition.artifactsDiscovered && progress.totalArtifacts < condition.artifactsDiscovered) {
-      conditionMet = false;
-    }
-    
-    if (condition.consciousnessLevel && consciousness.awarenessLevel < condition.consciousnessLevel) {
-      conditionMet = false;
-    }
-    
-    if (condition.breathMastery && breath.coherence < condition.breathMastery) {
-      conditionMet = false;
-    }
-    
-    if (condition.easterEggsFound) {
-      const discoveredEggs = easterEggs.filter(egg => egg.discovered).length;
-      if (discoveredEggs < condition.easterEggsFound) {
+  const checkAchievementUnlock = useCallback(
+    (achievementId: string) => {
+      const achievementIndex = achievements.findIndex(ach => ach.id === achievementId);
+      if (achievementIndex === -1) return;
+
+      const achievement = achievements[achievementIndex];
+      if (!achievement || achievement.unlocked) return;
+
+      const condition = achievement.unlockCondition;
+      let conditionMet = true;
+
+      // Check various conditions
+      if (
+        condition.artifactsDiscovered &&
+        progress.totalArtifacts < condition.artifactsDiscovered
+      ) {
         conditionMet = false;
       }
-    }
-    
-    if (conditionMet) {
-      setAchievements(prev => prev.map((a, i) => 
-        i === achievementIndex ? { ...a, unlocked: true } : a
-      ));
-      
-      onAchievementUnlocked?.(achievement);
-    }
-  }, [achievements, progress.totalArtifacts, consciousness.awarenessLevel, breath.coherence, easterEggs, onAchievementUnlocked]);
+
+      if (
+        condition.consciousnessLevel &&
+        consciousness.awarenessLevel < condition.consciousnessLevel
+      ) {
+        conditionMet = false;
+      }
+
+      if (condition.breathMastery && breath.coherence < condition.breathMastery) {
+        conditionMet = false;
+      }
+
+      if (condition.easterEggsFound) {
+        const discoveredEggs = easterEggs.filter(egg => egg.discovered).length;
+        if (discoveredEggs < condition.easterEggsFound) {
+          conditionMet = false;
+        }
+      }
+
+      if (conditionMet) {
+        setAchievements(prev =>
+          prev.map((a, i) => (i === achievementIndex ? { ...a, unlocked: true } : a))
+        );
+
+        onAchievementUnlocked?.(achievement);
+      }
+    },
+    [
+      achievements,
+      progress.totalArtifacts,
+      consciousness.awarenessLevel,
+      breath.coherence,
+      easterEggs,
+      onAchievementUnlocked,
+    ]
+  );
 
   /**
    * Reveal documentation artifact
    */
-  const revealDocumentation = useCallback((documentationId: string) => {
-    const docIndex = documentationArtifacts.findIndex(doc => doc.id === documentationId);
-    if (docIndex === -1) return;
-    
-    const doc = documentationArtifacts[docIndex];
-    if (doc.revealed) return;
-    
-    setDocumentationArtifacts(prev => prev.map((d, i) => 
-      i === docIndex ? { ...d, revealed: true } : d
-    ));
-    
-    onDocumentationRevealed?.(doc);
-  }, [documentationArtifacts, onDocumentationRevealed]);
+  const revealDocumentation = useCallback(
+    (documentationId: string) => {
+      const docIndex = documentationArtifacts.findIndex(doc => doc.id === documentationId);
+      if (docIndex === -1) return;
+
+      const doc = documentationArtifacts[docIndex];
+      if (!doc || doc.revealed) return;
+
+      setDocumentationArtifacts(prev =>
+        prev.map((d, i) => (i === docIndex ? { ...d, revealed: true } : d))
+      );
+
+      onDocumentationRevealed?.(doc);
+    },
+    [documentationArtifacts, onDocumentationRevealed]
+  );
 
   /**
    * Add interaction to history
@@ -436,33 +472,36 @@ export const ProgressiveRevelation: React.FC<ProgressiveRevelationProps> = ({
   // Update time spent in current layer
   useFrame((state, delta) => {
     if (!enabled) return;
-    
+
     setTimeSpentInLayer(prev => ({
       ...prev,
       [currentLayer]: prev[currentLayer] + delta,
     }));
-    
+
     // Periodically check for discoveries
-    if (Math.random() < 0.01) { // 1% chance per frame
+    if (Math.random() < 0.01) {
+      // 1% chance per frame
       // Check all easter eggs
       easterEggs.forEach(egg => {
         if (!egg.discovered) {
           checkEasterEggDiscovery(egg.id);
         }
       });
-      
+
       // Check all achievements
       achievements.forEach(achievement => {
         if (!achievement.unlocked) {
           checkAchievementUnlock(achievement.id);
         }
       });
-      
+
       // Check documentation reveals
       documentationArtifacts.forEach(doc => {
-        if (!doc.revealed && 
-            doc.unlockCondition.layer <= currentLayer && 
-            consciousness.awarenessLevel >= doc.unlockCondition.consciousnessLevel) {
+        if (
+          !doc.revealed &&
+          doc.unlockCondition.layer <= currentLayer &&
+          consciousness.awarenessLevel >= doc.unlockCondition.consciousnessLevel
+        ) {
           revealDocumentation(doc.id);
         }
       });
@@ -474,45 +513,48 @@ export const ProgressiveRevelation: React.FC<ProgressiveRevelationProps> = ({
   return (
     <group ref={groupRef}>
       {/* Easter Egg Indicators (only visible when close to discovery) */}
-      {easterEggs.map((egg, index) => (
-        !egg.discovered && egg.layer === currentLayer && (
-          <group key={egg.id} position={generateEasterEggPositions[index]?.toArray() || [0, 0, 0]}>
-            {/* Subtle hint indicator */}
-            {consciousness.awarenessLevel > (egg.discoveryCondition.consciousnessLevel || 0) - 0.1 && (
-              <mesh>
-                <sphereGeometry args={[0.05, 8, 8]} />
-                <meshBasicMaterial
-                  color={0xffaa00}
-                  transparent
-                  opacity={0.3 + Math.sin(Date.now() * 0.005) * 0.2}
-                />
-              </mesh>
-            )}
-          </group>
-        )
-      ))}
-      
+      {easterEggs.map(
+        (egg, index) =>
+          !egg.discovered &&
+          egg.layer === currentLayer && (
+            <group
+              key={egg.id}
+              position={generateEasterEggPositions[index]?.toArray() || [0, 0, 0]}
+            >
+              {/* Subtle hint indicator */}
+              {consciousness.awarenessLevel >
+                (egg.discoveryCondition.consciousnessLevel || 0) - 0.1 && (
+                <mesh>
+                  <sphereGeometry args={[0.05, 8, 8]} />
+                  <meshBasicMaterial
+                    color={0xffaa00}
+                    transparent
+                    opacity={0.3 + Math.sin(Date.now() * 0.005) * 0.2}
+                  />
+                </mesh>
+              )}
+            </group>
+          )
+      )}
+
       {/* Achievement Progress Indicators */}
-      {achievements.map((achievement, index) => (
-        !achievement.unlocked && (
-          <mesh 
-            key={achievement.id}
-            position={[
-              Math.cos(index * SACRED_MATHEMATICS.TAU / achievements.length) * 50,
-              10,
-              Math.sin(index * SACRED_MATHEMATICS.TAU / achievements.length) * 50
-            ]}
-            visible={consciousness.awarenessLevel > 0.5}
-          >
-            <sphereGeometry args={[0.1, 8, 8]} />
-            <meshBasicMaterial
-              color={0x00aaff}
-              transparent
-              opacity={0.4}
-            />
-          </mesh>
-        )
-      ))}
+      {achievements.map(
+        (achievement, index) =>
+          !achievement.unlocked && (
+            <mesh
+              key={achievement.id}
+              position={[
+                Math.cos((index * SACRED_MATHEMATICS.TAU) / achievements.length) * 50,
+                10,
+                Math.sin((index * SACRED_MATHEMATICS.TAU) / achievements.length) * 50,
+              ]}
+              visible={consciousness.awarenessLevel > 0.5}
+            >
+              <sphereGeometry args={[0.1, 8, 8]} />
+              <meshBasicMaterial color={0x00aaff} transparent opacity={0.4} />
+            </mesh>
+          )
+      )}
     </group>
   );
 };

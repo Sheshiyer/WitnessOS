@@ -58,6 +58,10 @@ export interface BirthData {
   birthTime: string; // HH:MM format
   birthLocation: [number, number]; // [latitude, longitude]
   timezone: string;
+  // Backward compatibility properties
+  date: string; // alias for birthDate
+  time: string; // alias for birthTime
+  location: [number, number]; // alias for birthLocation
 }
 
 // Personal data interface
@@ -65,6 +69,8 @@ export interface PersonalData {
   fullName: string;
   preferredName?: string;
   birthDate: string;
+  // Backward compatibility properties
+  name: string; // alias for fullName
 }
 
 // Question-based input interface

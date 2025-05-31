@@ -1,19 +1,19 @@
 /**
  * Sigil Forge Engine 3D Visualization Component
- * 
+ *
  * Symbol creation using minimal GLSL fractal generation
  * Displays personalized sigils as interactive 3D consciousness symbols
  */
 
 'use client';
 
-import React, { useRef, useMemo, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Vector3, Color, Group, BufferGeometry, Float32BufferAttribute } from 'three';
-import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
-import { useConsciousness } from '@/hooks/useConsciousness';
 import { createFractalGeometry } from '@/generators/fractal-noise';
+import { useConsciousness } from '@/hooks/useConsciousness';
+import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
 import type { QuestionInput } from '@/types';
+import { useFrame } from '@react-three/fiber';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { BufferGeometry, Color, Float32BufferAttribute, Group, Vector3 } from 'three';
 
 interface SigilForgeEngineProps {
   intention: QuestionInput;
@@ -72,11 +72,13 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
         include_sacred_geometry: true,
         complexity_level: Math.floor(consciousnessLevel * 5) + 1,
         style: 'fractal_minimalist',
-      }).then((result) => {
-        if (result.success && onCalculationComplete) {
-          onCalculationComplete(result.data);
-        }
-      }).catch(console.error);
+      })
+        .then(result => {
+          if (result.success && onCalculationComplete) {
+            onCalculationComplete(result.data);
+          }
+        })
+        .catch(console.error);
     }
   }, [intention, visible, calculateSigilForge, onCalculationComplete, consciousnessLevel]);
 
@@ -85,32 +87,28 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
     const layers: SigilLayer[] = [];
     const cleanText = text.replace(/[aeiou\s]/gi, '').toUpperCase();
     const uniqueChars = [...new Set(cleanText.split(''))];
-    
+
     // Base layer - main sigil structure
     const baseElements: SigilElement[] = [];
     uniqueChars.forEach((char, index) => {
       const charCode = char.charCodeAt(0);
       const angle = (index / uniqueChars.length) * Math.PI * 2;
       const radius = 1 + (charCode % 50) / 100;
-      
+
       // Create line element for each character
       const startPoint = new Vector3(0, 0, 0);
-      const endPoint = new Vector3(
-        Math.cos(angle) * radius,
-        Math.sin(angle) * radius,
-        (charCode % 20) / 100
-      );
-      
+      const endPoint = new Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, (charCode % 20) / 100);
+
       baseElements.push({
         type: 'line',
         points: [startPoint, endPoint],
-        color: SIGIL_COLORS[charCode % SIGIL_COLORS.length],
+        color: SIGIL_COLORS[charCode % SIGIL_COLORS.length] || new Color('#FFFFFF'),
         thickness: 0.02 + (charCode % 10) / 500,
         energy: (charCode % 100) / 100,
         frequency: 200 + (charCode % 600),
       });
     });
-    
+
     layers.push({
       name: 'base',
       elements: baseElements,
@@ -118,19 +116,15 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
       rotation: 0,
       scale: 1,
     });
-    
+
     // Sacred geometry layer
     const sacredElements: SigilElement[] = [];
     const centerPoints: Vector3[] = [];
     for (let i = 0; i < 6; i++) {
       const angle = (i / 6) * Math.PI * 2;
-      centerPoints.push(new Vector3(
-        Math.cos(angle) * 0.5,
-        Math.sin(angle) * 0.5,
-        0
-      ));
+      centerPoints.push(new Vector3(Math.cos(angle) * 0.5, Math.sin(angle) * 0.5, 0));
     }
-    
+
     sacredElements.push({
       type: 'circle',
       points: centerPoints,
@@ -139,7 +133,7 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
       energy: 0.7,
       frequency: 528, // Love frequency
     });
-    
+
     layers.push({
       name: 'sacred',
       elements: sacredElements,
@@ -147,34 +141,30 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
       rotation: Math.PI / 6,
       scale: 0.8,
     });
-    
+
     // Fractal enhancement layer
     const fractalElements: SigilElement[] = [];
     uniqueChars.slice(0, 3).forEach((char, index) => {
       const charCode = char.charCodeAt(0);
       const spiralPoints: Vector3[] = [];
-      
+
       for (let i = 0; i < 20; i++) {
         const t = i / 20;
         const angle = t * Math.PI * 4;
         const radius = t * 0.3;
-        spiralPoints.push(new Vector3(
-          Math.cos(angle) * radius,
-          Math.sin(angle) * radius,
-          t * 0.2
-        ));
+        spiralPoints.push(new Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, t * 0.2));
       }
-      
+
       fractalElements.push({
         type: 'spiral',
         points: spiralPoints,
-        color: SIGIL_COLORS[(charCode + index) % SIGIL_COLORS.length],
+        color: SIGIL_COLORS[(charCode + index) % SIGIL_COLORS.length] || new Color('#FFFFFF'),
         thickness: 0.005,
         energy: 0.5,
         frequency: 396 + index * 111,
       });
     });
-    
+
     layers.push({
       name: 'fractal',
       elements: fractalElements,
@@ -182,49 +172,51 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
       rotation: -Math.PI / 4,
       scale: 1.2,
     });
-    
+
     return layers;
   };
 
   // Process sigil data into 3D structure
   const { sigilLayers, sigilGeometry, activationField } = useMemo(() => {
     let layers: SigilLayer[] = [];
-    
-    if (state.data && state.data.sigil_structure) {
+
+    const sigilData = state.data as any; // Type assertion for engine-specific data
+    if (sigilData?.sigil_structure) {
       // Use API data if available
-      layers = state.data.sigil_structure.layers || [];
+      layers = sigilData.sigil_structure.layers || [];
     } else if (intention.question) {
       // Generate from intention text
       layers = generateSigilFromText(intention.question);
     }
-    
+
     // Create combined geometry
     const geometry = new BufferGeometry();
     const positions: number[] = [];
     const colors: number[] = [];
     const indices: number[] = [];
     let vertexIndex = 0;
-    
+
     layers.forEach(layer => {
       layer.elements.forEach(element => {
         element.points.forEach(point => {
           positions.push(point.x, point.y, point.z);
           colors.push(element.color.r, element.color.g, element.color.b);
-          
-          if (positions.length >= 6) { // At least 2 points
+
+          if (positions.length >= 6) {
+            // At least 2 points
             indices.push(vertexIndex - 1, vertexIndex);
           }
           vertexIndex++;
         });
       });
     });
-    
+
     if (positions.length > 0) {
       geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
       geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
       geometry.setIndex(indices);
     }
-    
+
     // Create activation field fractal
     const activationFractal = createFractalGeometry({
       type: 'mandala',
@@ -233,7 +225,7 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
       complexity: intention.question?.length || 10,
       seed: intention.question?.charCodeAt(0) || 42,
     });
-    
+
     return { sigilLayers: layers, sigilGeometry: geometry, activationField: activationFractal };
   }, [state.data, intention.question]);
 
@@ -241,22 +233,22 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
   useFrame((state, delta) => {
     if (groupRef.current && visible) {
       const time = state.clock.elapsedTime;
-      
+
       // Rotate sigil based on consciousness level
       groupRef.current.rotation.z += delta * 0.1 * consciousnessLevel;
-      
+
       // Breath synchronization
       const breathScale = 1 + Math.sin(breathPhase * Math.PI * 2) * 0.06;
       groupRef.current.scale.setScalar(scale * breathScale);
-      
+
       // Animate layers
       groupRef.current.children.forEach((child, index) => {
         if (child.userData.layer) {
           const layer = child.userData.layer as SigilLayer;
-          
+
           // Layer-specific rotation
           child.rotation.z += delta * (0.02 + index * 0.01) * consciousnessLevel;
-          
+
           // Consciousness-responsive opacity
           if ('material' in child && child.material) {
             const material = child.material as any;
@@ -275,20 +267,17 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
     <group ref={groupRef} position={position}>
       {/* Main Sigil Structure */}
       {sigilLayers.map((layer, index) => (
-        <group
-          key={layer.name}
-          rotation={[0, 0, layer.rotation]}
-          scale={layer.scale}
-          userData={{ layer }}
-        >
+        <group key={layer.name} rotation={[0, 0, layer.rotation]} scale={layer.scale} userData={{ layer }}>
           {layer.elements.map((element, elemIndex) => {
             if (element.type === 'line' && element.points.length >= 2) {
               const start = element.points[0];
               const end = element.points[1];
+              if (!start || !end) return null;
+
               const direction = end.clone().sub(start);
               const length = direction.length();
               const midpoint = start.clone().add(direction.clone().multiplyScalar(0.5));
-              
+
               return (
                 <mesh
                   key={`${layer.name}-line-${elemIndex}`}
@@ -306,98 +295,77 @@ export const SigilForgeEngine: React.FC<SigilForgeEngineProps> = ({
                 </mesh>
               );
             }
-            
+
             if (element.type === 'circle') {
               return (
-                <mesh
-                  key={`${layer.name}-circle-${elemIndex}`}
-                  rotation={[Math.PI / 2, 0, 0]}
-                >
+                <mesh key={`${layer.name}-circle-${elemIndex}`} rotation={[Math.PI / 2, 0, 0]}>
                   <ringGeometry args={[0.4, 0.5, 16]} />
-                  <meshStandardMaterial
-                    color={element.color}
-                    transparent
-                    opacity={layer.opacity}
-                  />
+                  <meshStandardMaterial color={element.color} transparent opacity={layer.opacity} />
                 </mesh>
               );
             }
-            
+
             return null;
           })}
         </group>
       ))}
-      
+
       {/* Combined Sigil Geometry */}
       {sigilGeometry && (
-        <line geometry={sigilGeometry}>
-          <lineBasicMaterial
-            vertexColors
-            transparent
-            opacity={0.8}
-            linewidth={2}
-          />
-        </line>
+        <lineSegments geometry={sigilGeometry}>
+          <lineBasicMaterial vertexColors transparent opacity={0.8} />
+        </lineSegments>
       )}
-      
+
       {/* Activation Field */}
       {activationField && (
-        <mesh
-          geometry={activationField}
-          scale={[2, 2, 0.1]}
-          position={[0, 0, -0.5]}
-        >
+        <mesh geometry={activationField} scale={[2, 2, 0.1]} position={[0, 0, -0.5]}>
           <meshStandardMaterial
-            color="#FFFFFF"
+            color='#FFFFFF'
             transparent
             opacity={0.1 + consciousnessLevel * 0.2}
             wireframe
           />
         </mesh>
       )}
-      
+
       {/* Energy Nodes */}
-      {sigilLayers[0]?.elements.map((element, index) => (
-        element.points.length > 0 && (
-          <mesh
-            key={`node-${index}`}
-            position={element.points[0].toArray()}
-          >
-            <sphereGeometry args={[0.03, 8, 8]} />
-            <meshStandardMaterial
-              color={element.color}
-              emissive={element.color}
-              emissiveIntensity={element.energy * consciousnessLevel}
-            />
-          </mesh>
-        )
-      ))}
-      
+      {sigilLayers[0]?.elements.map(
+        (element, index) =>
+          element.points.length > 0 &&
+          element.points[0] && (
+            <mesh key={`node-${index}`} position={element.points[0].toArray()}>
+              <sphereGeometry args={[0.03, 8, 8]} />
+              <meshStandardMaterial
+                color={element.color}
+                emissive={element.color}
+                emissiveIntensity={element.energy * consciousnessLevel}
+              />
+            </mesh>
+          )
+      )}
+
       {/* Intention Manifestation Ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[1.8, 2.0, 32]} />
-        <meshBasicMaterial
-          color="#FFFFFF"
-          transparent
-          opacity={0.05 + consciousnessLevel * 0.1}
-        />
+        <meshBasicMaterial color='#FFFFFF' transparent opacity={0.05 + consciousnessLevel * 0.1} />
       </mesh>
-      
+
       {/* Central Focus Point */}
       <mesh>
         <sphereGeometry args={[0.05, 12, 12]} />
         <meshStandardMaterial
-          color="#FFFFFF"
-          emissive="#FFFFFF"
+          color='#FFFFFF'
+          emissive='#FFFFFF'
           emissiveIntensity={consciousnessLevel * 0.5}
         />
       </mesh>
-      
+
       {/* Loading indicator */}
       {state.loading && (
         <mesh>
           <torusGeometry args={[1.5, 0.1, 8, 32]} />
-          <meshBasicMaterial color="#DDA0DD" transparent opacity={0.5} />
+          <meshBasicMaterial color='#DDA0DD' transparent opacity={0.5} />
         </mesh>
       )}
     </group>

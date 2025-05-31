@@ -1,19 +1,19 @@
 /**
  * Tarot Engine 3D Visualization Component
- * 
+ *
  * Card-based symbolic environments with archetypal fractal signatures
  * Displays tarot spreads as immersive 3D symbolic landscapes
  */
 
 'use client';
 
-import React, { useRef, useMemo, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Vector3, Color, Group, Euler } from 'three';
-import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
-import { useConsciousness } from '@/hooks/useConsciousness';
 import { createFractalGeometry } from '@/generators/fractal-noise';
+import { useConsciousness } from '@/hooks/useConsciousness';
+import { useWitnessOSAPI } from '@/hooks/useWitnessOSAPI';
 import type { QuestionInput } from '@/types';
+import { useFrame } from '@react-three/fiber';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { Color, Euler, Group, Vector3 } from 'three';
 
 interface TarotEngineProps {
   question: QuestionInput;
@@ -45,7 +45,7 @@ interface TarotSpread {
 }
 
 const TAROT_SPREADS: Record<string, TarotSpread> = {
-  'three_card': {
+  three_card: {
     name: 'Past, Present, Future',
     positions: [
       { name: 'Past', position: new Vector3(-2, 0, 0), meaning: 'What has led to this moment' },
@@ -53,7 +53,7 @@ const TAROT_SPREADS: Record<string, TarotSpread> = {
       { name: 'Future', position: new Vector3(2, 0, 0), meaning: 'Potential outcome' },
     ],
   },
-  'celtic_cross': {
+  celtic_cross: {
     name: 'Celtic Cross',
     positions: [
       { name: 'Present', position: new Vector3(0, 0, 0), meaning: 'Current situation' },
@@ -71,19 +71,19 @@ const TAROT_SPREADS: Record<string, TarotSpread> = {
 };
 
 const SUIT_COLORS: Record<string, Color> = {
-  'cups': new Color('#4A90E2'),      // Water - Blue
-  'wands': new Color('#F5A623'),     // Fire - Orange
-  'swords': new Color('#7ED321'),    // Air - Yellow/Green
-  'pentacles': new Color('#D0021B'), // Earth - Red
-  'major': new Color('#9013FE'),     // Major Arcana - Purple
+  cups: new Color('#4A90E2'), // Water - Blue
+  wands: new Color('#F5A623'), // Fire - Orange
+  swords: new Color('#7ED321'), // Air - Yellow/Green
+  pentacles: new Color('#D0021B'), // Earth - Red
+  major: new Color('#9013FE'), // Major Arcana - Purple
 };
 
 const ELEMENT_FRACTALS: Record<string, string> = {
-  'water': 'julia',
-  'fire': 'dragon',
-  'air': 'sierpinski',
-  'earth': 'mandelbrot',
-  'spirit': 'mandala',
+  water: 'julia',
+  fire: 'dragon',
+  air: 'sierpinski',
+  earth: 'mandelbrot',
+  spirit: 'mandala',
 };
 
 export const TarotEngine: React.FC<TarotEngineProps> = ({
@@ -102,15 +102,17 @@ export const TarotEngine: React.FC<TarotEngineProps> = ({
     if (question && visible) {
       calculateTarot({
         question: question.question,
-        spread_type: question.context?.spread_type || 'three_card',
-        focus_area: question.context?.focus_area || 'general',
+        spread_type: (question.context as any)?.spread_type || 'three_card',
+        focus_area: (question.context as any)?.focus_area || 'general',
         include_reversals: true,
         include_numerology: true,
-      }).then((result) => {
-        if (result.success && onCalculationComplete) {
-          onCalculationComplete(result.data);
-        }
-      }).catch(console.error);
+      })
+        .then(result => {
+          if (result.success && onCalculationComplete) {
+            onCalculationComplete(result.data);
+          }
+        })
+        .catch(console.error);
     }
   }, [question, visible, calculateTarot, onCalculationComplete]);
 
@@ -120,24 +122,24 @@ export const TarotEngine: React.FC<TarotEngineProps> = ({
       return { cards: [], spread: TAROT_SPREADS.three_card, cardGeometries: [] };
     }
 
-    const tarotData = state.data;
-    const spreadType = tarotData.spread_type || 'three_card';
-    const currentSpread = TAROT_SPREADS[spreadType] || TAROT_SPREADS.three_card;
-    
+    const tarotData = state.data as any; // Type assertion for engine-specific data
+    const spreadType = tarotData?.spread_type || 'three_card';
+    const currentSpread = TAROT_SPREADS[spreadType as keyof typeof TAROT_SPREADS] || TAROT_SPREADS.three_card;
+
     // Create card objects
     const cardList: TarotCard[] = [];
     const geometries: any[] = [];
-    
-    if (tarotData.cards) {
+
+    if (tarotData?.cards) {
       tarotData.cards.forEach((cardData: any, index: number) => {
-        const spreadPosition = currentSpread.positions[index];
+        const spreadPosition = currentSpread?.positions[index];
         if (!spreadPosition) return;
 
         // Determine suit and color
         const suit = cardData.suit || 'major';
         const element = cardData.element || 'spirit';
-        const color = SUIT_COLORS[suit] || SUIT_COLORS.major;
-        
+        const color = SUIT_COLORS[suit as keyof typeof SUIT_COLORS] || SUIT_COLORS.major;
+
         const card: TarotCard = {
           name: cardData.name,
           suit: suit,
@@ -147,11 +149,11 @@ export const TarotEngine: React.FC<TarotEngineProps> = ({
           reversed: cardData.reversed || false,
           archetype: cardData.archetype || 'unknown',
           element: element,
-          color: color,
+          color: color || new Color('#FFFFFF'),
         };
-        
+
         cardList.push(card);
-        
+
         // Create fractal geometry for card's archetypal energy
         const fractalType = ELEMENT_FRACTALS[element] || 'mandala';
         const geometry = createFractalGeometry({
@@ -161,7 +163,7 @@ export const TarotEngine: React.FC<TarotEngineProps> = ({
           complexity: cardData.number || 1,
           seed: cardData.name.charCodeAt(0),
         });
-        
+
         geometries.push(geometry);
       });
     }
@@ -174,11 +176,11 @@ export const TarotEngine: React.FC<TarotEngineProps> = ({
     if (groupRef.current && visible) {
       // Gentle rotation of the entire spread
       groupRef.current.rotation.y += delta * 0.02 * consciousnessLevel;
-      
+
       // Breath synchronization
       const breathScale = 1 + Math.sin(breathPhase * Math.PI * 2) * 0.03;
       groupRef.current.scale.setScalar(scale * breathScale);
-      
+
       // Animate individual cards
       groupRef.current.children.forEach((child, index) => {
         if (child.type === 'Group') {
@@ -186,9 +188,9 @@ export const TarotEngine: React.FC<TarotEngineProps> = ({
           const time = state.clock.elapsedTime;
           const offset = index * 0.5;
           child.position.y += Math.sin(time + offset) * 0.001;
-          
+
           // Consciousness-responsive glow
-          child.children.forEach((cardChild) => {
+          child.children.forEach(cardChild => {
             if (cardChild.type === 'Mesh' && 'material' in cardChild) {
               const material = cardChild.material as any;
               if (material.emissiveIntensity !== undefined) {
@@ -207,15 +209,15 @@ export const TarotEngine: React.FC<TarotEngineProps> = ({
     <group ref={groupRef} position={position}>
       {/* Tarot Cards */}
       {cards.map((card, index) => (
-        <group 
-          key={`${card.name}-${index}`} 
+        <group
+          key={`${card.name}-${index}`}
           position={card.position.toArray()}
           rotation={card.rotation.toArray()}
         >
           {/* Card base */}
           <mesh>
             <boxGeometry args={[1, 1.6, 0.05]} />
-            <meshStandardMaterial 
+            <meshStandardMaterial
               color={card.color}
               transparent
               opacity={0.8}
@@ -223,25 +225,17 @@ export const TarotEngine: React.FC<TarotEngineProps> = ({
               emissiveIntensity={0.1}
             />
           </mesh>
-          
+
           {/* Card border */}
           <mesh>
             <boxGeometry args={[1.1, 1.7, 0.06]} />
-            <meshStandardMaterial 
-              color="#ffffff"
-              transparent
-              opacity={0.3}
-            />
+            <meshStandardMaterial color='#ffffff' transparent opacity={0.3} />
           </mesh>
-          
+
           {/* Archetypal fractal pattern */}
           {cardGeometries[index] && (
-            <mesh 
-              geometry={cardGeometries[index]}
-              position={[0, 0, 0.03]}
-              scale={[0.8, 0.8, 0.1]}
-            >
-              <meshStandardMaterial 
+            <mesh geometry={cardGeometries[index]} position={[0, 0, 0.03]} scale={[0.8, 0.8, 0.1]}>
+              <meshStandardMaterial
                 color={card.color}
                 transparent
                 opacity={0.6}
@@ -251,69 +245,60 @@ export const TarotEngine: React.FC<TarotEngineProps> = ({
               />
             </mesh>
           )}
-          
+
           {/* Suit symbol */}
           <mesh position={[0, -0.6, 0.03]}>
             <sphereGeometry args={[0.1, 8, 8]} />
             <meshStandardMaterial color={card.color} />
           </mesh>
-          
+
           {/* Reversed indicator */}
           {card.reversed && (
             <mesh position={[0.4, 0.7, 0.03]}>
               <coneGeometry args={[0.05, 0.1, 3]} />
-              <meshStandardMaterial color="#ff0000" />
+              <meshStandardMaterial color='#ff0000' />
             </mesh>
           )}
-          
+
           {/* Card energy field */}
           <mesh>
             <ringGeometry args={[0.8, 1.0, 16]} />
-            <meshBasicMaterial 
-              color={card.color}
-              transparent
-              opacity={0.1}
-              side={2}
-            />
+            <meshBasicMaterial color={card.color} transparent opacity={0.1} side={2} />
           </mesh>
         </group>
       ))}
-      
+
       {/* Spread connection lines */}
-      {spread.positions.length > 1 && spread.positions.map((pos, index) => {
-        if (index === 0) return null;
-        const prevPos = spread.positions[index - 1];
-        const direction = pos.position.clone().sub(prevPos.position);
-        const length = direction.length();
-        const midpoint = prevPos.position.clone().add(direction.clone().multiplyScalar(0.5));
-        
-        return (
-          <mesh key={`connection-${index}`} position={midpoint.toArray()}>
-            <cylinderGeometry args={[0.01, 0.01, length]} />
-            <meshBasicMaterial 
-              color="#ffffff" 
-              transparent 
-              opacity={0.2}
-            />
-          </mesh>
-        );
-      })}
-      
+      {spread?.positions &&
+        spread.positions.length > 1 &&
+        spread.positions.map((pos, index) => {
+          if (index === 0) return null;
+          const prevPos = spread.positions[index - 1];
+          if (!prevPos) return null;
+
+          const direction = pos.position.clone().sub(prevPos.position);
+          const length = direction.length();
+          const midpoint = prevPos.position.clone().add(direction.clone().multiplyScalar(0.5));
+
+          return (
+            <mesh key={`connection-${index}`} position={midpoint.toArray()}>
+              <cylinderGeometry args={[0.01, 0.01, length]} />
+              <meshBasicMaterial color='#ffffff' transparent opacity={0.2} />
+            </mesh>
+          );
+        })}
+
       {/* Spread circle */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[3, 3.2, 32]} />
-        <meshBasicMaterial 
-          color="#ffffff" 
-          transparent 
-          opacity={0.05}
-        />
+        <meshBasicMaterial color='#ffffff' transparent opacity={0.05} />
       </mesh>
-      
+
       {/* Loading indicator */}
       {state.loading && (
         <mesh>
           <torusGeometry args={[2, 0.1, 8, 32]} />
-          <meshBasicMaterial color="#9013FE" transparent opacity={0.5} />
+          <meshBasicMaterial color='#9013FE' transparent opacity={0.5} />
         </mesh>
       )}
     </group>
