@@ -1,62 +1,70 @@
-{
-  `path`: `webshore-todo.md`,
-  `content`: `# WitnessOS Webshore Development Todo
+# WitnessOS Webshore Procedural Development Todo
 
-*Cross-session tracking for consciousness exploration world*
+*Cross-session tracking for consciousness exploration world - Procedural Generation Approach*
 
 ---
 
-## 🌊 **PHASE 1: Foundation & Portal Chamber** 
+## 🌊 **PHASE 1: Foundation & Procedural Portal Chamber**
 *Priority: Critical - Entry point for all users*
 
-### **1.1 Asset Pipeline Setup**
-- [ ] Create project directory structure
-- [ ] Test Polyhaven asset integration workflow
-- [ ] Test Hyper3D AI generation workflow
-- [ ] Create asset organization system
-- [ ] Document asset naming conventions
+### **1.1 Procedural Pipeline Setup**
+- [ ] Create Next.js + React Three Fiber project structure
+- [ ] Setup Three.js procedural generation framework
+- [ ] Integrate WitnessOS Sacred Geometry Engine (Python → JS)
+- [ ] Create consciousness algorithm library
+- [ ] Setup user data integration with API
+- [ ] Document procedural generation conventions
 
-### **1.2 Portal Chamber Scene (portal-main.blend)**
-- [ ] Create octagonal sacred chamber geometry (low-poly)
-- [ ] Generate mystical HDRI environment (Polyhaven)
-- [ ] Create breathing platform (circular, sacred geometry)
-- [ ] Generate floating consciousness symbol (Hyper3D AI)
-- [ ] Setup breathing-synchronized lighting system
-- [ ] Add particle system (consciousness energy dots)
-- [ ] Create sacred geometry wall textures (Polyhaven)
-- [ ] Setup camera for first-person exploration
-- [ ] Test mobile optimization (polygon reduction)
+### **1.2 Portal Chamber Procedural Generator (ProceduralPortal.jsx)**
+- [ ] Create octagonal chamber geometry generator (from numerology)
+- [ ] Implement breathing platform sacred circle algorithm
+- [ ] Generate personal consciousness symbol from user data
+- [ ] Setup real-time breathing synchronization system
+- [ ] Create procedural particle system (consciousness energy)
+- [ ] Implement consciousness-responsive materials/shaders
+- [ ] Setup first-person camera with touch controls
+- [ ] Test mobile optimization (procedural LOD)
 
-### **1.3 Breathing Synchronization System**
-- [ ] Create Python script for breath animation cycles
-- [ ] Setup 4-second breathing loop (1.5s in, 1s hold, 1.5s out)
-- [ ] Connect breathing to lighting intensity
-- [ ] Connect breathing to particle flow
-- [ ] Connect breathing to sacred geometry scaling
-- [ ] Test breath sync with different frame rates
+### **1.3 Real-Time Breathing Synchronization System**
+- [ ] Implement Web Audio API microphone breath detection
+- [ ] Create 4-second breathing cycle algorithm (1.5s in, 1s hold, 1.5s out)
+- [ ] Setup breath-responsive shader uniforms
+- [ ] Connect breathing to procedural particle flow algorithms
+- [ ] Implement breath-synchronized sacred geometry scaling
+- [ ] Test breath sync with different frame rates and devices
+- [ ] Create manual breathing mode fallback for accessibility
+
+### **1.4 Personal Symbol Procedural Generation**
+- [ ] Create consciousness symbol generation algorithm from user data
+- [ ] Implement floating symbol animation (procedural)
+- [ ] Setup touch/click interaction for symbol activation
+- [ ] Create symbol revelation animation sequence (algorithmic)
+- [ ] Add symbol meaning text overlay system
+- [ ] Test symbol interaction on mobile touch
+- [ ] Create portal activation sequence (procedural transition)
 
 ---
 
-## 🌱 **PHASE 2: Symbol Garden & Basic Discovery**
+## 🌱 **PHASE 2: Procedural Symbol Garden & Discovery Mechanics**
 *Priority: High - Core discovery mechanics*
 
-### **2.1 Symbol Constellation System**
-- [ ] Search Polyhaven for mystical/nature environments
-- [ ] Create garden landscape base geometry
-- [ ] Generate 12 symbol crystals (Hyper3D AI prompts)
-- [ ] Create crystal material with glow effects
-- [ ] Setup crystal interaction zones
-- [ ] Create symbol reveal animation system
-- [ ] Add spatial audio for symbol discoveries
-- [ ] Create progressive revelation mechanics
+### **2.1 Symbol Garden Procedural Generator**
+- [ ] Create organic terrain generation algorithm (Perlin noise)
+- [ ] Implement procedural mystical garden environment
+- [ ] Generate 12 symbol crystal formations from VOCAB.md data
+- [ ] Create procedural crystal materials with consciousness-responsive glow
+- [ ] Setup algorithmic crystal interaction zones
+- [ ] Create symbol reveal animation system (procedural)
+- [ ] Add procedural spatial audio for symbol discoveries
+- [ ] Create progressive revelation mechanics (algorithmic)
 
-### **2.2 VOCAB Symbol Integration**
-- [ ] Define 12 core WitnessOS symbols for discovery
-- [ ] Create symbol meaning database
-- [ ] Generate AI prompts for each symbol crystal
-- [ ] Create symbol-to-crystal material mapping
-- [ ] Setup discovery progress tracking
-- [ ] Test symbol touch/click interactions
+### **2.2 VOCAB Symbol Procedural Integration**
+- [ ] Define 12 core WitnessOS symbols for algorithmic discovery
+- [ ] Create symbol meaning database integration
+- [ ] Generate procedural symbol geometry from consciousness data
+- [ ] Create symbol-to-crystal material mapping algorithms
+- [ ] Setup discovery progress tracking (API integration)
+- [ ] Test symbol touch/click interactions (mobile-optimized)
 
 ### **2.3 Navigation System**
 - [ ] Create first-person camera controller

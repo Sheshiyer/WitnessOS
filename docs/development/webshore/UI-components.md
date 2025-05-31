@@ -1,52 +1,88 @@
-# 3D-Scenes.md — WitnessOS Webshore Blender Scene Library
+# Procedural-Components.md — WitnessOS Webshore Procedural Scene Library
 
 ---
 
 ## 🌊 1. Introduction
 
-This document defines the **3D consciousness scene library** for the WitnessOS Webshore discovery world. Each scene is designed to be **breath-synchronized**, **sacred geometry-aligned**, and **fully interactive** in first-person exploration.
+This document defines the **procedural 3D consciousness component library** for the WitnessOS Webshore discovery world. Each component is designed to be **algorithmically generated**, **breath-synchronized**, **sacred geometry-aligned**, and **fully interactive** in first-person exploration.
 
-Scenes are organized by **discovery layers** and **consciousness functions**, with detailed specifications for Blender creation and EverArt asset integration.
+Components are organized by **discovery layers** and **consciousness functions**, with detailed specifications for Three.js + React Three Fiber procedural generation.
 
 ---
 
-## 🎮 2. Core Discovery Scenes
+## 🎮 2. Core Procedural Discovery Components
 
 ### **2.1 Portal Chamber (Entry Scene)**
 
 **Purpose**: Minimalist breathing chamber for consciousness entry and synchronization
 
-**Blender Scene Specification**:
-```blender
-Scene File: portal-main.blend
+**Procedural Generation Specification**:
+```javascript
+// ProceduralPortal.jsx - Generated from user numerology
+import { useFrame } from '@react-three/fiber'
+import { useMemo } from 'react'
 
-Geometry (Low-Poly):
-- Sacred chamber: Octagonal room (8 walls, 200 polygons)
-- Central platform: Circular breathing platform (50 polygons)
-- Floating symbol: Icosphere with symbol texture (20 polygons)
-- Particle system: 100 floating consciousness particles
+const ProceduralPortalChamber = ({ userNumerology, breathingState }) => {
 
-Lighting Setup:
-- Key Light: Soft area light above (breathing-synchronized intensity)
-- Rim Lights: 4 directional lights for sacred geometry (compass directions)
-- Ambient: World shader with consciousness gradient (purple to gold)
+  // Generate chamber geometry from life path number
+  const chamberGeometry = useMemo(() => {
+    const sides = 8 // Octagonal base
+    const radius = userNumerology.lifePathNumber * 0.5 + 3 // 3.5-8m radius
+    const height = userNumerology.expressionNumber * 0.3 + 2.5 // 2.8-5.5m height
 
-Materials (EverArt Integration):
-- Chamber walls: Sacred geometry texture (seamless, 1024x1024)
-- Platform: Breathing mandala texture (animated UV offset)
-- Symbol: Mysterious glyph texture (glowing emission shader)
-- Particles: Simple emission material (breath-synchronized)
+    return generateOctagonalChamber(sides, radius, height)
+  }, [userNumerology])
 
-Animations:
-- Breathing cycle: 4-second loop (inhale 1.5s, hold 1s, exhale 1.5s)
-- Symbol rotation: Slow 360° rotation over 30 seconds
-- Particle flow: Gentle upward movement with breath sync
-- Portal activation: Symbol expands and opens gateway (triggered)
+  // Generate breathing platform from expression number
+  const platformGeometry = useMemo(() => {
+    const platformRadius = userNumerology.expressionNumber * 0.2 + 1 // 1.2-3m
+    const segments = userNumerology.soulUrgeNumber + 16 // 17-25 segments
 
-Interaction Zones:
-- Breathing detection area: Central platform (3m radius)
-- Symbol interaction: Touch/click to activate portal
-- Chamber exploration: Limited movement within chamber
+    return generateSacredCircle(platformRadius, segments)
+  }, [userNumerology])
+
+  // Generate personal consciousness symbol
+  const personalSymbol = useMemo(() => {
+    return generateConsciousnessSymbol({
+      lifePathNumber: userNumerology.lifePathNumber,
+      birthDay: userNumerology.birthDay,
+      personalityTraits: userNumerology.personalityNumbers
+    })
+  }, [userNumerology])
+
+  // Procedural materials based on archetype
+  const chamberMaterials = useMemo(() => {
+    return generateConsciousnessMaterials({
+      primaryColor: getArchetypeColor(userNumerology.archetype),
+      breathingIntensity: breathingState.intensity,
+      consciousnessLevel: userNumerology.consciousnessLevel
+    })
+  }, [userNumerology, breathingState])
+
+  return (
+    <group>
+      {/* Procedurally generated chamber walls */}
+      <mesh geometry={chamberGeometry} material={chamberMaterials.walls} />
+
+      {/* Breathing platform with sacred geometry */}
+      <mesh geometry={platformGeometry} material={chamberMaterials.platform} />
+
+      {/* Personal floating symbol */}
+      <FloatingSymbol
+        symbol={personalSymbol}
+        breathingSync={breathingState}
+        material={chamberMaterials.symbol}
+      />
+
+      {/* Procedural particle system */}
+      <ConsciousnessParticles
+        count={userNumerology.lifePathNumber * 10}
+        breathingSync={breathingState}
+        pattern={userNumerology.particlePattern}
+      />
+    </group>
+  )
+}
 ```
 
 **EverArt Asset Requirements**:

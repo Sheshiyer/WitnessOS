@@ -1,22 +1,90 @@
-# Prompts.md — AI Asset Generation for WitnessOS 3D Consciousness World
+# Procedural-Algorithms.md — Consciousness Generation Algorithms for WitnessOS 3D World
 
 ---
 
 ## 🌊 1. Introduction
 
-This document contains **specialized AI prompts** for creating the WitnessOS 3D consciousness exploration world. Prompts are optimized for **Blender MCP** (3D scene creation) and **EverArt** (texture and 2D asset generation) to build a fully immersive first-person consciousness discovery experience.
+This document contains **specialized procedural generation algorithms** for creating the WitnessOS 3D consciousness exploration world. Algorithms are optimized for **Three.js + React Three Fiber** implementation to build a fully immersive first-person consciousness discovery experience through **pure mathematical generation**.
 
-All prompts maintain the **mystical-technical balance** while optimizing for **low-poly aesthetics** and **mobile WebGL performance**.
+All algorithms maintain the **mystical-technical balance** while optimizing for **real-time generation** and **mobile WebGL performance**.
 
 ---
 
-## � 2. Blender MCP Scene Creation Prompts
+## 🧮 2. Core Procedural Generation Algorithms
 
-### **2.1 Portal Chamber (Entry Scene)**
+### **2.1 Portal Chamber Generation Algorithm**
 
-**Primary Breathing Chamber**
-```
-Create a sacred consciousness entry chamber in Blender. Low-poly aesthetic, WebGL optimized. Octagonal room with 8 walls, sacred geometry proportions. Central circular platform for breathing meditation. Single floating symbol above platform (icosphere with glow). Soft ambient lighting with breathing synchronization capability. Color palette: Deep purples, cosmic blues, golden accents. Geometry budget: 300 polygons total. Include particle system for floating consciousness energy (100 particles). Export as GLB under 1MB. Scene should feel mystical, minimal, and focused on breath awareness.
+**Octagonal Chamber Procedural Generation**
+```javascript
+// generateOctagonalChamber.js - Sacred geometry chamber from numerology
+function generateOctagonalChamber(userNumerology) {
+  const lifePathNumber = userNumerology.lifePathNumber
+  const expressionNumber = userNumerology.expressionNumber
+
+  // Chamber dimensions from sacred numerology
+  const radius = lifePathNumber * 0.5 + 3 // 3.5-8m radius
+  const height = expressionNumber * 0.3 + 2.5 // 2.8-5.5m height
+  const sides = 8 // Octagonal sacred geometry
+
+  // Generate vertices for octagonal chamber
+  const vertices = []
+  const indices = []
+
+  // Create octagonal base
+  for (let i = 0; i < sides; i++) {
+    const angle = (i / sides) * Math.PI * 2
+    const x = Math.cos(angle) * radius
+    const z = Math.sin(angle) * radius
+
+    // Bottom vertices
+    vertices.push(x, 0, z)
+    // Top vertices
+    vertices.push(x, height, z)
+  }
+
+  // Generate faces with sacred proportions
+  for (let i = 0; i < sides; i++) {
+    const next = (i + 1) % sides
+    const bottom1 = i * 2
+    const top1 = i * 2 + 1
+    const bottom2 = next * 2
+    const top2 = next * 2 + 1
+
+    // Wall faces (sacred geometry triangulation)
+    indices.push(bottom1, top1, bottom2)
+    indices.push(top1, top2, bottom2)
+  }
+
+  return new THREE.BufferGeometry().setFromPoints(vertices).setIndex(indices)
+}
+
+// generateBreathingPlatform.js - Sacred circle from expression number
+function generateBreathingPlatform(userNumerology) {
+  const expressionNumber = userNumerology.expressionNumber
+  const soulUrgeNumber = userNumerology.soulUrgeNumber
+
+  // Platform dimensions from consciousness signature
+  const platformRadius = expressionNumber * 0.2 + 1 // 1.2-3m
+  const segments = soulUrgeNumber + 16 // 17-25 segments (sacred geometry)
+
+  // Generate sacred circle with golden ratio proportions
+  const geometry = new THREE.CircleGeometry(platformRadius, segments)
+
+  // Add sacred geometry patterns to UV coordinates
+  const uvs = geometry.attributes.uv.array
+  for (let i = 0; i < uvs.length; i += 2) {
+    // Apply golden ratio spiral to UV mapping
+    const angle = Math.atan2(uvs[i+1] - 0.5, uvs[i] - 0.5)
+    const distance = Math.sqrt((uvs[i] - 0.5)**2 + (uvs[i+1] - 0.5)**2)
+
+    // Golden spiral transformation
+    const goldenRatio = 1.618033988749
+    uvs[i] = 0.5 + distance * Math.cos(angle * goldenRatio)
+    uvs[i+1] = 0.5 + distance * Math.sin(angle * goldenRatio)
+  }
+
+  return geometry
+}
 ```
 
 **Symbol Garden Environment**

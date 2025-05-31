@@ -1,0 +1,162 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "@typescript-eslint/recommended",
+    "@typescript-eslint/recommended-requiring-type-checking",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint", "react", "react-hooks", "jsx-a11y", "prettier"],
+  "rules": {
+    // Prettier integration
+    "prettier/prettier": "error",
+
+    // TypeScript strict rules for consciousness-aware development
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/prefer-nullish-coalescing": "error",
+    "@typescript-eslint/prefer-optional-chain": "error",
+    "@typescript-eslint/no-unnecessary-type-assertion": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/no-misused-promises": "error",
+
+    // React and JSX rules
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+    "react/display-name": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+
+    // Accessibility rules for consciousness interfaces
+    "jsx-a11y/alt-text": "error",
+    "jsx-a11y/aria-props": "error",
+    "jsx-a11y/aria-proptypes": "error",
+    "jsx-a11y/aria-unsupported-elements": "error",
+    "jsx-a11y/role-has-required-aria-props": "error",
+    "jsx-a11y/role-supports-aria-props": "error",
+
+    // Code quality rules
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-debugger": "error",
+    "no-alert": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-arrow-callback": "error",
+    "arrow-spacing": "error",
+    "no-duplicate-imports": "error",
+    "no-unused-expressions": "error",
+
+    // Consciousness-specific naming conventions
+    "camelcase": [
+      "error",
+      {
+        "properties": "never",
+        "allow": ["^consciousness_", "^archetype_", "^sacred_", "^breath_", "^field_", "^reality_", "^witness_"]
+      }
+    ],
+
+    // Function and variable naming for consciousness context
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "variableLike",
+        "format": ["camelCase", "PascalCase"],
+        "filter": {
+          "regex": "^(consciousness|archetype|sacred|breath|field|reality|witness)_",
+          "match": false
+        }
+      },
+      {
+        "selector": "typeLike",
+        "format": ["PascalCase"]
+      },
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "custom": {
+          "regex": "^I[A-Z]",
+          "match": false
+        }
+      },
+      {
+        "selector": "enumMember",
+        "format": ["UPPER_CASE", "PascalCase"]
+      }
+    ],
+
+    // Import organization for consciousness modules
+    "sort-imports": [
+      "error",
+      {
+        "ignoreCase": true,
+        "ignoreDeclarationSort": true,
+        "ignoreMemberSort": false,
+        "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
+      }
+    ],
+
+    // Complexity rules for maintainable consciousness code
+    "complexity": ["warn", 10],
+    "max-depth": ["warn", 4],
+    "max-lines": ["warn", 300],
+    "max-lines-per-function": ["warn", 50],
+    "max-params": ["warn", 5],
+
+    // Three.js and React Three Fiber specific rules
+    "no-new": "off", // Allow new Three.js objects
+    "@typescript-eslint/no-unsafe-assignment": "warn", // Three.js has complex types
+    "@typescript-eslint/no-unsafe-member-access": "warn",
+    "@typescript-eslint/no-unsafe-call": "warn",
+
+    // Performance rules for 3D consciousness experiences
+    "no-inner-declarations": "error",
+    "no-loop-func": "error",
+    "prefer-template": "error"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "max-lines-per-function": "off"
+      }
+    },
+    {
+      "files": ["src/types/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "max-lines": "off"
+      }
+    },
+    {
+      "files": ["src/generators/**/*.ts", "src/components/procedural-scenes/**/*.tsx"],
+      "rules": {
+        "complexity": ["warn", 15],
+        "max-lines-per-function": ["warn", 75]
+      }
+    }
+  ],
+  "env": {
+    "browser": true,
+    "es2020": true,
+    "node": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

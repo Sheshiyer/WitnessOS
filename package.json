@@ -111,5 +111,11 @@
     "Honor consciousness sovereignty",
     "Maintain field integrity",
     "Serve the highest good"
-  ]
+  ],
+  "dependencies": {
+    "@react-three/drei": "^10.1.2",
+    "@react-three/fiber": "^9.1.2",
+    "@types/three": "^0.176.0",
+    "three": "^0.177.0"
+  }
 }
