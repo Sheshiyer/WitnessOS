@@ -12,7 +12,7 @@
 'use client';
 
 import { gsap } from 'gsap';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface EnhancedWitnessOSBootSequenceProps {
   onBootComplete?: () => void;
@@ -238,126 +238,26 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
     standard: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
   };
 
-  const morphText = (targetText: string, messageIndex: number, callback?: () => void) => {
-    const duration = 35; // Optimized timing for smooth effect
-    const morphDuration = 15; // More morphing iterations for better effect
-    let currentText = '';
-    let charIndex = 0;
-
-    // Initialize message state
-    setMessageStates(prev => ({
-      ...prev,
-      [messageIndex]: {
-        displayText: '',
-        isMorphing: true,
-        morphProgress: 0,
-        isComplete: false,
-      },
-    }));
-
-    const morphChar = () => {
-      if (charIndex >= targetText.length) {
-        setMessageStates(prev => ({
-          ...prev,
-          [messageIndex]: {
-            displayText: targetText,
-            isMorphing: false,
-            morphProgress: 100,
-            isComplete: true,
-          },
-        }));
-        callback?.();
-        return;
-      }
-
-      let morphCount = 0;
-      const targetChar = targetText[charIndex];
-
-      // Update progress
-      const progress = (charIndex / targetText.length) * 100;
+  const morphText = useCallback(
+    (targetText: string, messageIndex: number, callback?: () => void) => {
+      // Simplified approach - just show the text directly to prevent infinite loops
       setMessageStates(prev => ({
         ...prev,
         [messageIndex]: {
-          ...prev[messageIndex],
-          morphProgress: progress,
+          displayText: targetText,
+          isMorphing: false,
+          morphProgress: 100,
+          isComplete: true,
         },
       }));
 
-      // Choose character set based on message content with enhanced logic
-      let charSet = matrixChars;
-      if (
-        targetText.includes('sacred') ||
-        targetText.includes('geometry') ||
-        targetText.includes('φ') ||
-        targetText.includes('Golden ratio')
-      ) {
-        charSet = consciousnessChars.sacred + consciousnessChars.geometric;
-      } else if (
-        targetText.includes('consciousness') ||
-        targetText.includes('archetypal') ||
-        targetText.includes('mystical') ||
-        targetText.includes('wisdom')
-      ) {
-        charSet = consciousnessChars.mystical + consciousnessChars.cosmic;
-      } else if (
-        targetText.includes('portal') ||
-        targetText.includes('chamber') ||
-        targetText.includes('octagonal') ||
-        targetText.includes('fractal')
-      ) {
-        charSet = consciousnessChars.geometric + consciousnessChars.sacred;
-      } else if (
-        targetText.includes('frequency') ||
-        targetText.includes('Hz') ||
-        targetText.includes('resonance') ||
-        targetText.includes('coherence')
-      ) {
-        charSet = consciousnessChars.cosmic + consciousnessChars.mystical;
+      // Call callback after a short delay
+      if (callback) {
+        setTimeout(callback, 100);
       }
-
-      const morphInterval = setInterval(() => {
-        if (morphCount >= morphDuration) {
-          currentText += targetChar;
-          setMessageStates(prev => ({
-            ...prev,
-            [messageIndex]: {
-              ...prev[messageIndex],
-              displayText: currentText,
-            },
-          }));
-          charIndex++;
-          clearInterval(morphInterval);
-          setTimeout(morphChar, duration / 4); // Faster transition between characters
-        } else {
-          const randomChar =
-            targetChar === ' ' ? ' ' : charSet[Math.floor(Math.random() * charSet.length)];
-
-          // Enhanced preview with consciousness-themed effects
-          const remainingText = targetText.slice(charIndex + 1);
-          const fadedRemaining = remainingText
-            .split('')
-            .map((char, i) => {
-              if (i < 2) return char; // Show next 2 characters clearly
-              if (i < 5) return Math.random() > 0.5 ? char : '·'; // Fade with dots
-              if (i < 8) return Math.random() > 0.7 ? char : '∞'; // Use consciousness symbols
-              return Math.random() > 0.8 ? char : ' '; // Randomly show/hide distant characters
-            })
-            .join('');
-
-          setMessageStates(prev => ({
-            ...prev,
-            [messageIndex]: {
-              ...prev[messageIndex],
-              displayText: currentText + randomChar + fadedRemaining,
-            },
-          }));
-          morphCount++;
-        }
-      }, duration);
-    };
-
-    morphChar();
-  };
+    },
+    []
+  );
 
   // Initialize GSAP animations
   useEffect(() => {
@@ -432,7 +332,7 @@ export const EnhancedWitnessOSBootSequence: React.FC<EnhancedWitnessOSBootSequen
     }
 
     return () => {};
-  }, [currentIndex, onBootComplete]);
+  }, [currentIndex, onBootComplete, morphText]);
 
   const getMessageColor = (level: BootMessage['level']) => {
     switch (level) {

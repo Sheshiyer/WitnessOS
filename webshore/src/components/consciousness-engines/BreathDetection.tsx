@@ -7,13 +7,14 @@
 
 'use client';
 
+import { createBreathWave } from '@/generators/wave-equations/consciousness-waves';
 import type { BreathState } from '@/types';
 import { CONSCIOUSNESS_CONSTANTS } from '@/utils/consciousness-constants';
 import { useFrame } from '@react-three/fiber';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Color, Mesh, MeshBasicMaterial } from 'three';
 
-const { BREATH_PATTERNS } = CONSCIOUSNESS_CONSTANTS;
+const { BREATH_PATTERNS, SACRED_MATHEMATICS } = CONSCIOUSNESS_CONSTANTS;
 
 interface BreathDetectionProps {
   onBreathStateChange: (breathState: BreathState) => void;
@@ -65,8 +66,8 @@ export const BreathDetection: React.FC<BreathDetectionProps> = ({
   const breathRingRef = useRef<Mesh>(null);
   const coherenceRingRef = useRef<Mesh>(null);
 
-  // Breath wave generator (for future use)
-  // const breathWave = useRef(createBreathWave());
+  // Breath wave generator
+  const breathWave = useRef(createBreathWave());
 
   // Audio data buffers
   const volumeHistory = useRef<number[]>([]);
@@ -106,7 +107,105 @@ export const BreathDetection: React.FC<BreathDetectionProps> = ({
     } catch (error) {
       console.error('Failed to initialize microphone:', error);
     }
-  }, [enabled, startAnalysis]);
+  }, [enabled]);
+
+  /**
+   * Calculate breath coherence from pattern history
+   */
+  const calculateCoherence = (patterns: string[]): number => {
+    if (patterns.length < 10) return 0;
+
+    // Look for rhythmic patterns
+    let transitions = 0;
+    let validTransitions = 0;
+
+    for (let i = 1; i < patterns.length; i++) {
+      if (patterns[i] !== patterns[i - 1]) {
+        transitions++;
+        // Valid transitions: pause->inhale, inhale->hold, hold->exhale, exhale->pause
+        const validSequences = [
+          ['pause', 'inhale'],
+          ['inhale', 'hold'],
+          ['hold', 'exhale'],
+          ['exhale', 'pause'],
+        ];
+
+        if (validSequences.some(seq => seq[0] === patterns[i - 1] && seq[1] === patterns[i])) {
+          validTransitions++;
+        }
+      }
+    }
+
+    return transitions > 0 ? validTransitions / transitions : 0;
+  };
+
+  /**
+   * Analyze breath pattern from audio data
+   */
+  const analyzeBreathPattern = useCallback(
+    (volume: number, frequency: number): AudioAnalysis => {
+      const { baselineVolume, inhaleThreshold, exhaleThreshold } = calibrationData;
+      const adjustedVolume = Math.max(0, volume - baselineVolume) * sensitivity;
+
+      // Calculate volume trend
+      const recentVolumes = volumeHistory.current.slice(-10);
+      const volumeTrend =
+        recentVolumes.length > 1
+          ? (recentVolumes[recentVolumes.length - 1] ?? 0) - (recentVolumes[0] ?? 0)
+          : 0;
+
+      // Determine breath phase
+      let pattern: AudioAnalysis['pattern'] = 'pause';
+      let confidence = 0;
+
+      if (adjustedVolume > inhaleThreshold && volumeTrend > 0.01) {
+        pattern = 'inhale';
+        confidence = Math.min(1, adjustedVolume / inhaleThreshold);
+      } else if (adjustedVolume > exhaleThreshold && volumeTrend < -0.01) {
+        pattern = 'exhale';
+        confidence = Math.min(1, adjustedVolume / exhaleThreshold);
+      } else if (adjustedVolume > exhaleThreshold) {
+        pattern = 'hold';
+        confidence = Math.min(1, adjustedVolume / exhaleThreshold);
+      }
+
+      // Calculate coherence based on pattern consistency
+      const patternHistory = volumeHistory.current.map(v => {
+        const adj = Math.max(0, v - baselineVolume) * sensitivity;
+        if (adj > inhaleThreshold) return 'inhale';
+        if (adj > exhaleThreshold) return 'exhale';
+        return 'pause';
+      });
+
+      const coherence = calculateCoherence(patternHistory);
+
+      return {
+        volume: adjustedVolume,
+        frequency,
+        coherence,
+        pattern,
+        confidence,
+      };
+    },
+    [calibrationData, sensitivity]
+  );
+
+  /**
+   * Convert audio analysis to breath state
+   */
+  const convertToBreathState = useCallback((analysis: AudioAnalysis): BreathState => {
+    const pattern = BREATH_PATTERNS.COHERENT; // Default pattern
+
+    return {
+      pattern,
+      phase: analysis.pattern,
+      intensity: analysis.confidence,
+      rhythm: 60 / pattern.totalCycle, // BPM
+      coherence: analysis.coherence,
+      synchronization: analysis.coherence,
+      timestamp: new Date().toISOString(),
+    };
+  }, []);
 
   /**
    * Start continuous audio analysis
@@ -160,101 +259,8 @@ export const BreathDetection: React.FC<BreathDetectionProps> = ({
 
       analyze();
     },
-    [audioContext, onBreathStateChange, calibrationData, sensitivity]
+    [audioContext, onBreathStateChange, analyzeBreathPattern, convertToBreathState]
   );
-
-  /**
-   * Analyze breath pattern from audio data
-   */
-  const analyzeBreathPattern = (volume: number, frequency: number): AudioAnalysis => {
-    const { baselineVolume, inhaleThreshold, exhaleThreshold } = calibrationData;
-    const adjustedVolume = Math.max(0, volume - baselineVolume) * sensitivity;
-
-    // Calculate volume trend
-    const recentVolumes = volumeHistory.current.slice(-10);
-    const volumeTrend =
-      recentVolumes.length > 1 ? (recentVolumes[recentVolumes.length - 1] ?? 0) - (recentVolumes[0] ?? 0) : 0;
-
-    // Determine breath phase
-    let pattern: AudioAnalysis['pattern'] = 'pause';
-    let confidence = 0;
-
-    if (adjustedVolume > inhaleThreshold && volumeTrend > 0.01) {
-      pattern = 'inhale';
-      confidence = Math.min(1, adjustedVolume / inhaleThreshold);
-    } else if (adjustedVolume > exhaleThreshold && volumeTrend < -0.01) {
-      pattern = 'exhale';
-      confidence = Math.min(1, adjustedVolume / exhaleThreshold);
-    } else if (adjustedVolume > exhaleThreshold) {
-      pattern = 'hold';
-      confidence = Math.min(1, adjustedVolume / exhaleThreshold);
-    }
-
-    // Calculate coherence based on pattern consistency
-    const patternHistory = volumeHistory.current.map(v => {
-      const adj = Math.max(0, v - baselineVolume) * sensitivity;
-      if (adj > inhaleThreshold) return 'inhale';
-      if (adj > exhaleThreshold) return 'exhale';
-      return 'pause';
-    });
-
-    const coherence = calculateCoherence(patternHistory);
-
-    return {
-      volume: adjustedVolume,
-      frequency,
-      coherence,
-      pattern,
-      confidence,
-    };
-  };
-
-  /**
-   * Calculate breath coherence from pattern history
-   */
-  const calculateCoherence = (patterns: string[]): number => {
-    if (patterns.length < 10) return 0;
-
-    // Look for rhythmic patterns
-    let transitions = 0;
-    let validTransitions = 0;
-
-    for (let i = 1; i < patterns.length; i++) {
-      if (patterns[i] !== patterns[i - 1]) {
-        transitions++;
-        // Valid transitions: pause->inhale, inhale->hold, hold->exhale, exhale->pause
-        const validSequences = [
-          ['pause', 'inhale'],
-          ['inhale', 'hold'],
-          ['hold', 'exhale'],
-          ['exhale', 'pause'],
-        ];
-
-        if (validSequences.some(seq => seq[0] === patterns[i - 1] && seq[1] === patterns[i])) {
-          validTransitions++;
-        }
-      }
-    }
-
-    return transitions > 0 ? validTransitions / transitions : 0;
-  };
-
-  /**
-   * Convert audio analysis to breath state
-   */
-  const convertToBreathState = (analysis: AudioAnalysis): BreathState => {
-    const pattern = BREATH_PATTERNS.COHERENT; // Default pattern
-
-    return {
-      pattern,
-      phase: analysis.pattern,
-      intensity: analysis.confidence,
-      rhythm: 60 / pattern.totalCycle, // BPM
-      coherence: analysis.coherence,
-      synchronization: analysis.coherence,
-      timestamp: new Date().toISOString(),
-    };
-  };
 
   /**
    * Calibrate breath detection thresholds
@@ -314,7 +320,7 @@ export const BreathDetection: React.FC<BreathDetectionProps> = ({
         audioContext.close();
       }
     };
-  }, [enabled, initializeAudio, audioContext, microphone]);
+  }, [enabled, initializeAudio]);
 
   // Auto-calibrate after audio initialization
   useEffect(() => {

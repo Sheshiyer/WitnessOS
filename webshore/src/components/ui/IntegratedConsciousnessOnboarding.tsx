@@ -17,7 +17,14 @@ import { type ConsciousnessProfile } from './ConsciousnessDataCollector';
 
 interface IntegratedConsciousnessOnboardingProps {
   onProfileComplete: (profile: ConsciousnessProfile) => void;
-  onStepChange?: (step: number, total: number) => void;
+  onStepChange?: (
+    step: number,
+    total: number,
+    stepName?: string,
+    data?: Partial<ConsciousnessProfile>
+  ) => void;
+  initialStep?: number;
+  initialData?: Partial<ConsciousnessProfile> | null;
 }
 
 type OnboardingStep =
@@ -115,49 +122,90 @@ const ARCHETYPAL_DIRECTIONS: ArchetypalDirection[] = [
 
 export const IntegratedConsciousnessOnboarding: React.FC<
   IntegratedConsciousnessOnboardingProps
-> = ({ onProfileComplete, onStepChange }) => {
+> = ({ onProfileComplete, onStepChange, initialStep = 0, initialData = null }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const compassRef = useRef<HTMLDivElement>(null);
 
-  const [currentStep, setCurrentStep] = useState<OnboardingStep>('direction_selection');
-  const [selectedDirection, setSelectedDirection] = useState<ArchetypalDirection | null>(null);
-  const [userName, setUserName] = useState('');
-  const [birthDate, setBirthDate] = useState('');
-  const [birthTime, setBirthTime] = useState('');
-  const [birthCity, setBirthCity] = useState('');
-  const [birthCountry, setBirthCountry] = useState('');
+  // Initialize state from saved data or defaults
+  const getInitialStep = (): OnboardingStep => {
+    const stepMap: OnboardingStep[] = [
+      'direction_selection',
+      'name_story',
+      'birth_date_story',
+      'birth_time_story',
+      'birth_location_story',
+      'confirmation',
+    ];
+    return stepMap[initialStep] || 'direction_selection';
+  };
 
-  const [profile, setProfile] = useState<ConsciousnessProfile>({
-    personalData: {
-      fullName: '',
-      name: '',
-      preferredName: '',
-      birthDate: '',
-    },
-    birthData: {
-      birthDate: '',
-      birthTime: '',
-      birthLocation: [0, 0],
-      timezone: '',
-      date: '',
-      time: '',
-      location: [0, 0],
-    },
-    location: {
-      city: '',
-      country: '',
-      latitude: 0,
-      longitude: 0,
-      timezone: '',
-    },
-    preferences: {
-      primaryShape: 'circle',
-      spectralDirection: 'north',
-      consciousnessLevel: 1,
-    },
-    archetypalSignature: {},
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>(getInitialStep());
+  const [selectedDirection, setSelectedDirection] = useState<ArchetypalDirection | null>(() => {
+    if (initialData?.preferences?.spectralDirection) {
+      return (
+        ARCHETYPAL_DIRECTIONS.find(d => d.id === initialData.preferences.spectralDirection) || null
+      );
+    }
+    return null;
+  });
+  const [userName, setUserName] = useState(initialData?.personalData?.fullName || '');
+  const [birthDate, setBirthDate] = useState(initialData?.birthData?.birthDate || '');
+  const [birthTime, setBirthTime] = useState(initialData?.birthData?.birthTime || '');
+  const [birthCity, setBirthCity] = useState(initialData?.location?.city || '');
+  const [birthCountry, setBirthCountry] = useState(initialData?.location?.country || '');
+
+  const [profile, setProfile] = useState<ConsciousnessProfile>(() => {
+    // Initialize with saved data or defaults
+    const defaultProfile: ConsciousnessProfile = {
+      personalData: {
+        fullName: '',
+        name: '',
+        preferredName: '',
+        birthDate: '',
+      },
+      birthData: {
+        birthDate: '',
+        birthTime: '',
+        birthLocation: [0, 0],
+        timezone: '',
+        date: '',
+        time: '',
+        location: [0, 0],
+      },
+      location: {
+        city: '',
+        country: '',
+        latitude: 0,
+        longitude: 0,
+        timezone: '',
+      },
+      preferences: {
+        primaryShape: 'circle',
+        spectralDirection: 'north',
+        consciousnessLevel: 1,
+      },
+      archetypalSignature: {},
+    };
+
+    // Merge with initial data if available
+    if (initialData) {
+      return {
+        ...defaultProfile,
+        ...initialData,
+        personalData: { ...defaultProfile.personalData, ...initialData.personalData },
+        birthData: { ...defaultProfile.birthData, ...initialData.birthData },
+        location: { ...defaultProfile.location, ...initialData.location },
+        preferences: { ...defaultProfile.preferences, ...initialData.preferences },
+        archetypalSignature: {
+          ...defaultProfile.archetypalSignature,
+          ...initialData.archetypalSignature,
+        },
+      };
+    }
+
+    return defaultProfile;
   });
 
   // Persistent profile card state for Pokemon-style evolution
@@ -210,7 +258,7 @@ export const IntegratedConsciousnessOnboarding: React.FC<
     return () => ctx.revert();
   }, [currentStep]);
 
-  // Update step tracking
+  // Update step tracking with progressive persistence
   useEffect(() => {
     const stepMap: Record<OnboardingStep, number> = {
       direction_selection: 1,
@@ -220,8 +268,10 @@ export const IntegratedConsciousnessOnboarding: React.FC<
       birth_location_story: 5,
       confirmation: 6,
     };
-    onStepChange?.(stepMap[currentStep], 6);
-  }, [currentStep, onStepChange]);
+
+    // Call with step name and current profile data for progressive saving
+    onStepChange?.(stepMap[currentStep], 6, currentStep, profile);
+  }, [currentStep, onStepChange, profile]);
 
   const handleDirectionSelect = (direction: ArchetypalDirection) => {
     setSelectedDirection(direction);
@@ -419,67 +469,94 @@ export const IntegratedConsciousnessOnboarding: React.FC<
         }}
       />
 
-      {/* Persistent Profile Card - Pokemon Evolution Style */}
-      {profileCardData.direction && currentStep !== 'direction_selection' && (
-        <PersistentProfileCard
-          ref={profileCardRef}
-          profileData={profileCardData}
-          className='absolute top-4 right-4 z-20'
-        />
-      )}
-
-      {/* Main Content */}
-      <div ref={contentRef} className='relative z-10 flex-1 flex items-center justify-center p-8'>
+      {/* Main Content - Left-Right Split Layout */}
+      <div ref={contentRef} className='relative z-10 flex-1 flex overflow-hidden'>
+        {/* Direction Selection - Full Screen */}
         {currentStep === 'direction_selection' && (
-          <DirectionSelectionStep
-            directions={ARCHETYPAL_DIRECTIONS}
-            onSelect={handleDirectionSelect}
-            compassRef={compassRef}
-          />
+          <div className='w-full flex items-center justify-center p-8'>
+            <DirectionSelectionStep
+              directions={ARCHETYPAL_DIRECTIONS}
+              onSelect={handleDirectionSelect}
+              compassRef={compassRef}
+            />
+          </div>
         )}
 
-        {currentStep === 'name_story' && selectedDirection && (
-          <CyberpunkNameStep
-            direction={selectedDirection}
-            onSubmit={handleNameSubmit}
-            profileCardRef={profileCardRef}
-          />
+        {/* Onboarding Steps - Left-Right Split */}
+        {currentStep !== 'direction_selection' && currentStep !== 'confirmation' && (
+          <>
+            {/* Left Side - Form */}
+            <div className='flex-1 flex items-center justify-center p-6 md:p-8 lg:p-12 min-h-0'>
+              {currentStep === 'name_story' && selectedDirection && (
+                <CyberpunkNameStep
+                  direction={selectedDirection}
+                  onSubmit={handleNameSubmit}
+                  profileCardRef={profileCardRef}
+                />
+              )}
+
+              {currentStep === 'birth_date_story' && selectedDirection && (
+                <CyberpunkBirthDateStep
+                  direction={selectedDirection}
+                  userName={userName}
+                  onSubmit={handleBirthDateSubmit}
+                  profileCardRef={profileCardRef}
+                />
+              )}
+
+              {currentStep === 'birth_time_story' && selectedDirection && (
+                <CyberpunkBirthTimeStep
+                  direction={selectedDirection}
+                  userName={userName}
+                  onSubmit={handleBirthTimeSubmit}
+                  profileCardRef={profileCardRef}
+                />
+              )}
+
+              {currentStep === 'birth_location_story' && selectedDirection && (
+                <CyberpunkLocationStep
+                  direction={selectedDirection}
+                  userName={userName}
+                  onSubmit={handleLocationSubmit}
+                  profileCardRef={profileCardRef}
+                />
+              )}
+            </div>
+
+            {/* Right Side - Profile Card */}
+            <div className='hidden lg:flex lg:w-80 xl:w-96 items-center justify-center p-6 lg:p-8 border-l border-cyan-500/20 bg-black/10 backdrop-blur-sm'>
+              {profileCardData.direction && (
+                <PersistentProfileCard
+                  ref={profileCardRef}
+                  profileData={profileCardData}
+                  className='w-full max-w-sm'
+                />
+              )}
+            </div>
+
+            {/* Mobile Profile Card - Top Right */}
+            <div className='lg:hidden absolute top-4 right-4 z-20'>
+              {profileCardData.direction && (
+                <PersistentProfileCard
+                  ref={profileCardRef}
+                  profileData={profileCardData}
+                  className='w-56 md:w-64 scale-75 md:scale-90 origin-top-right'
+                />
+              )}
+            </div>
+          </>
         )}
 
-        {currentStep === 'birth_date_story' && selectedDirection && (
-          <CyberpunkBirthDateStep
-            direction={selectedDirection}
-            userName={userName}
-            onSubmit={handleBirthDateSubmit}
-            profileCardRef={profileCardRef}
-          />
-        )}
-
-        {currentStep === 'birth_time_story' && selectedDirection && (
-          <CyberpunkBirthTimeStep
-            direction={selectedDirection}
-            userName={userName}
-            onSubmit={handleBirthTimeSubmit}
-            profileCardRef={profileCardRef}
-          />
-        )}
-
-        {currentStep === 'birth_location_story' && selectedDirection && (
-          <CyberpunkLocationStep
-            direction={selectedDirection}
-            userName={userName}
-            onSubmit={handleLocationSubmit}
-            profileCardRef={profileCardRef}
-          />
-        )}
-
+        {/* Confirmation Step - Full Screen */}
         {currentStep === 'confirmation' && selectedDirection && (
-          <CyberpunkConfirmationStep
-            direction={selectedDirection}
-            profile={profile}
-            profileCardData={profileCardData}
-            onConfirm={handleConfirmation}
-          />
+          <div className='w-full flex items-center justify-center p-8'>
+            <CyberpunkConfirmationStep
+              direction={selectedDirection}
+              profile={profile}
+              profileCardData={profileCardData}
+              onConfirm={handleConfirmation}
+            />
+          </div>
         )}
       </div>
 
@@ -573,14 +650,18 @@ const DirectionSelectionStep: React.FC<{
             zIndex: directions.length - index,
           });
 
-          // Deal cards into fan layout with staggered animation
-          const fanAngle = (index - (directions.length - 1) / 2) * 15; // Spread cards in fan
-          const fanOffset = Math.abs(index - (directions.length - 1) / 2) * 20;
+          // Deal cards into fan layout with proper equal angular spacing
+          const totalCards = directions.length;
+          const fanSpread = 120; // Total degrees for the fan (120 degrees for better spacing)
+          const startAngle = -fanSpread / 2; // Start from left side of fan
+          const angleStep = fanSpread / (totalCards - 1); // Equal spacing between cards
+          const fanAngle = startAngle + index * angleStep; // Calculate exact angle for this card
+          const fanRadius = 180; // Distance from center point for fan layout
 
           gsap.to(card, {
-            x: fanOffset * Math.sin((fanAngle * Math.PI) / 180),
-            y: fanOffset * Math.cos((fanAngle * Math.PI) / 180),
-            rotation: fanAngle,
+            x: fanRadius * Math.sin((fanAngle * Math.PI) / 180),
+            y: fanRadius * Math.cos((fanAngle * Math.PI) / 180) * 0.6, // Flatten the arc slightly
+            rotation: fanAngle * 0.8, // Reduce rotation for better readability
             scale: 1,
             opacity: 1,
             duration: 0.8,
@@ -613,14 +694,19 @@ const DirectionSelectionStep: React.FC<{
           ease: 'power2.out',
         });
       } else {
-        // Return to fan position
-        const fanAngle = (cardIndex - (directions.length - 1) / 2) * 15;
-        const fanOffset = Math.abs(cardIndex - (directions.length - 1) / 2) * 20;
+        // Return to fan position using the same calculation as initial layout
+        const totalCards = directions.length;
+        const fanSpread = 120;
+        const startAngle = -fanSpread / 2;
+        const angleStep = fanSpread / (totalCards - 1);
+        const fanAngle = startAngle + cardIndex * angleStep;
+        const fanRadius = 180;
 
         gsap.to(card, {
           scale: 1,
-          y: fanOffset * Math.cos((fanAngle * Math.PI) / 180),
-          rotation: fanAngle,
+          x: fanRadius * Math.sin((fanAngle * Math.PI) / 180),
+          y: fanRadius * Math.cos((fanAngle * Math.PI) / 180) * 0.6,
+          rotation: fanAngle * 0.8,
           zIndex: directions.length - cardIndex,
           duration: 0.3,
           ease: 'power2.out',
@@ -713,7 +799,7 @@ const DirectionSelectionStep: React.FC<{
               }}
             >
               {/* Cyberpunk Tarot Card */}
-              <div className='relative w-40 h-60 md:w-48 md:h-72 cyberpunk-card'>
+              <div className='relative w-36 h-56 sm:w-40 sm:h-60 md:w-44 md:h-66 lg:w-48 lg:h-72 cyberpunk-card'>
                 {/* Cyberpunk Neon Border */}
                 <div
                   className={`
@@ -736,20 +822,20 @@ const DirectionSelectionStep: React.FC<{
                 </div>
 
                 {/* Cyberpunk Tarot Card Content */}
-                <div className='relative z-10 h-full flex flex-col p-4'>
+                <div className='relative z-10 h-full flex flex-col p-2 sm:p-3 md:p-4'>
                   {/* Card Header */}
-                  <div className='text-center mb-4'>
-                    <div className='text-xs font-mono text-cyan-400 mb-1 tracking-wider'>
+                  <div className='text-center mb-2 sm:mb-3 md:mb-4'>
+                    <div className='text-[10px] sm:text-xs font-mono text-cyan-400 mb-1 tracking-wider'>
                       ARCHETYPE_{String(index + 1).padStart(2, '0')}
                     </div>
-                    <div className='h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent mb-2' />
+                    <div className='h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent mb-1 sm:mb-2' />
                   </div>
 
                   {/* Central Symbol */}
                   <div className='flex-1 flex items-center justify-center'>
                     <div
                       className={`
-                        text-6xl md:text-7xl transition-all duration-300
+                        text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl transition-all duration-300
                         ${hoveredCard === direction.id ? 'scale-110' : ''}
                       `}
                       style={{
@@ -769,13 +855,13 @@ const DirectionSelectionStep: React.FC<{
 
                   {/* Card Footer */}
                   <div className='text-center'>
-                    <div className='h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent mb-2' />
+                    <div className='h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent mb-1 sm:mb-2' />
                     <h3
-                      className={`text-sm md:text-base font-bold ${direction.color} font-mono tracking-wide mb-2`}
+                      className={`text-xs sm:text-sm md:text-base font-bold ${direction.color} font-mono tracking-wide mb-1 sm:mb-2`}
                     >
                       {direction.name.toUpperCase()}
                     </h3>
-                    <p className='text-gray-400 text-xs leading-tight px-1 mb-2 font-mono'>
+                    <p className='text-gray-400 text-[10px] sm:text-xs leading-tight px-1 mb-1 sm:mb-2 font-mono'>
                       {direction.description}
                     </p>
 
@@ -785,7 +871,7 @@ const DirectionSelectionStep: React.FC<{
                         <span
                           key={keyword}
                           className={`
-                            px-2 py-1 text-xs font-mono
+                            px-1 sm:px-2 py-0.5 sm:py-1 text-[9px] sm:text-xs font-mono
                             bg-gray-900/80 text-gray-400 border border-gray-700/50
                             transition-all duration-300
                             ${hoveredCard === direction.id ? 'border-cyan-500/50 text-cyan-300' : ''}
@@ -887,10 +973,24 @@ const DirectionSelectionStep: React.FC<{
         }
 
         /* Responsive adjustments */
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
           .cyberpunk-card {
-            width: 140px !important;
-            height: 210px !important;
+            width: 144px !important; /* w-36 */
+            height: 224px !important; /* h-56 */
+          }
+        }
+
+        @media (min-width: 641px) and (max-width: 768px) {
+          .cyberpunk-card {
+            width: 160px !important; /* w-40 */
+            height: 240px !important; /* h-60 */
+          }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .cyberpunk-card {
+            width: 176px !important; /* w-44 */
+            height: 264px !important; /* h-66 */
           }
         }
       `}</style>
@@ -1054,7 +1154,7 @@ const CyberpunkNameStep: React.FC<{
   };
 
   return (
-    <div className='w-full max-w-2xl mx-auto text-center'>
+    <div className='w-full text-center'>
       {/* Cyberpunk Header */}
       <div className='mb-8'>
         <h1 className='text-3xl md:text-4xl font-bold text-cyan-400 mb-3 tracking-wider font-mono'>
@@ -1147,7 +1247,7 @@ const CyberpunkBirthDateStep: React.FC<{
   };
 
   return (
-    <div className='w-full max-w-2xl mx-auto text-center'>
+    <div className='w-full text-center'>
       <div className='mb-8'>
         <h1 className='text-3xl md:text-4xl font-bold text-cyan-400 mb-3 tracking-wider font-mono'>
           <span className='text-pink-500'>&gt;</span> TEMPORAL_CALIBRATION.exe
@@ -1235,7 +1335,7 @@ const CyberpunkBirthTimeStep: React.FC<{
   };
 
   return (
-    <div className='w-full max-w-2xl mx-auto text-center'>
+    <div className='w-full text-center'>
       <div className='mb-8'>
         <h1 className='text-3xl md:text-4xl font-bold text-cyan-400 mb-3 tracking-wider font-mono'>
           <span className='text-pink-500'>&gt;</span> CHRONOS_PRECISION.exe
@@ -1324,7 +1424,7 @@ const CyberpunkLocationStep: React.FC<{
   };
 
   return (
-    <div className='w-full max-w-2xl mx-auto text-center'>
+    <div className='w-full text-center'>
       <div className='mb-8'>
         <h1 className='text-3xl md:text-4xl font-bold text-cyan-400 mb-3 tracking-wider font-mono'>
           <span className='text-pink-500'>&gt;</span> GEOSPATIAL_MAPPING.exe

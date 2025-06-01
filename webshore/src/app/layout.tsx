@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
+// Debug components (development only)
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -22,9 +24,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Dynamic import for debug components to avoid SSR issues
+  const DebugProvider = require('@/components/debug').DebugProvider;
+  const DebugNavigationPanel = require('@/components/debug').DebugNavigationPanel;
+  const DebugToggleButton = require('@/components/debug').DebugToggleButton;
+
   return (
     <html lang='en'>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <DebugProvider>
+          {children}
+          <DebugNavigationPanel />
+          <DebugToggleButton />
+        </DebugProvider>
+      </body>
     </html>
   );
 }
