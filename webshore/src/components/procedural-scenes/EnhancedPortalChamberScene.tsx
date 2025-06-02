@@ -20,7 +20,7 @@ import { OrbitControls, PerspectiveCamera, Stats } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import React, { useCallback, useEffect, useState } from 'react';
 import { BreathDetection } from '../consciousness-engines/BreathDetection';
-import { useDebug } from '../debug/DebugContext';
+import { useDebug } from '../debug';
 import { PortalChamber } from './PortalChamber';
 
 interface EnhancedPortalChamberSceneProps {
@@ -41,9 +41,9 @@ interface EnhancedPortalChamberSceneProps {
 }
 
 /**
- * Enhanced Portal Chamber Scene with Layer Integration
+ * Internal Portal Chamber Scene Component (with debug context)
  */
-export const EnhancedPortalChamberScene: React.FC<EnhancedPortalChamberSceneProps> = ({
+const PortalChamberSceneInternal: React.FC<EnhancedPortalChamberSceneProps> = ({
   humanDesignType = 'generator',
   enneagramType = 9,
   fractalType = FractalType.MANDELBROT,
@@ -433,6 +433,26 @@ export const EnhancedPortalChamberScene: React.FC<EnhancedPortalChamberSceneProp
         </div>
       </div>
     </div>
+  );
+};
+
+/**
+ * Enhanced Portal Chamber Scene with Debug Provider
+ * Wraps the internal component with debug context only when needed
+ */
+export const EnhancedPortalChamberScene: React.FC<EnhancedPortalChamberSceneProps> = props => {
+  // Dynamic import for debug components to avoid SSR issues
+  const DebugProvider = require('@/components/debug').DebugProvider;
+  const DebugNavigationPanel = require('@/components/debug').DebugNavigationPanel;
+  const DebugToggleButton = require('@/components/debug').DebugToggleButton;
+
+  return (
+    <DebugProvider>
+      <PortalChamberSceneInternal {...props} />
+      {/* Debug components only load in portal */}
+      <DebugNavigationPanel />
+      <DebugToggleButton />
+    </DebugProvider>
   );
 };
 

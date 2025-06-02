@@ -269,9 +269,9 @@ export const IntegratedConsciousnessOnboarding: React.FC<
       confirmation: 6,
     };
 
-    // Call with step name and current profile data for progressive saving
-    onStepChange?.(stepMap[currentStep], 6, currentStep, profile);
-  }, [currentStep, onStepChange, profile]);
+    // Call with step name - profile data will be passed when handlers are called
+    onStepChange?.(stepMap[currentStep], 6, currentStep);
+  }, [currentStep, onStepChange]); // Removed profile to prevent infinite re-renders
 
   const handleDirectionSelect = (direction: ArchetypalDirection) => {
     setSelectedDirection(direction);
@@ -299,15 +299,16 @@ export const IntegratedConsciousnessOnboarding: React.FC<
 
   const handleNameSubmit = (name: string) => {
     setUserName(name);
-    setProfile(prev => ({
-      ...prev,
+    const updatedProfile = {
+      ...profile,
       personalData: {
         fullName: name,
         name: name,
         preferredName: name.split(' ')[0] || name,
-        birthDate: prev.personalData?.birthDate || '',
+        birthDate: profile.personalData?.birthDate || '',
       },
-    }));
+    };
+    setProfile(updatedProfile);
 
     // Update profile card with name (Pokemon evolution style)
     setProfileCardData(prev => ({
@@ -316,30 +317,36 @@ export const IntegratedConsciousnessOnboarding: React.FC<
       completionPercentage: 33.33, // 2/6 steps complete
     }));
 
+    // Save progress with updated profile data
+    onStepChange?.(2, 6, 'name_story', updatedProfile);
+
     setCurrentStep('birth_date_story');
   };
 
   const handleBirthDateSubmit = (date: string) => {
     setBirthDate(date);
-    setProfile(prev => ({
-      ...prev,
+    const updatedProfile = {
+      ...profile,
       personalData: {
-        fullName: prev.personalData?.fullName || '',
-        name: prev.personalData?.name || '',
+        fullName: profile.personalData?.fullName || '',
+        name: profile.personalData?.name || '',
         preferredName:
-          prev.personalData?.preferredName || prev.personalData?.fullName?.split(' ')[0] || '',
+          profile.personalData?.preferredName ||
+          profile.personalData?.fullName?.split(' ')[0] ||
+          '',
         birthDate: date,
       },
       birthData: {
         birthDate: date,
-        birthTime: prev.birthData?.birthTime || '',
-        birthLocation: prev.birthData?.birthLocation || [0, 0],
-        timezone: prev.birthData?.timezone || '',
+        birthTime: profile.birthData?.birthTime || '',
+        birthLocation: profile.birthData?.birthLocation || [0, 0],
+        timezone: profile.birthData?.timezone || '',
         date: date,
-        time: prev.birthData?.time || '',
-        location: prev.birthData?.location || [0, 0],
+        time: profile.birthData?.time || '',
+        location: profile.birthData?.location || [0, 0],
       },
-    }));
+    };
+    setProfile(updatedProfile);
 
     // Update profile card with birth date
     setProfileCardData(prev => ({
@@ -347,6 +354,9 @@ export const IntegratedConsciousnessOnboarding: React.FC<
       birthDate: date,
       completionPercentage: 50, // 3/6 steps complete
     }));
+
+    // Save progress with updated profile data
+    onStepChange?.(3, 6, 'birth_date_story', updatedProfile);
 
     setCurrentStep('birth_time_story');
   };
@@ -762,10 +772,10 @@ const DirectionSelectionStep: React.FC<{
   };
 
   return (
-    <div className='w-full h-screen flex flex-col justify-center items-center px-4 py-6'>
+    <div className='w-full min-h-screen flex flex-col px-4 py-6 md:py-8'>
       {/* Cyberpunk Header */}
-      <div className='text-center mb-12 z-10'>
-        <h1 className='text-3xl md:text-4xl font-bold text-cyan-400 mb-3 tracking-wider font-mono'>
+      <div className='text-center mb-8 md:mb-12 z-10 flex-shrink-0'>
+        <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold text-cyan-400 mb-3 tracking-wider font-mono'>
           <span className='text-pink-500'>&gt;</span> ARCHETYPAL_SELECTION.exe
         </h1>
         <p className='text-gray-300 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-mono'>
@@ -779,11 +789,57 @@ const DirectionSelectionStep: React.FC<{
       {/* Tarot Card Fan Layout */}
       <div
         ref={compassRef}
-        className='relative flex-1 flex items-center justify-center w-full max-w-4xl'
+        className='relative flex-1 flex items-center justify-center w-full max-w-4xl mx-auto'
       >
+        {/* Velvet Table Surface Background */}
+        <div className='absolute inset-0 flex items-center justify-center'>
+          <div
+            className='w-full max-w-5xl h-96 rounded-3xl velvet-table-surface'
+            style={{
+              background: `
+                radial-gradient(ellipse at 30% 40%, rgba(45, 27, 105, 0.8) 0%, rgba(45, 27, 105, 0.4) 40%, transparent 70%),
+                radial-gradient(ellipse at 70% 60%, rgba(75, 0, 130, 0.6) 0%, rgba(75, 0, 130, 0.3) 40%, transparent 70%),
+                linear-gradient(135deg, #2D1B69 0%, #4B0082 25%, #663399 50%, #4B0082 75%, #2D1B69 100%)
+              `,
+              boxShadow: `
+                inset 0 0 100px rgba(139, 92, 246, 0.1),
+                inset 0 0 50px rgba(45, 27, 105, 0.3),
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 10px 20px rgba(45, 27, 105, 0.2)
+              `,
+              filter: 'blur(0.5px)',
+              transform: 'perspective(800px) rotateX(15deg)',
+            }}
+          />
+
+          {/* Fabric texture overlay */}
+          <div
+            className='absolute w-full max-w-5xl h-96 rounded-3xl opacity-30'
+            style={{
+              background: `
+                repeating-linear-gradient(
+                  45deg,
+                  transparent,
+                  transparent 2px,
+                  rgba(255, 255, 255, 0.03) 2px,
+                  rgba(255, 255, 255, 0.03) 4px
+                ),
+                repeating-linear-gradient(
+                  -45deg,
+                  transparent,
+                  transparent 2px,
+                  rgba(255, 255, 255, 0.02) 2px,
+                  rgba(255, 255, 255, 0.02) 4px
+                )
+              `,
+              transform: 'perspective(800px) rotateX(15deg)',
+            }}
+          />
+        </div>
+
         <div
           ref={containerRef}
-          className='relative w-full h-full flex items-center justify-center'
+          className='relative w-full h-full flex items-center justify-center z-10'
           style={{ perspective: '1000px' }}
         >
           {directions.map((direction, index) => (
@@ -825,10 +881,10 @@ const DirectionSelectionStep: React.FC<{
                 <div className='relative z-10 h-full flex flex-col p-2 sm:p-3 md:p-4'>
                   {/* Card Header */}
                   <div className='text-center mb-2 sm:mb-3 md:mb-4'>
-                    <div className='text-[10px] sm:text-xs font-mono text-cyan-400 mb-1 tracking-wider'>
+                    <div className='text-xs sm:text-sm font-mono text-cyan-400 mb-1 tracking-wider font-bold'>
                       ARCHETYPE_{String(index + 1).padStart(2, '0')}
                     </div>
-                    <div className='h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent mb-1 sm:mb-2' />
+                    <div className='h-px bg-gradient-to-r from-transparent via-cyan-500/70 to-transparent mb-1 sm:mb-2' />
                   </div>
 
                   {/* Central Symbol */}
@@ -855,26 +911,26 @@ const DirectionSelectionStep: React.FC<{
 
                   {/* Card Footer */}
                   <div className='text-center'>
-                    <div className='h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent mb-1 sm:mb-2' />
+                    <div className='h-px bg-gradient-to-r from-transparent via-cyan-500/70 to-transparent mb-1 sm:mb-2' />
                     <h3
-                      className={`text-xs sm:text-sm md:text-base font-bold ${direction.color} font-mono tracking-wide mb-1 sm:mb-2`}
+                      className={`text-sm sm:text-base md:text-lg font-bold ${direction.color} font-mono tracking-wide mb-2 sm:mb-3 drop-shadow-lg`}
                     >
                       {direction.name.toUpperCase()}
                     </h3>
-                    <p className='text-gray-400 text-[10px] sm:text-xs leading-tight px-1 mb-1 sm:mb-2 font-mono'>
+                    <p className='text-gray-300 text-xs sm:text-sm leading-relaxed px-1 mb-2 sm:mb-3 font-mono'>
                       {direction.description}
                     </p>
 
                     {/* Cyberpunk Keywords */}
-                    <div className='flex flex-wrap gap-1 justify-center'>
+                    <div className='flex flex-wrap gap-1 sm:gap-2 justify-center'>
                       {direction.keywords.slice(0, 2).map((keyword, keyIndex) => (
                         <span
                           key={keyword}
                           className={`
-                            px-1 sm:px-2 py-0.5 sm:py-1 text-[9px] sm:text-xs font-mono
-                            bg-gray-900/80 text-gray-400 border border-gray-700/50
-                            transition-all duration-300
-                            ${hoveredCard === direction.id ? 'border-cyan-500/50 text-cyan-300' : ''}
+                            px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-mono font-medium
+                            bg-gray-900/90 text-gray-300 border border-gray-600/70
+                            transition-all duration-300 rounded-sm
+                            ${hoveredCard === direction.id ? 'border-cyan-500/70 text-cyan-200 bg-cyan-900/20' : ''}
                           `}
                           style={{
                             clipPath: 'polygon(0 0, calc(100% - 4px) 0, 100% 100%, 4px 100%)',
@@ -918,7 +974,7 @@ const DirectionSelectionStep: React.FC<{
       </div>
 
       {/* Cyberpunk Status Display */}
-      <div className='text-center mt-8 z-10'>
+      <div className='text-center mt-6 md:mt-8 z-10 flex-shrink-0'>
         <div className='text-xs font-mono text-gray-500'>
           [STATUS] {selectedCard ? 'ARCHETYPE_LOCKED' : 'AWAITING_SELECTION'} | NEURAL_SYNC:{' '}
           {hoveredCard ? 'ACTIVE' : 'STANDBY'}
@@ -970,6 +1026,39 @@ const DirectionSelectionStep: React.FC<{
 
         .cyberpunk-card:hover::before {
           opacity: 1;
+        }
+
+        /* Velvet table surface animations */
+        .velvet-table-surface {
+          animation: velvet-breathe 8s ease-in-out infinite;
+        }
+
+        @keyframes velvet-breathe {
+          0%, 100% {
+            transform: perspective(800px) rotateX(15deg) scale(1);
+            filter: blur(0.5px) brightness(1);
+          }
+          50% {
+            transform: perspective(800px) rotateX(15deg) scale(1.02);
+            filter: blur(0.3px) brightness(1.1);
+          }
+        }
+
+        /* Subtle cloth deformation on hover */
+        .cyberpunk-card:hover ~ .velvet-table-surface {
+          animation: cloth-deform 0.6s ease-out;
+        }
+
+        @keyframes cloth-deform {
+          0% {
+            transform: perspective(800px) rotateX(15deg) scale(1);
+          }
+          30% {
+            transform: perspective(800px) rotateX(15deg) scale(1.01) translateY(-2px);
+          }
+          100% {
+            transform: perspective(800px) rotateX(15deg) scale(1);
+          }
         }
 
         /* Responsive adjustments */

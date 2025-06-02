@@ -65,7 +65,9 @@ export default function Home() {
     }
   }, [
     onboardingFlow.isLoaded,
-    onboardingFlow.shouldSkipOnboarding,
+    onboardingFlow.isProfileValid, // Use the actual dependency instead of the function
+    onboardingFlow.profile,
+    onboardingFlow.onboardingProgress,
     bootComplete,
     dataCollectionComplete,
   ]);
@@ -145,27 +147,17 @@ export default function Home() {
       partialData
     );
     return (
-      <>
-        {/* Debug Info */}
-        <div className='fixed top-4 right-4 z-50 bg-black/80 text-cyan-400 p-2 rounded text-xs font-mono'>
-          <div>Step: {initialStep}</div>
-          <div>Cache: {onboardingFlow.profile ? 'YES' : 'NO'}</div>
-          <div>Progress: {onboardingFlow.onboardingProgress ? 'YES' : 'NO'}</div>
-          <div className='text-yellow-400 mt-1'>Ctrl+Shift+C to clear cache</div>
-        </div>
-
-        <IntegratedConsciousnessOnboarding
-          onProfileComplete={handleProfileComplete}
-          onStepChange={(step, total, stepName, data) => {
-            // Save progress incrementally
-            if (stepName && data) {
-              handleStepProgress(step, total, stepName, data);
-            }
-          }}
-          initialStep={initialStep}
-          initialData={partialData}
-        />
-      </>
+      <IntegratedConsciousnessOnboarding
+        onProfileComplete={handleProfileComplete}
+        onStepChange={(step, total, stepName, data) => {
+          // Save progress incrementally
+          if (stepName && data) {
+            handleStepProgress(step, total, stepName, data);
+          }
+        }}
+        initialStep={initialStep}
+        initialData={partialData}
+      />
     );
   }
 

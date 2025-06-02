@@ -242,7 +242,7 @@ export class PlatonicSolidGenerator {
       edges,
       center: new Vector3(0, 0, 0),
       radius: radius * modulation,
-      dualSolid: PlatonicSolidGenerator.icosahedron(radius, consciousness),
+      // Removed dualSolid to prevent infinite recursion
     };
   }
 
@@ -310,7 +310,7 @@ export class PlatonicSolidGenerator {
       edges,
       center: new Vector3(0, 0, 0),
       radius: radius * modulation,
-      dualSolid: PlatonicSolidGenerator.dodecahedron(radius, consciousness),
+      // Removed dualSolid to prevent infinite recursion
     };
   }
 }
